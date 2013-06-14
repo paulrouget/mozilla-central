@@ -1353,6 +1353,9 @@ ContainerState::CreateOrRecycleThebesLayer(const nsIFrame* aActiveScrolledRoot,
     // Mark this layer as being used for Thebes-painting display items
     data = new ThebesDisplayItemLayerUserData();
     layer->SetUserData(&gThebesDisplayItemLayerUserData, data);
+
+    layer->SetLayerFlashing(mContainerFrame->PresContext()->GetLayerFlashing());
+
     ResetScrollPositionForLayerPixelAlignment(aActiveScrolledRoot);
 #ifndef MOZ_ANDROID_OMTC
     didResetScrollPositionForLayerPixelAlignment = true;

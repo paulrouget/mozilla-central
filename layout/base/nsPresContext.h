@@ -1005,6 +1005,9 @@ public:
     mExistThrottledUpdates = aExistThrottledUpdates;
   }
 
+  void SetLayerFlashing(bool aValue) { mLayerFlashing = aValue; }
+  bool GetLayerFlashing() { return mLayerFlashing; }
+
 protected:
   friend class nsRunnableMethod<nsPresContext>;
   NS_HIDDEN_(void) ThemeChangedInternal();
@@ -1297,6 +1300,8 @@ protected:
   // value the slow way.
   mutable unsigned      mIsChromeIsCached : 1;
   mutable unsigned      mIsChrome : 1;
+
+  bool                  mLayerFlashing;
 
 #ifdef DEBUG
   bool                  mInitialized;

@@ -179,7 +179,8 @@ Layer::Layer(LayerManager* aManager, void* aImplData) :
   mIsFixedPosition(false),
   mMargins(0, 0, 0, 0),
   mDebugColorIndex(0),
-  mAnimationGeneration(0)
+  mAnimationGeneration(0),
+  mLayerFlashing(false)
 {}
 
 Layer::~Layer()

@@ -3369,6 +3369,27 @@ nsDOMWindowUtils::GetPaintFlashing(bool* aRetVal)
 }
 
 NS_IMETHODIMP
+nsDOMWindowUtils::SetLayerFlashing(bool aLayerFlashing)
+{
+  nsPresContext* presContext = GetPresContext();
+  if (presContext) {
+    presContext->SetLayerFlashing(aLayerFlashing);
+  }
+  return NS_OK;
+}
+
+NS_IMETHODIMP
+nsDOMWindowUtils::GetLayerFlashing(bool* aRetVal)
+{
+  *aRetVal = false;
+  nsPresContext* presContext = GetPresContext();
+  if (presContext) {
+    *aRetVal  = presContext->GetLayerFlashing();
+  }
+  return NS_OK;
+}
+
+NS_IMETHODIMP
 nsDOMWindowUtils::DispatchEventToChromeOnly(nsIDOMEventTarget* aTarget,
                                             nsIDOMEvent* aEvent,
                                             bool* aRetVal)

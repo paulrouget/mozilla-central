@@ -1020,6 +1020,8 @@ nsPresContext::Init(nsDeviceContext* aDeviceContext)
   mInitialized = true;
 #endif
 
+  mLayerFlashing = false;
+
   mBorderWidthTable[NS_STYLE_BORDER_WIDTH_THIN] = CSSPixelsToAppUnits(1);
   mBorderWidthTable[NS_STYLE_BORDER_WIDTH_MEDIUM] = CSSPixelsToAppUnits(3);
   mBorderWidthTable[NS_STYLE_BORDER_WIDTH_THICK] = CSSPixelsToAppUnits(5);

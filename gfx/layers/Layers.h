@@ -1156,6 +1156,9 @@ public:
 
   virtual LayerRenderState GetRenderState() { return LayerRenderState(); }
 
+  void SetLayerFlashing(bool aValue) { mLayerFlashing = aValue; }
+  bool GetLayerFlashing() { return mLayerFlashing; }
+
 protected:
   Layer(LayerManager* aManager, void* aImplData);
 
@@ -1253,6 +1256,8 @@ protected:
   // If this layer is used for OMTA, then this counter is used to ensure we
   // stay in sync with the animation manager
   uint64_t mAnimationGeneration;
+
+  bool mLayerFlashing;
 };
 
 /**
