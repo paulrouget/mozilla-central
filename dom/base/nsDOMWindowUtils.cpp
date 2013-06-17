@@ -41,6 +41,7 @@
 #include "nsIDOMHTMLCanvasElement.h"
 #include "gfxContext.h"
 #include "gfxImageSurface.h"
+#include "gfxPlatform.h"
 #include "nsLayoutUtils.h"
 #include "nsComputedDOMStyle.h"
 #include "nsIPresShell.h"
@@ -3371,10 +3372,27 @@ nsDOMWindowUtils::GetPaintFlashing(bool* aRetVal)
 NS_IMETHODIMP
 nsDOMWindowUtils::SetLayerFlashing(bool aLayerFlashing)
 {
+  bool canFlashLayers;
+  this->GetCanFlashLayers(&canFlashLayers);
+  if (aLayerFlashing && !canFlashLayers) {
+    return NS_ERROR_FAILURE;
+  }
+
   nsPresContext* presContext = GetPresContext();
   if (presContext) {
     presContext->SetLayerFlashing(aLayerFlashing);
   }
+  return NS_OK;
+}
+
+NS_IMETHODIMP
+nsDOMWindowUtils::GetCanFlashLayers(bool* aRetVal)
+{
+#ifdef MOZ_WIDGET_GONK
+  *aRetVal = true;
+#else
+  *aRetVal = gfxPlatform::OffMainThreadCompositingEnabled();
+#endif
   return NS_OK;
 }
 

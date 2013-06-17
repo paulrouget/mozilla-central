@@ -1393,6 +1393,7 @@ interface nsIDOMWindowUtils : nsISupports {
     * Setting layerFlashing to true will outine graphics layers.
     */
    attribute boolean layerFlashing;
+   readonly attribute boolean canFlashLayers;
 
    /**
     * Allows running of a "synchronous section", in the form of an nsIRunnable
