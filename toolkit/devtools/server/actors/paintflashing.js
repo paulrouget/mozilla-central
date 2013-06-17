@@ -40,8 +40,10 @@ var PaintFlashingActor = protocol.ActorClass({
   setPaintFlashing: method(function(value) {
     this.DOMUtils.paintFlashing = value;
   }, {
-    request: { value: Arg(0) },
-    response: {}
+    request: {},
+    response: {
+      value: RetVal("boolean")
+    }
   })
 });
 
