@@ -59,7 +59,7 @@
   background-color: hsla(206,37%,4%,.4);
 }
 
-#command-button-paintflashing {
+#command-button-layerdiag {
   list-style-image: url("chrome://browser/skin/devtools/command-paintflashing.png");
   -moz-image-region: rect(0px, 16px, 16px, 0px);
 }

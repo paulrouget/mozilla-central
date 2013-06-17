@@ -17,6 +17,8 @@ Object.defineProperty(exports, "TargetFactory", {
   get: () => require("devtools/framework/target").TargetFactory
 });
 
+require("devtools/layerdiagnostic/main");
+
 loader.lazyGetter(this, "osString", () => Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS);
 
 // Panels
