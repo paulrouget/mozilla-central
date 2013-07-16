@@ -3108,7 +3108,7 @@ nsDocument::ElementFromPointHelper(float aX, float aY,
                                    bool aFlushLayout)
 {
   // As per the the spec, we return null if either coord is negative
-  if (!aIgnoreRootScrollFrame && (aX < 0 || aY < 0)) {
+  if (!(aIgnoreRootScrollFrame) && (aX < 0 || aY < 0)) {
     return nullptr;
   }
 
@@ -3134,6 +3134,7 @@ nsDocument::ElementFromPointHelper(float aX, float aY,
 
   nsIFrame *ptFrame = nsLayoutUtils::GetFrameForPoint(rootFrame, pt, true,
                                                       aIgnoreRootScrollFrame);
+
   if (!ptFrame) {
     return nullptr;
   }
@@ -3149,8 +3150,7 @@ nsresult
 nsDocument::NodesFromRectHelper(float aX, float aY,
                                 float aTopSize, float aRightSize,
                                 float aBottomSize, float aLeftSize,
-                                bool aIgnoreRootScrollFrame,
-                                bool aFlushLayout,
+                                uint32_t aFlags,
                                 nsIDOMNodeList** aReturn)
 {
   NS_ENSURE_ARG_POINTER(aReturn);
@@ -3161,7 +3161,8 @@ nsDocument::NodesFromRectHelper(float aX, float aY,
 
   // Following the same behavior of elementFromPoint,
   // we don't return anything if either coord is negative
-  if (!aIgnoreRootScrollFrame && (aX < 0 || aY < 0))
+  if (!(aFlags & nsLayoutUtils::IGNORE_ROOT_SCROLL_FRAME)
+      && (aX < 0 || aY < 0))
     return NS_OK;
 
   nscoord x = nsPresContext::CSSPixelsToAppUnits(aX - aLeftSize);
@@ -3173,7 +3174,7 @@ nsDocument::NodesFromRectHelper(float aX, float aY,
 
   // Make sure the layout information we get is up-to-date, and
   // ensure we get a root frame (for everything but XUL)
-  if (aFlushLayout) {
+  if (aFlags & nsLayoutUtils::FLUSH_LAYOUT) {
     FlushPendingNotifications(Flush_Layout);
   }
 
@@ -3186,8 +3187,8 @@ nsDocument::NodesFromRectHelper(float aX, float aY,
     return NS_OK; // return nothing to premature XUL callers as a reminder to wait
 
   nsAutoTArray<nsIFrame*,8> outFrames;
-  nsLayoutUtils::GetFramesForArea(rootFrame, rect, outFrames,
-                                  true, aIgnoreRootScrollFrame);
+  aFlags |= nsLayoutUtils::IGNORE_SUPPRESSION;
+  nsLayoutUtils::GetFramesForArea(rootFrame, rect, outFrames, aFlags);
 
   // Used to filter out repeated elements in sequence.
   nsIContent* lastAdded = nullptr;

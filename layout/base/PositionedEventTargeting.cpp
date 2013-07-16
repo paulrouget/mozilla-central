@@ -271,7 +271,7 @@ FindFrameTargetedByInputEvent(const nsGUIEvent *aEvent,
   nsRect targetRect = GetTargetRect(aRootFrame, aPointRelativeToRootFrame, prefs);
   nsAutoTArray<nsIFrame*,8> candidates;
   nsresult rv = nsLayoutUtils::GetFramesForArea(aRootFrame, targetRect, candidates,
-                                                false, ignoreRootScrollFrame);
+                  ignoreRootScrollFrame ? nsLayoutUtils::IGNORE_ROOT_SCROLL_FRAME : 0);
   if (NS_FAILED(rv)) {
     return target;
   }

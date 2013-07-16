@@ -1288,20 +1288,24 @@ nsDOMWindowUtils::ElementFromPoint(float aX, float aY,
   nsCOMPtr<nsIDocument> doc = window->GetExtantDoc();
   NS_ENSURE_STATE(doc);
 
-  Element* el =
-    doc->ElementFromPointHelper(aX, aY, aIgnoreRootScrollFrame, aFlushLayout);
+  uint32_t flags = 0;
+  if (aIgnoreRootScrollFrame)
+    flags |= nsIDOMWindowUtils::IGNORE_ROOT_SCROLL_FRAME;
+  if (aFlushLayout)
+    flags |= nsIDOMWindowUtils::FLUSH_LAYOUT;
+
+  Element* el = doc->ElementFromPointHelper(aX, aY, aIgnoreRootScrollFrame, aFlushLayout);
   nsCOMPtr<nsIDOMElement> retval = do_QueryInterface(el);
   retval.forget(aReturn);
   return NS_OK;
 }
 
 NS_IMETHODIMP
-nsDOMWindowUtils::NodesFromRect(float aX, float aY,
-                                float aTopSize, float aRightSize,
-                                float aBottomSize, float aLeftSize,
-                                bool aIgnoreRootScrollFrame,
-                                bool aFlushLayout,
-                                nsIDOMNodeList** aReturn)
+nsDOMWindowUtils::NodesFromRectWithFlags(float aX, float aY,
+                                         float aTopSize, float aRightSize,
+                                         float aBottomSize, float aLeftSize,
+                                         uint32_t aFlags,
+                                         nsIDOMNodeList** aReturn)
 {
   if (!nsContentUtils::IsCallerChrome()) {
     return NS_ERROR_DOM_SECURITY_ERR;
@@ -1313,8 +1317,29 @@ nsDOMWindowUtils::NodesFromRect(float aX, float aY,
   nsCOMPtr<nsIDocument> doc = window->GetExtantDoc();
   NS_ENSURE_STATE(doc);
 
-  return doc->NodesFromRectHelper(aX, aY, aTopSize, aRightSize, aBottomSize, aLeftSize, 
-                                  aIgnoreRootScrollFrame, aFlushLayout, aReturn);
+  return doc->NodesFromRectHelper(aX, aY, aTopSize, aRightSize, aBottomSize,
+                                  aLeftSize, aFlags, aReturn);
+}
+
+NS_IMETHODIMP
+nsDOMWindowUtils::NodesFromRect(float aX, float aY,
+                                float aTopSize, float aRightSize,
+                                float aBottomSize, float aLeftSize,
+                                bool aIgnoreRootScrollFrame,
+                                bool aFlushLayout,
+                                nsIDOMNodeList** aReturn)
+{
+  uint32_t flags = 0;
+
+  if (aIgnoreRootScrollFrame)
+    flags |= nsIDOMWindowUtils::IGNORE_ROOT_SCROLL_FRAME;
+
+  if (aFlushLayout)
+    flags |= nsIDOMWindowUtils::FLUSH_LAYOUT;
+
+  return NodesFromRectWithFlags(aX, aY, aTopSize, aRightSize,
+                                aBottomSize, aLeftSize, flags,
+                                aReturn);
 }
 
 static already_AddRefed<gfxImageSurface>

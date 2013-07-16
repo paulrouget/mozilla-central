@@ -1362,8 +1362,7 @@ public:
   virtual nsresult NodesFromRectHelper(float aX, float aY,
                                        float aTopSize, float aRightSize,
                                        float aBottomSize, float aLeftSize,
-                                       bool aIgnoreRootScrollFrame,
-                                       bool aFlushLayout,
+                                       uint32_t aFlags,
                                        nsIDOMNodeList** aReturn) = 0;
 
   /**

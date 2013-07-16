@@ -1793,8 +1793,15 @@ nsLayoutUtils::GetFrameForPoint(nsIFrame* aFrame, nsPoint aPt,
   PROFILER_LABEL("nsLayoutUtils", "GetFrameForPoint");
   nsresult rv;
   nsAutoTArray<nsIFrame*,8> outFrames;
-  rv = GetFramesForArea(aFrame, nsRect(aPt, nsSize(1, 1)), outFrames,
-                        aShouldIgnoreSuppression, aIgnoreRootScrollFrame);
+
+  uint32_t flags = 0;
+
+  if (aIgnoreRootScrollFrame)
+    flags |= nsLayoutUtils::IGNORE_ROOT_SCROLL_FRAME;
+  if (aShouldIgnoreSuppression)
+    flags |= nsLayoutUtils::IGNORE_SUPPRESSION;
+
+  rv = GetFramesForArea(aFrame, nsRect(aPt, nsSize(1, 1)), outFrames, flags);
   NS_ENSURE_SUCCESS(rv, nullptr);
   return outFrames.Length() ? outFrames.ElementAt(0) : nullptr;
 }
@@ -1802,8 +1809,7 @@ nsLayoutUtils::GetFrameForPoint(nsIFrame* aFrame, nsPoint aPt,
 nsresult
 nsLayoutUtils::GetFramesForArea(nsIFrame* aFrame, const nsRect& aRect,
                                 nsTArray<nsIFrame*> &aOutFrames,
-                                bool aShouldIgnoreSuppression,
-                                bool aIgnoreRootScrollFrame)
+                                uint32_t aFlags)
 {
   PROFILER_LABEL("nsLayoutUtils","GetFramesForArea");
   nsDisplayListBuilder builder(aFrame, nsDisplayListBuilder::EVENT_DELIVERY,
@@ -1811,11 +1817,11 @@ nsLayoutUtils::GetFramesForArea(nsIFrame* aFrame, const nsRect& aRect,
   nsDisplayList list;
   nsRect target(aRect);
 
-  if (aShouldIgnoreSuppression) {
+  if (aFlags & nsLayoutUtils::IGNORE_SUPPRESSION) {
     builder.IgnorePaintSuppression();
   }
 
-  if (aIgnoreRootScrollFrame) {
+  if (aFlags & nsLayoutUtils::IGNORE_ROOT_SCROLL_FRAME) {
     nsIFrame* rootScrollFrame =
       aFrame->PresContext()->PresShell()->GetRootScrollFrame();
     if (rootScrollFrame) {
@@ -1834,7 +1840,7 @@ nsLayoutUtils::GetFramesForArea(nsIFrame* aFrame, const nsRect& aRect,
   }
 #endif
 
-  nsDisplayItem::HitTestState hitTestState;
+  nsDisplayItem::HitTestState hitTestState(NULL, aFlags & IGNORE_MOUSE_THROUGH);
   list.HitTest(&builder, target, &hitTestState, &aOutFrames);
   list.DeleteAll();
   return NS_OK;

@@ -553,8 +553,13 @@ public:
    */
   static nsresult GetFramesForArea(nsIFrame* aFrame, const nsRect& aRect,
                                    nsTArray<nsIFrame*> &aOutFrames,
-                                   bool aShouldIgnoreSuppression = false,
-                                   bool aIgnoreRootScrollFrame = false);
+                                   uint32_t aFlags);
+  enum {
+    IGNORE_ROOT_SCROLL_FRAME = 0x01,
+    FLUSH_LAYOUT = 0x02,
+    IGNORE_SUPPRESSION = 0x04,
+    IGNORE_MOUSE_THROUGH = 0x08
+  };
 
   /**
    * Transform aRect relative to aAncestor down to the coordinate system of

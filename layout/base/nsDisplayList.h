@@ -777,8 +777,9 @@ public:
   struct HitTestState {
     typedef nsTArray<ViewID> ShadowArray;
 
-    HitTestState(ShadowArray* aShadows = NULL)
-      : mShadows(aShadows) {
+    HitTestState(ShadowArray* aShadows = NULL, bool aIgnoreMouseThrough = false)
+      : mShadows(aShadows),
+        mIgnoreMouseThrough(aIgnoreMouseThrough) {
     }
 
     ~HitTestState() {
@@ -792,6 +793,10 @@ public:
     // process. Display items may append IDs into this array if it is
     // non-null.
     ShadowArray* mShadows;
+
+    // Whether 'pointer-events:none' and 'mousethrough' properties should
+    // be ignored.
+    bool mIgnoreMouseThrough;
   };
 
   /**

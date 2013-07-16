@@ -581,6 +581,7 @@ interface nsIDOMWindowUtils : nsISupports {
                                  in boolean aIgnoreRootScrollFrame,
                                  in boolean aFlushLayout);
 
+
   /**
    * Retrieve all nodes that intersect a rect in the window's document.
    *
@@ -603,6 +604,19 @@ interface nsIDOMWindowUtils : nsISupports {
                                in float aLeftSize,
                                in boolean aIgnoreRootScrollFrame,
                                in boolean aFlushLayout);
+
+  const uint32_t IGNORE_ROOT_SCROLL_FRAME = 0x01;
+  const uint32_t FLUSH_LAYOUT = 0x02;
+  const uint32_t IGNORE_SUPPRESSION = 0x04;
+  const uint32_t IGNORE_MOUSE_THROUGH = 0x08;
+
+  nsIDOMNodeList nodesFromRectWithFlags(in float aX,
+                                        in float aY,
+                                        in float aTopSize,
+                                        in float aRightSize,
+                                        in float aBottomSize,
+                                        in float aLeftSize,
+                                        in uint32_t aFlags);
 
   /**
    * Compare the two canvases, returning the number of differing pixels and
