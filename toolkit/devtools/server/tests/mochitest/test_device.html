@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html>
+<!--
+https://bugzilla.mozilla.org/show_bug.cgi?id=
+-->
+<head>
+  <meta charset="utf-8">
+  <title>Mozilla Bug</title>
+  <script type="application/javascript" src="chrome://mochikit/content/tests/SimpleTest/SimpleTest.js"></script>
+  <link rel="stylesheet" type="text/css" href="chrome://mochikit/content/tests/SimpleTest/test.css">
+</head>
+<body>
+<pre id="test">
+<script>
+
+window.onload = function() {
+  var Cu = Components.utils;
+  var Ci = Components.interfaces;
+
+  Cu.import("resource://gre/modules/PermissionsTable.jsm") 
+  Cu.import("resource://gre/modules/devtools/Loader.jsm");
+  Cu.import("resource://gre/modules/devtools/dbg-client.jsm");
+  Cu.import("resource://gre/modules/devtools/dbg-server.jsm");
+  Cu.import("resource://gre/modules/Services.jsm");
+
+  SimpleTest.waitForExplicitFinish();
+
+  var {DeviceFront} = devtools.require("devtools/server/actors/device");
+
+  DebuggerServer.init(function () { return true; });
+  DebuggerServer.addBrowserActors();
+
+  var client= new DebuggerClient(DebuggerServer.connectPipe());
+  client.connect(function onConnect() {
+    client.listTabs(function onListTabs(aResponse) {
+      var d = DeviceFront(client, aResponse);
+
+      var desc, permissions;
+
+      d.getDescription().then((v) => desc = v)
+      .then(() => d.getPermissionsTable())
+      .then((json) => permissions = json)
+      .then(checkValues);
+
+      var utils = window.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils);
+
+      function checkValues() {
+        is(desc.width, window.screen.width, "getWidth valid");
+        is(desc.height, window.screen.height, "getHeight valid");
+        is(desc.dpi, utils.displayDPI, "getDPI valid");
+        is(desc.name, Services.appinfo.name, "getName valid");
+        is(desc.geckoVersion, Services.appinfo.platformVersion, "getGeckoVersion valid");
+        is(desc.channel, Services.prefs.getCharPref('app.update.channel'), "getChannel valid");
+        is(desc.version, Services.appinfo.version, "getVersion valid");
+
+        var a = JSON.stringify(PermissionsTable);
+        var b = JSON.stringify(permissions.permissionsTable);
+
+        is(a, b, "Permissions Tables is valid");
+
+        client.close(() => SimpleTest.finish());
+      }
+
+    });
+  });
+
+}
+</script>
+</pre>
+</body>
+</html>
