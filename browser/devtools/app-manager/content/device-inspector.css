@@ -1,0 +1,125 @@
+html, body {
+  height: 100%;
+}
+
+template {
+  display: none;
+}
+
+#device-inspector {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+#banners-and-logs {
+  display: flex;
+  min-height: 100px;
+}
+
+#collapsable-content {
+  display: flex;
+  max-height: 0;
+  overflow: hidden;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+body.expanded #collapsable-content {
+  max-height: 100%;
+}
+
+#logs {
+  display: flex;
+  width: 40%;
+}
+
+.banner {
+  display: none;
+  width: 60%;
+}
+
+#device-inspector[status="connected"]     #banner-connected,
+#device-inspector[status="connecting"]    #banner-connecting,
+#device-inspector[status="disconnected"]  #banner-disconnected,
+#device-inspector[status="disconnecting"] #banner-disconnecting {
+  display: flex;
+}
+
+body.edit-connection .banner {
+  display: none !important;
+}
+
+body.edit-connection #banner-editing {
+  display: flex !important;
+}
+
+#logs > pre {
+  overflow: auto;
+  width: 100%;
+}
+
+.banner-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+#banner-connected > .banner-box {
+  width: calc(100%/3);
+  align-items: center;
+}
+
+#content {
+  display: flex;
+  flex-direction: column;
+}
+
+.meta {
+  flex-shrink: 0;
+  display: flex;
+}
+
+.meta > details {
+  flex-grow: 1;
+  text-align: right;
+}
+
+#tabs-headers {
+  flex-shrink: 0;
+  display: flex;
+}
+
+#tabs {
+  overflow: auto;
+  flex-shrink: 1;
+  flex-grow: 1;
+}
+
+.tab {
+  display: block;
+  width: calc(100%/3);
+  text-align: center;
+  flex-grow: 1;
+}
+
+.tabpanel {
+  height: 0;
+  overflow: hidden;
+}
+
+.tabpanel.selected {
+  height: auto;
+}
+
+#battery[status="discharging"] > .charging,
+#battery[status="charging"] > .discharging {
+  display: none;
+}
+
+.app {
+  display: flex;
+  align-items: center;
+}

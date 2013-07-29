@@ -90,8 +90,11 @@ EventEmitter.decorate(ConnectionsManager);
 
 exports.ConnectionsManager = ConnectionsManager;
 
+let lastID = -1;
+
 function Connection(host, port) {
   EventEmitter.decorate(this);
+  this.uid = ++lastID;
   this.host = host;
   this.port = port;
   this._setStatus(this.DISCONNECTED);
