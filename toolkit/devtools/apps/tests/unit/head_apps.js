@@ -88,6 +88,8 @@ function setup() {
   // as only launchable apps are returned
   Components.utils.import('resource://gre/modules/Webapps.jsm');
   DOMApplicationRegistry.allAppsLaunchable = true;
+
+  Services.prefs.setBoolPref("devtools.debugger.enable-content-actors", true);
 }
 
 function do_get_webappsdir() {
