@@ -182,11 +182,13 @@ DevTools.prototype = {
    *        The id of the tool to show
    * @param {Toolbox.HostType} hostType
    *        The type of host (bottom, window, side)
+   * @param {Number} cid
+   *        Connection uid, if a connection is used (will show the connection footer)
    *
    * @return {Toolbox} toolbox
    *        The toolbox that was opened
    */
-  showToolbox: function(target, toolId, hostType) {
+  showToolbox: function(target, toolId, hostType, cid = null) {
     let deferred = promise.defer();
 
     let toolbox = this._toolboxes.get(target);
@@ -209,7 +211,7 @@ DevTools.prototype = {
     }
     else {
       // No toolbox for target, create one
-      toolbox = new devtools.Toolbox(target, toolId, hostType);
+      toolbox = new devtools.Toolbox(target, toolId, hostType, cid);
 
       this._toolboxes.set(target, toolbox);
 

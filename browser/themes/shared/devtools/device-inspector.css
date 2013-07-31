@@ -55,10 +55,6 @@ hr {
   padding: 10px 20px;
 }
 
-#collapsable-content {
-  transition: max-height 200ms ease;
-}
-
 #content {
   padding-top: 20px;
   background: white;

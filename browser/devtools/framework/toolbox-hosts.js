@@ -192,7 +192,8 @@ SidebarHost.prototype = {
 /**
  * Host object for the toolbox in a separate window
  */
-function WindowHost() {
+function WindowHost(hostTab, cid) {
+  this.cid = cid;
   this._boundUnload = this._boundUnload.bind(this);
 
   EventEmitter.decorate(this);
@@ -209,8 +210,13 @@ WindowHost.prototype = {
   create: function WH_create() {
     let deferred = promise.defer();
 
+    let args = "";
+    if (Number.isInteger(this.cid)) {
+      args = "#cid=" + this.cid;
+    }
+
     let flags = "chrome,centerscreen,resizable,dialog=no";
-    let win = Services.ww.openWindow(null, this.WINDOW_URL, "_blank",
+    let win = Services.ww.openWindow(null, this.WINDOW_URL + args, "_blank",
                                      flags, null);
 
     let frameLoad = function(event) {
