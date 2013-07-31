@@ -125,8 +125,9 @@ let UI = {
 
   openToolbox: function(button) {
     let manifest = button.getAttribute("manifest");
-    this.deviceClient.getTargetForApp(manifest).then((target) => {
-      gDevTools.showToolbox(target, "webconsole", devtools.Toolbox.HostType.WINDOW);
-    });
+    let cid = this.connection.uid;
+    let url = "chrome://browser/content/devtools/app-manager/app-toolbox-host.xhtml";
+    url += "#cid=" + cid + "&url=" + manifest;
+    window.open(url);
   },
 }

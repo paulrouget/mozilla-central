@@ -54,6 +54,7 @@
     locale/browser/devtools/font-inspector.dtd     (%chrome/browser/devtools/font-inspector.dtd)
     locale/browser/devtools/device-inspector.dtd   (%chrome/browser/devtools/device-inspector.dtd)
     locale/browser/devtools/device-inspector.properties (%chrome/browser/devtools/device-inspector.properties)
+    locale/browser/devtools/app-toolbox-host.dtd   (%chrome/browser/devtools/app-toolbox-host.dtd)
     locale/browser/newTab.dtd                      (%chrome/browser/newTab.dtd)
     locale/browser/newTab.properties               (%chrome/browser/newTab.properties)
     locale/browser/openLocation.dtd                (%chrome/browser/openLocation.dtd)

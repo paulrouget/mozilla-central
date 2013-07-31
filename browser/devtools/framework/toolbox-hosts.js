@@ -10,6 +10,7 @@ let promise = require("sdk/core/promise");
 let EventEmitter = require("devtools/shared/event-emitter");
 
 Cu.import("resource://gre/modules/Services.jsm");
+Cu.import("resource:///modules/devtools/DOMHelpers.jsm");
 
 /**
  * A toolbox host represents an object that contains a toolbox (e.g. the
@@ -23,7 +24,8 @@ Cu.import("resource://gre/modules/Services.jsm");
 exports.Hosts = {
   "bottom": BottomHost,
   "side": SidebarHost,
-  "window": WindowHost
+  "window": WindowHost,
+  "iframe": IframeHost
 }
 
 /**
@@ -60,18 +62,15 @@ BottomHost.prototype = {
     this._nbox.appendChild(this._splitter);
     this._nbox.appendChild(this.frame);
 
-    let frameLoad = function() {
-      this.frame.removeEventListener("DOMContentLoaded", frameLoad, true);
-      this.emit("ready", this.frame);
-
-      deferred.resolve(this.frame);
-    }.bind(this);
-
     this.frame.tooltip = "aHTMLTooltip";
-    this.frame.addEventListener("DOMContentLoaded", frameLoad, true);
 
     // we have to load something so we can switch documents if we have to
     this.frame.setAttribute("src", "about:blank");
+    let helper = new DOMHelpers(this.frame.contentWindow);
+    helper.onceWindowFullyLoaded(() => {
+      this.emit("ready", this.frame);
+      deferred.resolve(this.frame);
+    });
 
     focusTab(this.hostTab);
 
@@ -143,16 +142,13 @@ SidebarHost.prototype = {
     this._sidebar.appendChild(this._splitter);
     this._sidebar.appendChild(this.frame);
 
-    let frameLoad = function() {
-      this.frame.removeEventListener("DOMContentLoaded", frameLoad, true);
-      this.emit("ready", this.frame);
-
-      deferred.resolve(this.frame);
-    }.bind(this);
-
-    this.frame.addEventListener("DOMContentLoaded", frameLoad, true);
     this.frame.tooltip = "aHTMLTooltip";
     this.frame.setAttribute("src", "about:blank");
+    let helper = new DOMHelpers(this.frame.contentWindow);
+    helper.onceWindowFullyLoaded(() => {
+      this.emit("ready", this.frame);
+      deferred.resolve(this.frame);
+    });
 
     focusTab(this.hostTab);
 
@@ -271,6 +267,59 @@ WindowHost.prototype = {
     return promise.resolve(null);
   }
 }
+
+/**
+ * Host object for already built iframe.
+ */
+function IframeHost(iframe) {
+  this.frame = iframe;
+  EventEmitter.decorate(this);
+}
+
+IframeHost.prototype = {
+  type: "iframe",
+
+  /**
+   * Create a box in the sidebar of the host tab.
+   */
+  create: function SH_create() {
+    let deferred = promise.defer();
+    this.frame.setAttribute("src", "about:blank");
+    let helper = new DOMHelpers(this.frame.contentWindow);
+    helper.onceWindowFullyLoaded(() => {
+      this.emit("ready", this.frame);
+      deferred.resolve(this.frame);
+    });
+    return deferred.promise;
+  },
+
+  /**
+   * Raise the host.
+   */
+  raise: function SH_raise() {
+    // Nothing to do for this host type.
+  },
+
+  /**
+   * Set the toolbox title.
+   */
+  setTitle: function SH_setTitle(title) {
+    // Nothing to do for this host type.
+  },
+
+  /**
+   * Destroy the sidebar.
+   */
+  destroy: function SH_destroy() {
+    if (!this._destroyed) {
+      this._destroyed = true;
+      this.frame = null;
+    }
+
+    return promise.resolve(null);
+  }
+}
+
 
 /**
  *  Switch to the given tab in a browser and focus the browser window

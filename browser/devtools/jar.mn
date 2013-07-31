@@ -69,4 +69,7 @@ browser.jar:
     content/browser/devtools/app-manager/device-inspector.css          (app-manager/content/device-inspector.css)
     content/browser/devtools/app-manager/device-inspector.js           (app-manager/content/device-inspector.js)
     content/browser/devtools/app-manager/device-inspector.xhtml        (app-manager/content/device-inspector.xhtml)
+    content/browser/devtools/app-manager/app-toolbox-host.css          (app-manager/content/app-toolbox-host.css)
+    content/browser/devtools/app-manager/app-toolbox-host.js           (app-manager/content/app-toolbox-host.js)
+    content/browser/devtools/app-manager/app-toolbox-host.xhtml        (app-manager/content/app-toolbox-host.xhtml)
     content/browser/devtools/app-manager/template.js                   (app-manager/content/template.js)

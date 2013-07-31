@@ -13,6 +13,7 @@ let Telemetry = require("devtools/shared/telemetry");
 Cu.import('resource://gre/modules/XPCOMUtils.jsm');
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource:///modules/devtools/gDevTools.jsm");
+Cu.import("resource:///modules/devtools/DOMHelpers.jsm");
 
 loader.lazyGetter(this, "Hosts", () => require("devtools/framework/toolbox-hosts").Hosts);
 
@@ -55,8 +56,10 @@ XPCOMUtils.defineLazyGetter(this, "Requisition", function() {
  *        Tool to select initially
  * @param {Toolbox.HostType} hostType
  *        Type of host that will host the toolbox (e.g. sidebar, window)
+ * @param {where} iframe
+ *        Where the toolbox should be built. Used by the host.
  */
-function Toolbox(target, selectedTool, hostType) {
+function Toolbox(target, selectedTool, hostType, where) {
   this._target = target;
   this._toolPanels = new Map();
   this._telemetry = new Telemetry();
@@ -79,7 +82,7 @@ function Toolbox(target, selectedTool, hostType) {
   }
   this._defaultToolId = selectedTool;
 
-  this._host = this._createHost(hostType);
+  this._host = this._createHost(hostType, where);
 
   EventEmitter.decorate(this);
 
@@ -100,7 +103,8 @@ exports.Toolbox = Toolbox;
 Toolbox.HostType = {
   BOTTOM: "bottom",
   SIDE: "side",
-  WINDOW: "window"
+  WINDOW: "window",
+  IFRAME: "iframe"
 }
 
 Toolbox.prototype = {
@@ -195,8 +199,6 @@ Toolbox.prototype = {
 
     this._host.create().then(iframe => {
       let domReady = () => {
-        iframe.removeEventListener("DOMContentLoaded", domReady, true);
-
         this.isReady = true;
 
         let closeButton = this.doc.getElementById("toolbox-close");
@@ -217,8 +219,9 @@ Toolbox.prototype = {
         }.bind(this));
       };
 
-      iframe.addEventListener("DOMContentLoaded", domReady, true);
       iframe.setAttribute("src", this._URL);
+      let helper = new DOMHelpers(iframe.contentWindow);
+      helper.onceWindowFullyLoaded(domReady);
     });
 
     return deferred.promise;
@@ -282,15 +285,16 @@ Toolbox.prototype = {
       dockBox.removeChild(dockBox.firstChild);
     }
 
-    if (!this._target.isLocalTab) {
-      return;
-    }
-
     let closeButton = this.doc.getElementById("toolbox-close");
-    if (this.hostType === this.HostType.WINDOW) {
+    if (this.hostType === this.HostType.WINDOW ||
+        this.hostType === this.HostType.IFRAME) {
       closeButton.setAttribute("hidden", "true");
     } else {
       closeButton.removeAttribute("hidden");
+    }
+
+    if (!this._target.isLocalTab) {
+      return;
     }
 
     let sideEnabled = Services.prefs.getBoolPref(this._prefs.SIDE_ENABLED);
@@ -623,15 +627,17 @@ Toolbox.prototype = {
    *
    * @param {string} hostType
    *        The host type of the new host object
+   * @param {where} iframe
+   *        Where the toolbox should be built.
    *
    * @return {Host} host
    *        The created host object
    */
-  _createHost: function TBOX_createHost(hostType) {
+  _createHost: function TBOX_createHost(hostType, where) {
     if (!Hosts[hostType]) {
       throw new Error('Unknown hostType: '+ hostType);
     }
-    let newHost = new Hosts[hostType](this.target.tab);
+    let newHost = new Hosts[hostType](where || this.target.tab);
 
     // clean up the toolbox if its window is closed
     newHost.on("window-closed", this.destroy);
