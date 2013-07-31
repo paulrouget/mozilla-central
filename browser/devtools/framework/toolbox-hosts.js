@@ -23,7 +23,8 @@ Cu.import("resource://gre/modules/Services.jsm");
 exports.Hosts = {
   "bottom": BottomHost,
   "side": SidebarHost,
-  "window": WindowHost
+  "window": WindowHost,
+  "tab": TabHost
 }
 
 /**
@@ -272,6 +273,77 @@ WindowHost.prototype = {
 
       this._window.removeEventListener("unload", this._boundUnload);
       this._window.close();
+    }
+
+    return promise.resolve(null);
+  }
+}
+
+/**
+ * Host object for the toolbox in its own tab
+ */
+function TabHost(hostTab, cid) {
+  this.cid = cid;
+  EventEmitter.decorate(this);
+}
+
+
+TabHost.prototype = {
+  type: "tab",
+
+  WINDOW_URL: "chrome://browser/content/devtools/framework/toolbox-window.xul",
+
+  /**
+   * Create a new xul window to contain the toolbox.
+   */
+  create: function WH_create() {
+    let deferred = promise.defer();
+
+    let args = "";
+    if (Number.isInteger(this.cid)) {
+      args = "#cid=" + this.cid;
+    }
+
+    let gBrowser = Services.wm.getMostRecentWindow("navigator:browser").gBrowser;
+    this.tab = gBrowser.selectedTab = gBrowser.addTab(this.WINDOW_URL + args);
+    let browser = this.tab.linkedBrowser;
+
+    let onLoad = function() {
+      browser.removeEventListener("load", onLoad, true);
+      this.frame = browser.contentWindow.document.getElementById("toolbox-iframe");
+      this.emit("ready", this.frame);
+      deferred.resolve(this.frame);
+    }.bind(this);
+
+    browser.addEventListener("load", onLoad, this);
+
+    return deferred.promise;
+  },
+
+  /**
+   * Raise the host.
+   */
+  raise: function RH_raise() {
+    let gBrowser = this.tab.ownerDocument.defaultView.gBrowser
+    gBrowser.selectedTab = this.tab;
+  },
+
+  /**
+   * Set the toolbox title.
+   */
+  setTitle: function WH_setTitle(title) {
+    this.tab.contentWindow.title = title;
+  },
+
+  /**
+   * Destroy the window.
+   */
+  destroy: function WH_destroy() {
+    if (!this._destroyed) {
+      this._destroyed = true;
+
+      let gBrowser = this.tab.ownerDocument.defaultView.gBrowser
+      gBrowser.removeTab(this.tab);
     }
 
     return promise.resolve(null);

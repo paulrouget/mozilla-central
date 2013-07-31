@@ -13,6 +13,7 @@ let Telemetry = require("devtools/shared/telemetry");
 Cu.import('resource://gre/modules/XPCOMUtils.jsm');
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource:///modules/devtools/gDevTools.jsm");
+Cu.import("resource:///modules/devtools/DOMHelpers.jsm");
 
 loader.lazyGetter(this, "Hosts", () => require("devtools/framework/toolbox-hosts").Hosts);
 
@@ -102,7 +103,8 @@ exports.Toolbox = Toolbox;
 Toolbox.HostType = {
   BOTTOM: "bottom",
   SIDE: "side",
-  WINDOW: "window"
+  WINDOW: "window",
+  TAB: "tab"
 }
 
 Toolbox.prototype = {
@@ -219,8 +221,9 @@ Toolbox.prototype = {
         }.bind(this));
       };
 
-      iframe.addEventListener("DOMContentLoaded", domReady, true);
       iframe.setAttribute("src", this._URL);
+      let domHelper = new DOMHelpers(iframe.contentWindow);
+      domHelper.onceWindowLoaded(domReady);
     });
 
     return deferred.promise;
@@ -285,7 +288,8 @@ Toolbox.prototype = {
     }
 
     let closeButton = this.doc.getElementById("toolbox-close");
-    if (this.hostType === this.HostType.WINDOW) {
+    if (this.hostType === this.HostType.WINDOW ||
+        this.hostType === this.HostType.TAB) {
       closeButton.setAttribute("hidden", "true");
     } else {
       closeButton.removeAttribute("hidden");

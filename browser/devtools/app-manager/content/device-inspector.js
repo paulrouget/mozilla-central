@@ -40,7 +40,7 @@ let UI = {
     this.deviceClient = new DeviceClient(this.connection);
 
     let pre = document.querySelector("#logs > pre");
-    pre.textContent = this.connection.logs;
+    pre.textContent = this.connection.logs + "\n";
     this.connection.on("newlog", (event, str) => {
       pre.textContent += str + "\n";
     });
@@ -141,7 +141,7 @@ let UI = {
   openToolbox: function(button) {
     let manifest = button.getAttribute("manifest");
     this.deviceClient.getTargetForApp(manifest).then((target) => {
-      gDevTools.showToolbox(target, "webconsole", devtools.Toolbox.HostType.WINDOW, this.cid);
+      gDevTools.showToolbox(target, "webconsole", devtools.Toolbox.HostType.TAB, this.cid);
     });
   },
 }
