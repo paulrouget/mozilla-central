@@ -58,6 +58,24 @@ let UI = {
       return this._solvel10n(property, args);
     });
     this.template.start();
+
+    this._sendHeightToParent();
+    this._sendConnectionIDToParent();
+  },
+
+  _sendHeightToParent: function() {
+    let banner = document.querySelector("#banners-and-logs");
+    let height = banner.getBoundingClientRect().height;
+    window.parent.postMessage(JSON.stringify({height:height}), "*");
+  },
+
+  _sendExpandedStatusToParent: function() {
+    let expanded = document.body.classList.contains("expanded");
+    window.parent.postMessage(JSON.stringify({expanded:expanded}), "*");
+  },
+
+  _sendConnectionIDToParent: function() {
+    window.parent.postMessage(JSON.stringify({connection:this.connection.uid}), "*");
   },
 
   _mergeStores: function(stores) {
@@ -116,6 +134,7 @@ let UI = {
 
   toggleDeviceInspector: function() {
     document.body.classList.toggle("expanded");
+    this._sendExpandedStatusToParent();
   },
 
   disconnect: function() {

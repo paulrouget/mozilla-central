@@ -55,8 +55,10 @@ XPCOMUtils.defineLazyGetter(this, "Requisition", function() {
  *        Tool to select initially
  * @param {Toolbox.HostType} hostType
  *        Type of host that will host the toolbox (e.g. sidebar, window)
+ * @param {Number} cid
+ *        Connection uid, if a connection is used (will show the connection footer)
  */
-function Toolbox(target, selectedTool, hostType) {
+function Toolbox(target, selectedTool, hostType, cid) {
   this._target = target;
   this._toolPanels = new Map();
   this._telemetry = new Telemetry();
@@ -79,7 +81,7 @@ function Toolbox(target, selectedTool, hostType) {
   }
   this._defaultToolId = selectedTool;
 
-  this._host = this._createHost(hostType);
+  this._host = this._createHost(hostType, cid);
 
   EventEmitter.decorate(this);
 
@@ -282,15 +284,15 @@ Toolbox.prototype = {
       dockBox.removeChild(dockBox.firstChild);
     }
 
-    if (!this._target.isLocalTab) {
-      return;
-    }
-
     let closeButton = this.doc.getElementById("toolbox-close");
     if (this.hostType === this.HostType.WINDOW) {
       closeButton.setAttribute("hidden", "true");
     } else {
       closeButton.removeAttribute("hidden");
+    }
+
+    if (!this._target.isLocalTab) {
+      return;
     }
 
     let sideEnabled = Services.prefs.getBoolPref(this._prefs.SIDE_ENABLED);
@@ -624,14 +626,17 @@ Toolbox.prototype = {
    * @param {string} hostType
    *        The host type of the new host object
    *
+   * @param {Number} cid
+   *        Connection uid, if a connection is used (will show the connection footer)
+   *
    * @return {Host} host
    *        The created host object
    */
-  _createHost: function TBOX_createHost(hostType) {
+  _createHost: function TBOX_createHost(hostType, cid) {
     if (!Hosts[hostType]) {
       throw new Error('Unknown hostType: '+ hostType);
     }
-    let newHost = new Hosts[hostType](this.target.tab);
+    let newHost = new Hosts[hostType](this.target.tab, cid);
 
     // clean up the toolbox if its window is closed
     newHost.on("window-closed", this.destroy);
