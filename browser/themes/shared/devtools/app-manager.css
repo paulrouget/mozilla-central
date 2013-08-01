@@ -1,0 +1,34 @@
+* {
+  margin: 0;
+  padding: 0;
+  -moz-box-sizing: border-box;
+}
+
+body {
+  color: #333;
+  background-color: white;
+}
+
+body, tbody {
+  font-family: Lucida Grande, Helvetica, Helvetica Neue, sans-serif;
+  line-height: 14px;
+  font-size: 12px;
+}
+
+a {
+  color: #000!important;
+  text-decoration: none;
+  border-bottom: 1px dotted #999
+}
+
+button {
+  background: #EEE;
+  border: 1px solid #999;
+  cursor: pointer;
+}
+
+hr {
+  border: none;
+  border-bottom: 1px dotted #EEE;
+  margin: 20px 0;
+}

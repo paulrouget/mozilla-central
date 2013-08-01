@@ -1,0 +1,22 @@
+html, body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+#main {
+  flex-grow: 1;
+}
+
+#device-inspector-iframe {
+  border-width: 0;
+}
+
+#device-inspector-iframe.expanded {
+  flex-grow: 2;
+}
+
