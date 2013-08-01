@@ -71,3 +71,6 @@ browser.jar:
     content/browser/devtools/app-manager/device-inspector.js           (app-manager/content/device-inspector.js)
     content/browser/devtools/app-manager/device-inspector.xhtml        (app-manager/content/device-inspector.xhtml)
     content/browser/devtools/app-manager/template.js                   (app-manager/content/template.js)
+    content/browser/devtools/app-manager/app-manager.css               (app-manager/content/app-manager.css)
+    content/browser/devtools/app-manager/app-manager.js                (app-manager/content/app-manager.js)
+    content/browser/devtools/app-manager/app-manager.xhtml             (app-manager/content/app-manager.xhtml)
