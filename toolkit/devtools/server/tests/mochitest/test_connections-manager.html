@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html>
+<!--
+https://bugzilla.mozilla.org/show_bug.cgi?id=
+-->
+<head>
+  <meta charset="utf-8">
+  <title>Mozilla Bug</title>
+  <script type="application/javascript" src="chrome://mochikit/content/tests/SimpleTest/SimpleTest.js"></script>
+  <link rel="stylesheet" type="text/css" href="chrome://mochikit/content/tests/SimpleTest/test.css">
+</head>
+<body>
+<pre id="test">
+<script>
+
+window.onload = function() {
+  SimpleTest.waitForExplicitFinish();
+
+  var Cu = Components.utils;
+
+  Cu.import("resource://gre/modules/devtools/dbg-server.jsm");
+  Cu.import("resource://gre/modules/devtools/Loader.jsm");
+
+  DebuggerServer.init(function () { return true; });
+  DebuggerServer.addBrowserActors();
+
+  var {ConnectionsManager} = devtools.require("devtools/client/connections-manager");
+
+
+  var c1 = ConnectionsManager.createConnection();
+  var c2 = ConnectionsManager.createConnection();
+
+  is(ConnectionsManager.getConnections()[0], c1, "Connection 1 registered");
+  is(ConnectionsManager.getConnections()[1], c2, "Connection 2 registered");
+
+  c1.once("destroyed", function() {
+    is(ConnectionsManager.getConnections().length, 1, "Connection 1 destroyed");
+    is(ConnectionsManager.getConnections()[0], c2, "Connection 2 still alive");
+
+    var c = c2;
+
+    var eventsRef = "connecting connected disconnecting disconnected host-changed disconnected destroyed";
+    var events = [];
+
+    is(c.status, c.DISCONNECTED, "disconnected");
+
+    c.once("connecting", function(e) { events.push(e); is(c.status, c.CONNECTING, "connecting"); });
+    c.once("connected", function(e) { events.push(e); is(c.status, c.CONNECTED, "connected"); c.disconnect()});
+    c.once("disconnecting", function(e) { events.push(e); is(c.status, c.DISCONNECTING, "disconnecting"); });
+    c.once("disconnected", function(e) { events.push(e); is(c.status, c.DISCONNECTED, "disconnected"); testError()});
+    c.once("destroyed", function(e) { events.push(e); is(c.status, c.DESTROYED, "destroyed"); finish()});
+
+    c.connect();
+
+    function testStore() {
+      c.store.on("set", function(e,path) {
+        if (path.join(".") == "device.width") {
+          is(c.store.object.device.width, window.screen.width, "Store is fed with valid data");
+          c.disconnect();
+        }
+      });
+    }
+
+    function testError() {
+      c.once("disconnected", function(e) {
+        events.push(e);
+        ConnectionsManager.destroyConnection(c);
+      });
+      c.once("host-changed", function(e) {
+        events.push(e);
+        c.connect();
+      });
+      c.port = 1;
+      c.host = "localhost";
+    }
+
+    function finish() {
+      is(events.join(" "), eventsRef, "Events received in the right order");
+      SimpleTest.finish();
+    }
+
+  });
+
+  ConnectionsManager.destroyConnection(c1);
+
+
+}
+</script>
+</pre>
+</body>
+</html>
