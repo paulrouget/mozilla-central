@@ -59,7 +59,8 @@ let DeviceActor = protocol.ActorClass({
 
   }, {request: {},response: { value: RetVal("json")}}),
 
-  screenshot: method(function() {
+  screenshotToDataURL: method(function() {
+    console.log("screenshotToDataURL");
     let window = Services.wm.getMostRecentWindow("navigator:browser");
     let canvas = window.document.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
     let width = window.innerWidth;
@@ -94,7 +95,29 @@ let DeviceFront = protocol.FrontClass(DeviceActor, {
     this.actorID = form.deviceActor;
     client.addActorPool(this);
     this.manage(this);
-  }
+  },
+
+  screenshotToBlob: function() {
+    let deferred = promise.defer();
+    this.screenshotToDataURL().then(longstr => {
+      longstr.string().then(dataURL => {
+        longstr.release().then(null, console.error);
+        let win = Services.appShell.hiddenDOMWindow;
+        let req = new win.XMLHttpRequest();
+        req.open("GET", dataURL, true);
+        req.responseType = "blob";
+        req.onload = () => {
+          let blob = req.response;
+          deferred.resolve(win.URL.createObjectURL(blob));
+        };
+        req.onerror = () => {
+          return deferred.reject();
+        }
+        req.send();
+      });
+    });
+    return deferred.promise;
+  },
 });
 
 const _knownDeviceFronts = new WeakMap();
