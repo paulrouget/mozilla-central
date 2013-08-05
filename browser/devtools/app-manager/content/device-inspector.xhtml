@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+     - License, v. 2.0. If a copy of the MPL was not distributed with this
+     - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<!DOCTYPE html [
+  <!ENTITY % deviceInspectorDTD SYSTEM "chrome://browser/locale/devtools/device-inspector.dtd" >
+  %deviceInspectorDTD;
+]>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+  <meta charset="utf8"/>
+
+  <link rel="stylesheet" href="device-inspector.css" type="text/css"/>
+  <link rel="stylesheet" href="chrome://browser/skin/devtools/device-inspector.css" type="text/css"/>
+
+  <body onload="UI.init()">
+
+    <div id="device-inspector" template='{"type":"attribute","path":"connection.status","name":"status"}'>
+      <div id="banners-and-logs">
+
+        <!-- Connected -->
+        <div id="banner-connected" class="banner">
+          <div id="status" class="banner-box">
+            <div class="banner-content">
+              <p template='{"type":"localizedContent","property":"connectedToDevice","paths":["device.description.name"]}'></p>
+              <p><a href="#" onclick="UI.disconnect()">&disconnect;</a></p>
+            </div>
+          </div>
+          <div id="summary" class="banner-box">
+            <div class="banner-content">
+              <p><span template='{"type":"localizedContent","property":"appsSummary","paths":["device.apps.all.length","device.apps.running.length","device.permissions.length"]}'></span></p>
+            </div>
+          </div>
+          <div id="expand" class="banner-box">
+            <div class="banner-content">
+              <p><a href="#" onclick="UI.toggleDeviceInspector()">&showDeviceInspector;</a></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disconnected -->
+        <div id="banner-disconnected" class="banner">
+          <div class="banner-box">
+            <div class="banner-content">
+              <p>&notConnected;</p>
+              <p><button onclick="UI.connect()" template='{"type":"localizedContent","property":"connectTo","paths":["connection.host","connection.port"]}'></button>
+                 <a href="#" onclick="UI.editConnectionParameters()">&changeHostAndPort;</a></p>
+              <p><button>&startSimulator;</button></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connecting -->
+        <div id="banner-connecting" class="banner">
+          <div id="status" class="banner-box">
+            <div class="banner-content">
+              <p>&connecting;</p>
+              <p><button onclick="UI.disconnect()">&cancel;</button></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disconnecting -->
+        <div id="banner-disconnecting" class="banner">
+          <div id="status" class="banner-box">
+            <div class="banner-content">
+              <p>&disconnecting;</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Editing -->
+        <div id="banner-editing" class="banner">
+          <div class="banner-box">
+            <div class="banner-content">
+              <p><input class="host"   template='{"type":"attribute","path":"connection.host","name":"value"}'></input>
+                <input class="port" template='{"type":"attribute","path":"connection.port","name":"value"}' type="number"></input></p>
+              <p><button onclick="UI.saveConnectionInfo()">&saveConnectionInfo;</button></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Logs -->
+        <div id="logs">
+          <pre></pre>
+        </div>
+
+      </div>
+
+      <!-- Collapsable content -->
+      <div id="collapsable-content">
+        <div id="content">
+          <div class="meta">
+            <header>
+              <h1>
+                <span template='{"type":"textContent","path":"device.description.name"}'></span>
+                <span template='{"type":"textContent","path":"device.description.version"}'></span>
+                (<span template='{"type":"textContent","path":"device.description.channel"}'></span>)
+              </h1>
+              <h2>
+                <span>Gecko </span>
+                <span template='{"type":"textContent","path":"device.description.geckoVersion"}'></span>
+              </h2>
+            </header>
+            <details>
+              <p><button onclick="UI.screenshot()">&screenshot;</button>  <button>&killall;</button></p>
+              <p template='{"type":"localizedContent","property":"deviceSize", "paths":["device.description.width","device.description.height","device.description.dpi"]}'></p>
+            </details>
+          </div>
+
+          <div id="tabs-headers">
+            <h2 onclick="UI.setTab('apps')" class="tab apps">Installed Apps</h2>
+            <h2 onclick="UI.setTab('permissions')" class="tab permissions">Permissions</h2>
+          </div>
+
+          <div id="tabs">
+            <div class="tabpanel apps" template-loop='{"arrayPath":"device.apps.all","childSelector":"#app-template"}'></div>
+            <div class="tabpanel permissions" template-loop='{"arrayPath":"device.permissions","childSelector":"#permission-template"}'></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </body>
+
+
+  <template id="permission-template">
+    <![CDATA[
+  <div class="permission">
+    <p>
+      <span template='{"type":"textContent","path":"name"}'></span>
+      <span template='{"type":"textContent","path":"app"}'></span>/
+      <span template='{"type":"textContent","path":"privileged"}'></span>/
+      <span template='{"type":"textContent","path":"certified"}'></span>
+    </p>
+  </div>
+  ]]>
+  </template>
+
+  <template id="app-template">
+  <![CDATA[
+  <div class="app" template='{"type":"attribute","path":"running","name":"running"}'>
+    <img class="app-icon" template='{"type":"attribute","path":"iconURL","name":"src"}'></img>
+    <span class="app-name" template='{"type":"textContent","path":"name"}'></span>
+    <a href="#" template='{"type":"attribute","path":"manifestURL","name":"manifest"}' onclick="UI.openToolbox(this)">debug</a>
+  </div>
+  ]]>
+  </template>
+
+  <script type="application/javascript;version=1.8" src="device-inspector.js"></script>
+  <script type="application/javascript;version=1.8" src="template.js"></script>
+
+</html>
