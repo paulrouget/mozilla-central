@@ -65,3 +65,7 @@ browser.jar:
     content/browser/devtools/connect.xhtml                             (framework/connect/connect.xhtml)
     content/browser/devtools/connect.css                               (framework/connect/connect.css)
     content/browser/devtools/connect.js                                (framework/connect/connect.js)
+    content/browser/devtools/app-manager/device-inspector.css          (app-manager/content/device-inspector.css)
+    content/browser/devtools/app-manager/device-inspector.js           (app-manager/content/device-inspector.js)
+    content/browser/devtools/app-manager/device-inspector.xhtml        (app-manager/content/device-inspector.xhtml)
+    content/browser/devtools/app-manager/template.js                   (app-manager/content/template.js)
