@@ -48,6 +48,7 @@ DeviceStore.prototype = {
     this.object.description = {};
     this.object.permissions = [];
     this.object.apps = {all: [], running: []}
+    this.object.settings = [];
   },
 
   _getAppFromManifest: function(manifest) {
@@ -76,6 +77,7 @@ DeviceStore.prototype = {
     this._getDeviceDescription();
     this._getDevicePermissionsTable();
     this._listenToApps();
+    this._getAllSettings();
     this._getAllApps()
     .then(this._getRunningApps.bind(this))
     .then(this._getAppsIcons.bind(this))
@@ -103,6 +105,26 @@ DeviceStore.prototype = {
         });
       }
       this.object.permissions = permissionsArray;
+    });
+  },
+
+  _getAllSettings: function() {
+    return this._deviceFront.getAllSettings()
+    .then(json => {
+      let array = [];
+      for (let key in  json) {
+        let oneSetting = {};
+        oneSetting.name = key;
+        oneSetting.value = json[key];
+
+        let type = typeof json[key];
+        oneSetting.type = type;
+        if (type == "string" && json[key].indexOf("data:") == 0) {
+          oneSetting.type = "url";
+        }
+        array.push(oneSetting);
+      }
+      this.object.settings = array;
     });
   },
 

@@ -87,6 +87,36 @@ let DeviceActor = protocol.ActorClass({
     };
   }, {request: {},response: { value: RetVal("json")}}),
 
+  getAllSettings: method(function() {
+    let win = Services.wm.getMostRecentWindow("navigator:browser");
+    if ("mozSettings" in win.navigator) {
+      let settings = win.navigator.mozSettings;
+      let deferred = promise.defer();
+      let lock = settings.createLock();
+      let request = lock.get('*');
+      request.onsuccess = function(e) {
+        deferred.resolve(request.result);
+      };
+      return deferred.promise;
+    } else {
+      return {};
+    }
+  }, {request: {},response: { value: RetVal("json")}}),
+
+  setSetting: method(function(name, value) {
+    let win = Services.wm.getMostRecentWindow("navigator:browser");
+    if ("mozSettings" in win.navigator) {
+      let settings = win.navigator.mozSettings;
+      let lock = settings.createLock();
+      let set = {};
+      set[name] = value;
+      lock.set(set);
+    }
+  }, {request: {
+    name: Arg(0, "string"),
+    value: Arg(1, "string")
+  },response: {}}),
+
 });
 
 let DeviceFront = protocol.FrontClass(DeviceActor, {

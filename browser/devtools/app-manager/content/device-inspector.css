@@ -2,6 +2,10 @@ html, body {
   height: 100%;
 }
 
+[hidden] {
+  display: none!important;
+}
+
 template {
   display: none;
 }
@@ -132,4 +136,44 @@ body.edit-connection #banner-editing {
 
 .app[running="true"] {
   order: 0;
+}
+
+.setting-value > * {
+  display: none;
+}
+
+.setting-value[type="url"] > a,
+.setting-value[type="number"] > input[type="number"],
+.setting-value[type="boolean"] > input[type="checkbox"],
+.setting-value[type="string"] > input[type="text"] {
+  display: inline;
+}
+
+
+.setting:nth-child(odd) {
+  background: #EEE;
+}
+
+.setting {
+  display: flex;
+  padding: 5px;
+  background: #DDD;
+}
+
+.setting-value > input:not([type="checkbox"]) {
+  -moz-appearance: none;
+  border-style: solid;
+  text-align: right;
+}
+
+.setting-value {
+  justify-content: flex-end;
+}
+
+.setting-name {
+  flex-grow: 1;
+}
+
+.setting-value[type="url"] > a {
+  color: #F06!important;
 }

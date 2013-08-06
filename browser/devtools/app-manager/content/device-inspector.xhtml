@@ -30,7 +30,7 @@
           </div>
           <div id="summary" class="banner-box">
             <div class="banner-content">
-              <p><span template='{"type":"localizedContent","property":"appsSummary","paths":["device.apps.all.length","device.apps.running.length","device.permissions.length"]}'></span></p>
+              <p><span template='{"type":"localizedContent","property":"appsSummary","paths":["device.apps.all.length","device.apps.running.length","device.permissions.length","device.settings.length"]}'></span></p>
             </div>
           </div>
           <div id="expand" class="banner-box">
@@ -113,11 +113,19 @@
           <div id="tabs-headers">
             <h2 onclick="UI.setTab('apps')" class="tab apps">Installed Apps</h2>
             <h2 onclick="UI.setTab('permissions')" class="tab permissions">Permissions</h2>
+            <h2 onclick="UI.setTab('settings')" class="tab settings">Settings</h2>
           </div>
 
           <div id="tabs">
             <div class="tabpanel apps" template-loop='{"arrayPath":"device.apps.all","childSelector":"#app-template"}'></div>
             <div class="tabpanel permissions" template-loop='{"arrayPath":"device.permissions","childSelector":"#permission-template"}'></div>
+            <div class="tabpanel settings">
+              <form  action="">
+                <input hidden="hidden" type="submit" value="sync"></input>
+                <input type="search" placeholder="filter" value="" oninput="UI.filterSettings(this.value)"></input>
+                <div template-loop='{"arrayPath":"device.settings","childSelector":"#setting-template"}'></div>
+              </form>
+            </div>
           </div>
 
         </div>
@@ -145,6 +153,22 @@
     <img class="app-icon" template='{"type":"attribute","path":"iconURL","name":"src"}'></img>
     <span class="app-name" template='{"type":"textContent","path":"name"}'></span>
     <a href="#" template='{"type":"attribute","path":"manifestURL","name":"manifest"}' onclick="UI.openToolbox(this)">debug</a>
+  </div>
+  ]]>
+  </template>
+
+  <template id="setting-template">
+  <![CDATA[
+  <div class="setting" template='{"type":"attribute","path":"name","name":"data-name"}'>
+    <data class="setting-name" template='{"type":"attribute","path":"name","name":"value"}'>
+      <span template='{"type":"textContent","path":"name"}'></span>
+    </data>
+    <div class="setting-value" template='{"type":"attribute","path":"type","name":"type"}'>
+      <input onchange="UI.updateSetting(this)" type="checkbox" template='{"type":"attributePresence","path":"value","name":"checked"}'></input>
+      <input onchange="UI.updateSetting(this)" type="text" template='{"type":"attribute","path":"value","name":"value"}'></input>
+      <input onchange="UI.updateSetting(this)" type="number" template='{"type":"attribute","path":"value","name":"value"}'></input>
+      <a target="_" template='{"type":"attribute","path":"value","name":"href"}'>data:...</a>
+    </div>
   </div>
   ]]>
   </template>

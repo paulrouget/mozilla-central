@@ -155,6 +155,18 @@ Template.prototype = {
           paths.push(rootPath + json.path);
           break;
         }
+        case "attributePresence": {
+          if (!("name" in json) ||
+              !("path" in json)) {
+            throw new Error("missing property");
+          }
+          if (this._resolvePath(rootPath + json.path, false)) {
+            e.setAttribute(json.name, "");
+          } else {
+            e.removeAttribute(json.name);
+          }
+          break;
+        }
         case "textContent": {
           if (!("path" in json)) {
             throw new Error("missing property");

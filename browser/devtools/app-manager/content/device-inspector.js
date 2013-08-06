@@ -197,6 +197,30 @@ let UI = {
     return deferred.promise;
   },
 
+  updateSetting: function(input) {
+    let name = input.parentNode.parentNode.querySelector(".setting-name").value;
+    let value;
+    console.log(input);
+    if (input.type == "checkbox") {
+      value = input.checked;
+    } else {
+      value = input.value;
+    }
+    let front = getDeviceFront(this.connection.client, this.listTabsResponse);
+    front.setSetting(name, value);
+  },
+
+  filterSettings: function(value = "") {
+    let settings = document.querySelectorAll(".setting");
+    for (let s of settings) {
+      if (s.dataset.name.indexOf(value) > -1) {
+        s.removeAttribute("hidden");
+      } else {
+        s.setAttribute("hidden", "true");
+      }
+    }
+  },
+
   openToolbox: function(button) {
     let manifest = button.getAttribute("manifest");
     this._getTargetForApp(manifest).then((target) => {
