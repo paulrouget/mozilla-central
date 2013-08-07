@@ -250,7 +250,7 @@ DeviceStore.prototype = {
     let a = this._getAppFromManifest(manifest);
     a.running = false;
     let running = this.object.apps.running;
-    this.store.apps.running = running.filter((m) => {
+    this.object.apps.running = running.filter((m) => {
       return m != manifest;
     });
   },

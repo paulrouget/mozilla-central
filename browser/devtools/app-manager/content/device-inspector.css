@@ -134,8 +134,19 @@ body.edit-connection #banner-editing {
   order: 1;
 }
 
-.app[running="true"] {
-  order: 0;
+.app-name {
+  flex-grow: 1;
+}
+
+.app > .app-button {
+  display: none;
+}
+
+.app[running="false"] > .start-app-button,
+.app[running="true"] > .stop-app-button,
+.app[running="true"] > .restart-app-button,
+.app[running="true"] > .debug-app-button {
+  display: inline-block;
 }
 
 .setting-value > * {

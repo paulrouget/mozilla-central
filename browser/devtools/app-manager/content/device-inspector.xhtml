@@ -152,7 +152,9 @@
   <div class="app" template='{"type":"attribute","path":"running","name":"running"}'>
     <img class="app-icon" template='{"type":"attribute","path":"iconURL","name":"src"}'></img>
     <span class="app-name" template='{"type":"textContent","path":"name"}'></span>
-    <a href="#" template='{"type":"attribute","path":"manifestURL","name":"manifest"}' onclick="UI.openToolbox(this)">debug</a>
+    <button class="app-button debug-app-button" template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.openToolbox(this.dataset.manifest)">debug</button>
+    <button class="app-button start-app-button" template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.startApp(this.dataset.manifest)">start</button>
+    <button class="app-button stop-app-button"  template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.stopApp(this.dataset.manifest)">stop</button>
   </div>
   ]]>
   </template>
