@@ -1,0 +1,2 @@
+component {50382038-ff68-11e2-a867-0050b60bc0ff} DevtoolsProtocolHandler.js
+contract @mozilla.org/network/protocol;1?name=devtools {50382038-ff68-11e2-a867-0050b60bc0ff}
