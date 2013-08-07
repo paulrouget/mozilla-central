@@ -113,5 +113,29 @@ hr {
 }
 
 .app[running="true"] {
-  border-left-color: #0F0;
+  color: #000;
+}
+
+.app-button {
+  margin: 0 3px;
+  font-size: 12px;
+  border: none;
+  color: white;
+  border-radius: 2px;
+}
+
+.debug-app-button {
+  background-color: #3498DB;
+}
+
+.start-app-button {
+  background-color: #18BC9C
+}
+
+.stop-app-button {
+  background-color: #E74C3C;
+}
+
+.restart-app-button {
+  background-color: #F39C12;
 }

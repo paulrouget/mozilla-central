@@ -191,19 +191,54 @@ let UI = {
       }, (error) => {
         deferred.reject(error);
       });
-    }, (error) => {
-      deferred.reject(error);
     });
     return deferred.promise;
   },
 
-  openToolbox: function(button) {
-    let manifest = button.getAttribute("manifest");
+  openToolbox: function(manifest) {
     this._getTargetForApp(manifest).then((target) => {
       gDevTools.showToolbox(target,
                             null,
                             devtools.Toolbox.HostType.WINDOW,
                             this.connection.uid);
     }, console.error);
+  },
+
+  startApp: function(manifest) {
+    let deferred = promise.defer();
+
+    if (!this.listTabsResponse) {
+      deferred.reject();
+    } else {
+      let actor = this.listTabsResponse.webappsActor;
+      let request = {
+        to: actor,
+        type: "launch",
+        manifestURL: manifest,
+      }
+      this.connection.client.request(request, (res) => {
+        deferred.resolve()
+      });
+    }
+    return deferred.promise;
+  },
+
+  stopApp: function(manifest) {
+    let deferred = promise.defer();
+
+    if (!this.listTabsResponse) {
+      deferred.reject();
+    } else {
+      let actor = this.listTabsResponse.webappsActor;
+      let request = {
+        to: actor,
+        type: "close",
+        manifestURL: manifest,
+      }
+      this.connection.client.request(request, (res) => {
+        deferred.resolve()
+      });
+    }
+    return deferred.promise;
   },
 }
