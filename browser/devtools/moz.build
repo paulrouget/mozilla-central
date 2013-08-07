@@ -23,4 +23,5 @@ DIRS += [
     'profiler',
     'fontinspector',
     'app-manager',
+    'components',
 ]
