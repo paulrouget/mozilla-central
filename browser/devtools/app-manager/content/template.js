@@ -205,7 +205,7 @@ Template.prototype = {
         throw new Error("can't find child");
       }
       template = this._doc.createElement("div");
-      template.innerHTML = templateParent.textContent;
+      template.innerHTML = templateParent.innerHTML;
       template = template.firstElementChild;
       let array = this._resolvePath(json.arrayPath, []);
       if (!Array.isArray(array)) {
@@ -230,8 +230,8 @@ Template.prototype = {
   },
 
   _processTree: function(parent, rootPath="") {
-    let loops = parent.querySelectorAll("[template-loop]");
-    let nodes = parent.querySelectorAll("[template]");
+    let loops = parent.querySelectorAll(":not(template) [template-loop]");
+    let nodes = parent.querySelectorAll(":not(template) [template]");
     for (let e of loops) {
       this._processLoop(e, rootPath);
     }
