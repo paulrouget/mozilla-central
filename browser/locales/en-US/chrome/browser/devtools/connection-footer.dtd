@@ -1,0 +1,9 @@
+<!ENTITY disconnect "disconnect">
+<!ENTITY showDeviceInspector "Click for more details">
+<!ENTITY notConnected "Not connected">
+<!ENTITY changeHostAndPort "change">
+<!ENTITY startSimulator "start simulator">
+<!ENTITY saveConnectionInfo "save">
+<!ENTITY connecting "connecting…">
+<!ENTITY disconnecting "disconnecting…">
+<!ENTITY cancel "cancel">

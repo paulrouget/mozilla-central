@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+     - License, v. 2.0. If a copy of the MPL was not distributed with this
+     - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<!DOCTYPE html [
+  <!ENTITY % connectionFooterDTD SYSTEM "chrome://browser/locale/devtools/connection-footer.dtd" >
+  %connectionFooterDTD;
+]>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf8"/>
+    <link rel="stylesheet" href="connection-footer.css" type="text/css"/>
+    <link rel="stylesheet" href="chrome://browser/skin/devtools/connection-footer.css" type="text/css"/>
+  </head>
+
+  <body onload="UI.init()">
+
+    <div id="connection-footer" template='{"type":"attribute","path":"connection.status","name":"status"}'>
+      <div id="banners-and-logs">
+
+        <!-- Connected -->
+        <div id="banner-connected" class="banner">
+          <div id="status" class="banner-box">
+            <div class="banner-content">
+              <span template='{"type":"localizedContent","property":"connectedToDevice","paths":["device.description.name"]}'></span>
+              <a href="#" onclick="UI.disconnect()">&disconnect;</a>
+            </div>
+          </div>
+          <div id="expand" class="banner-box">
+            <div class="banner-content">
+              <a target="_" href="devtools:device">&showDeviceInspector;</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disconnected -->
+        <div id="banner-disconnected" class="banner">
+          <div class="banner-box">
+            <div class="banner-content">
+              <span>&notConnected;</span>
+              <button onclick="UI.connect()" template='{"type":"localizedContent","property":"connectTo","paths":["connection.host","connection.port"]}'></button>
+              <a href="#" onclick="UI.editConnectionParameters()">&changeHostAndPort;</a>
+              <button>&startSimulator;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connecting -->
+        <div id="banner-connecting" class="banner">
+          <div id="status" class="banner-box">
+            <div class="banner-content">
+              <span>&connecting;</span>
+              <button onclick="UI.disconnect()">&cancel;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disconnecting -->
+        <div id="banner-disconnecting" class="banner">
+          <div id="status" class="banner-box">
+            <div class="banner-content">
+              <span>&disconnecting;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Editing -->
+        <div id="banner-editing" class="banner">
+          <div class="banner-box">
+            <div class="banner-content">
+              <input class="host"   template='{"type":"attribute","path":"connection.host","name":"value"}'></input>
+              <input class="port" template='{"type":"attribute","path":"connection.port","name":"value"}' type="number"></input>
+              <button onclick="UI.saveConnectionInfo()">&saveConnectionInfo;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Logs -->
+        <div id="logs">
+          <pre></pre>
+        </div>
+
+      </div>
+    </div>
+  </body>
+
+  <script type="application/javascript;version=1.8" src="connection-footer.js"></script>
+  <script type="application/javascript;version=1.8" src="template.js"></script>
+</html>
