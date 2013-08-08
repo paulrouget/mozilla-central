@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+     - License, v. 2.0. If a copy of the MPL was not distributed with this
+     - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<!DOCTYPE html [
+  <!ENTITY % appMgrDTD SYSTEM "chrome://browser/locale/devtools/app-manager.dtd" >
+  %appMgrDTD;
+]>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+  <head>
+    <meta charset="utf8"/>
+    <base href="chrome://browser/content/devtools/app-manager/"></base>
+    <title>&device.title;</title>
+
+    <link rel="stylesheet" href="device.css" type="text/css"/>
+    <link rel="stylesheet" href="chrome://browser/skin/devtools/device.css" type="text/css"/>
+  </head>
+
+  <body onload="UI.init()">
+
+    <div id="notConnectedMessage">&device.notConnected;</div>
+
+    <div id="content">
+      <div class="meta">
+        <header>
+          <h1>
+            <span template='{"type":"textContent","path":"device.description.name"}'></span>
+            <span template='{"type":"textContent","path":"device.description.version"}'></span>
+            (<span template='{"type":"textContent","path":"device.description.channel"}'></span>)
+          </h1>
+          <h2>
+            <span>Gecko </span>
+            <span template='{"type":"textContent","path":"device.description.geckoversion"}'></span>
+          </h2>
+        </header>
+        <details>
+          <p><button onclick="UI.screenshot()">&device.screenshot;</button>  <button>&device.killall;</button></p>
+          <p template='{"type":"localizedContent","property":"device.deviceSize", "paths":["device.description.width","device.description.height","device.description.dpi"]}'></p>
+        </details>
+      </div>
+
+      <div id="tabs-headers">
+        <h2 onclick="UI.setTab('apps')" class="tab apps">Installed Apps</h2>
+        <h2 onclick="UI.setTab('permissions')" class="tab permissions">Permissions</h2>
+      </div>
+
+      <div id="tabs">
+        <div class="tabpanel apps" template-loop='{"arrayPath":"apps.all","childSelector":"#app-template"}'></div>
+        <div class="tabpanel permissions" template-loop='{"arrayPath":"device.permissions","childSelector":"#permission-template"}'></div>
+      </div>
+    </div>
+
+    <iframe id="connection-footer" src="connection-footer.xhtml"></iframe>
+  </body>
+
+  <template id="permission-template">
+    <div class="permission">
+      <p>
+      <span template='{"type":"textContent","path":"name"}'></span>
+      <span template='{"type":"textContent","path":"app"}'></span>/
+      <span template='{"type":"textContent","path":"privileged"}'></span>/
+      <span template='{"type":"textContent","path":"certified"}'></span>
+      </p>
+    </div>
+  </template>
+
+  <template id="app-template">
+    <div class="app" template='{"type":"attribute","path":"running","name":"running"}'>
+      <img class="app-icon" template='{"type":"attribute","path":"iconURL","name":"src"}'></img>
+      <span class="app-name" template='{"type":"textContent","path":"name"}'></span>
+      <button class="app-button debug-app-button" template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.openToolbox(this.dataset.manifest)">&device.debugApp;</button>
+      <button class="app-button start-app-button" template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.startApp(this.dataset.manifest)">&device.startApp;</button>
+      <button class="app-button stop-app-button"  template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.stopApp(this.dataset.manifest)">&device.stopApp;</button>
+    </div>
+  </template>
+
+  <script type="application/javascript;version=1.8" src="device.js"></script>
+  <script type="application/javascript;version=1.8" src="template.js"></script>
+
+</html>

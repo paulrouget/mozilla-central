@@ -1,0 +1,17 @@
+<!ENTITY device.screenshot "screenshot">
+<!ENTITY device.killall "killall">
+<!ENTITY device.title "Device Control Center">
+<!ENTITY device.notConnected "Not connected">
+<!ENTITY device.startApp "start">
+<!ENTITY device.stopApp "stop">
+<!ENTITY device.debugApp "debug">
+
+<!ENTITY connection.disconnect "disconnect">
+<!ENTITY connection.showDeviceCtrlCenter "Click for more details">
+<!ENTITY connection.notConnected "Not connected">
+<!ENTITY connection.changeHostAndPort "change">
+<!ENTITY connection.startSimulator "start simulator">
+<!ENTITY connection.saveConnectionInfo "save">
+<!ENTITY connection.connecting "connecting…">
+<!ENTITY connection.disconnecting "disconnecting…">
+<!ENTITY connection.cancel "cancel">
