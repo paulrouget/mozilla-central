@@ -72,3 +72,6 @@ browser.jar:
     content/browser/devtools/app-manager/device.css                    (app-manager/content/device.css)
     content/browser/devtools/app-manager/device.js                     (app-manager/content/device.js)
     content/browser/devtools/app-manager/device.xhtml                  (app-manager/content/device.xhtml)
+    content/browser/devtools/app-manager/projects.css                  (app-manager/content/projects.css)
+    content/browser/devtools/app-manager/projects.js                   (app-manager/content/projects.js)
+    content/browser/devtools/app-manager/projects.xhtml                (app-manager/content/projects.xhtml)

@@ -15,6 +15,7 @@ Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 const SCHEME = "devtools";
 const URLS = {
   "devtools:device": "chrome://browser/content/devtools/app-manager/device.xhtml",
+  "devtools:app-manager": "chrome://browser/content/devtools/app-manager/projects.xhtml",
 }
 
 function DevtoolsProtocolHandler() {}
@@ -26,6 +27,7 @@ DevtoolsProtocolHandler.prototype = {
                  Ci.nsIProtocolHandler.URI_IS_LOCAL_RESOURCE,
 
   newURI: function PPH_newURI(aSpec, aOriginCharset, aBaseUri) {
+    dump("*" + aSpec + "*\n");
     let uri = Cc["@mozilla.org/network/simple-uri;1"].createInstance(Ci.nsIURI);
     uri.spec = aSpec;
     return uri;
