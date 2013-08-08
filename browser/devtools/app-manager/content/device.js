@@ -92,7 +92,7 @@ let UI = {
 
   _solvel10n: function(property, args = []) {
     if (!this._strings) {
-      this._strings = Services.strings.createBundle("chrome://browser/locale/devtools/device.properties");
+      this._strings = Services.strings.createBundle("chrome://browser/locale/devtools/app-manager.properties");
     }
     if (args && args.length > 0) {
       return this._strings.formatStringFromName(property, args, args.length);

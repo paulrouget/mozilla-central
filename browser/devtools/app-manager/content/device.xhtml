@@ -3,22 +3,22 @@
      - License, v. 2.0. If a copy of the MPL was not distributed with this
      - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 <!DOCTYPE html [
-  <!ENTITY % deviceDTD SYSTEM "chrome://browser/locale/devtools/device.dtd" >
-  %deviceDTD;
+  <!ENTITY % appMgrDTD SYSTEM "chrome://browser/locale/devtools/app-manager.dtd" >
+  %appMgrDTD;
 ]>
 
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
   <meta charset="utf8"/>
-  <title>&title;</title>
+  <title>&device.title;</title>
 
   <link rel="stylesheet" href="chrome://browser/content/devtools/app-manager/device.css" type="text/css"/>
   <link rel="stylesheet" href="chrome://browser/skin/devtools/device.css" type="text/css"/>
 
   <body onload="UI.init()">
 
-    <div id="notConnectedMessage">&notConnected;</div>
+    <div id="notConnectedMessage">&device.notConnected;</div>
 
     <div id="content">
       <div class="meta">
@@ -34,8 +34,8 @@
           </h2>
         </header>
         <details>
-          <p><button onclick="UI.screenshot()">&screenshot;</button>  <button>&killall;</button></p>
-          <p template='{"type":"localizedContent","property":"deviceSize", "paths":["device.description.width","device.description.height","device.description.dpi"]}'></p>
+          <p><button onclick="UI.screenshot()">&device.screenshot;</button>  <button>&device.killall;</button></p>
+          <p template='{"type":"localizedContent","property":"device.deviceSize", "paths":["device.description.width","device.description.height","device.description.dpi"]}'></p>
         </details>
       </div>
 
@@ -54,44 +54,24 @@
   </body>
 
   <template id="permission-template">
-  <![CDATA[
-  <div class="permission">
-    <p>
-    <span template='{"type":"textContent","path":"name"}'></span>
-    <span template='{"type":"textContent","path":"app"}'></span>/
-    <span template='{"type":"textContent","path":"privileged"}'></span>/
-    <span template='{"type":"textContent","path":"certified"}'></span>
-    </p>
-  </div>
-  ]]>
+    <div class="permission">
+      <p>
+      <span template='{"type":"textContent","path":"name"}'></span>
+      <span template='{"type":"textContent","path":"app"}'></span>/
+      <span template='{"type":"textContent","path":"privileged"}'></span>/
+      <span template='{"type":"textContent","path":"certified"}'></span>
+      </p>
+    </div>
   </template>
 
   <template id="app-template">
-  <![CDATA[
-  <div class="app" template='{"type":"attribute","path":"running","name":"running"}'>
-    <img class="app-icon" template='{"type":"attribute","path":"iconURL","name":"src"}'></img>
-    <span class="app-name" template='{"type":"textContent","path":"name"}'></span>
-    <button class="app-button debug-app-button" template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.openToolbox(this.dataset.manifest)">debug</button>
-    <button class="app-button start-app-button" template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.startApp(this.dataset.manifest)">start</button>
-    <button class="app-button stop-app-button"  template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.stopApp(this.dataset.manifest)">stop</button>
-  </div>
-  ]]>
-  </template>
-
-  <template id="setting-template">
-  <![CDATA[
-  <div class="setting" template='{"type":"attribute","path":"name","name":"data-name"}'>
-    <data class="setting-name" template='{"type":"attribute","path":"name","name":"value"}'>
-    <span template='{"type":"textContent","path":"name"}'></span>
-    </data>
-    <div class="setting-value" template='{"type":"attribute","path":"type","name":"type"}'>
-      <input onchange="UI.updateSetting(this)" type="checkbox" template='{"type":"attributePresence","path":"value","name":"checked"}'></input>
-      <input onchange="UI.updateSetting(this)" type="text" template='{"type":"attribute","path":"value","name":"value"}'></input>
-      <input onchange="UI.updateSetting(this)" type="number" template='{"type":"attribute","path":"value","name":"value"}'></input>
-      <a target="_" template='{"type":"attribute","path":"value","name":"href"}'>data:...</a>
+    <div class="app" template='{"type":"attribute","path":"running","name":"running"}'>
+      <img class="app-icon" template='{"type":"attribute","path":"iconURL","name":"src"}'></img>
+      <span class="app-name" template='{"type":"textContent","path":"name"}'></span>
+      <button class="app-button debug-app-button" template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.openToolbox(this.dataset.manifest)">&device.debugApp;</button>
+      <button class="app-button start-app-button" template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.startApp(this.dataset.manifest)">&device.startApp;</button>
+      <button class="app-button stop-app-button"  template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.stopApp(this.dataset.manifest)">&device.stopApp;</button>
     </div>
-  </div>
-  ]]>
   </template>
 
   <script type="application/javascript;version=1.8" src="chrome://browser/content/devtools/app-manager/device.js"></script>
