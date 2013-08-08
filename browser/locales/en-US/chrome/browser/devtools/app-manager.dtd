@@ -15,3 +15,16 @@
 <!ENTITY connection.connecting "connecting…">
 <!ENTITY connection.disconnecting "disconnecting…">
 <!ENTITY connection.cancel "cancel">
+
+<!ENTITY projects.or "or">
+<!ENTITY projects.localApps "Local Apps">
+<!ENTITY projects.addApp "Add">
+<!ENTITY projects.addPackaged "Add Packaged App">
+<!ENTITY projects.addHosted "Add Hosted App">
+<!ENTITY projects.title "Local Apps">
+<!ENTITY projects.removeApp "remove">
+<!ENTITY projects.reloadFiles "update">
+<!ENTITY projects.installApp "install">
+<!ENTITY projects.startApp "start">
+<!ENTITY projects.stopApp "stop">
+<!ENTITY projects.debugApp "debug">
