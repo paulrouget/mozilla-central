@@ -1,0 +1,56 @@
+* {
+  margin: 0;
+  padding: 0;
+  -moz-box-sizing: border-box;
+  font-size: 0.9rem;
+}
+
+body {
+  color: #333;
+  background-color: white;
+  font-family: Lucida Grande, Helvetica, Helvetica Neue, sans-serif;
+}
+
+a {
+  color: #000!important;
+  text-decoration: none;
+  border-bottom: 1px dotted #999
+}
+
+button {
+  background: #EEE;
+  border: 1px solid #999;
+  cursor: pointer;
+}
+
+.project {
+  min-height: 64px;
+  border-bottom: 1px solid gray;
+}
+
+img.icon {
+  float: left;
+  max-width: 64px;
+  max-height: 64px;
+}
+
+.project > section {
+  padding-left: 74px;
+}
+
+.name {
+  font-size: 1.2em;
+  font-weight: bold;
+  padding-left: 1em;
+}
+
+.type {
+  font-size: 1em;
+}
+
+.location {
+  font-size: 1em;
+  color: gray;
+  cursor: pointer;
+}
+

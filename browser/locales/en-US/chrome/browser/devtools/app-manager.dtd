@@ -15,3 +15,10 @@
 <!ENTITY connection.connecting "connecting…">
 <!ENTITY connection.disconnecting "disconnecting…">
 <!ENTITY connection.cancel "cancel">
+
+<!ENTITY projects.localApps "Local Apps">
+<!ENTITY projects.addPackaged "Add Packaged App">
+<!ENTITY projects.addHostedApp "Add Hosted App">
+<!ENTITY projects.title "Local Apps">
+<!ENTITY projects.removeApp "remove">
+<!ENTITY projects.reloadFiles "update">
