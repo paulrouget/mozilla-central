@@ -42,7 +42,7 @@
               <span>&connection.notConnected;</span>
               <button onclick="UI.connect()" id="connect-button" template='{"type":"localizedContent","property":"connection.connectTo","paths":["connection.host","connection.port"]}'></button>
               <a href="#" onclick="UI.editConnectionParameters()">&connection.changeHostAndPort;</a>
-              <button>&connection.startSimulator;</button>
+              <button id="start-simulator-button" onclick="UI.startSimulator()" template='{"type":"attribute","path":"simulators.versions.length","name":"simulators-count"}'>&connection.startSimulator;</button>
             </div>
           </div>
         </div>

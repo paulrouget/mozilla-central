@@ -3,12 +3,14 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource:///modules/devtools/gDevTools.jsm");
 
 const {devtools} = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
+const {Simulator} = Cu.import("resource://gre/modules/devtools/Simulator.jsm");
 const {require} = devtools;
 
 const {ConnectionsManager} = require("devtools/client/connections-manager");
 const EventEmitter = require("devtools/shared/event-emitter");
 const ConnectionStore = require("devtools/app-manager/connection-store");
 const DeviceStore = require("devtools/app-manager/device-store");
+const simulatorsStore = require("devtools/app-manager/simulators-store");
 
 let UI = {
   init: function() {
@@ -38,6 +40,7 @@ let UI = {
     this.store = this._mergeStores({
       "device": new DeviceStore(this.connection),
       "connection": new ConnectionStore(this.connection),
+      "simulators": simulatorsStore,
     });
 
     let pre = document.querySelector("#logs > pre");
@@ -106,5 +109,22 @@ let UI = {
     this.connection.host = host;
     Services.prefs.setCharPref("devtools.debugger.remote-host", host);
     Services.prefs.setIntPref("devtools.debugger.remote-port", port);
+  },
+
+  startSimulator: function() {
+    let versions = Simulator.availableVersions();
+    if (versions.length == 0)
+      return;
+    let version = versions[versions.length-1];
+    let port = ConnectionsManager.getFreeTCPPort();
+    this.simulator = Simulator.getByVersion(version);
+    this.simulator
+        .launch({ port: port })
+        .then(() => {
+           this.connection.port = port;
+           this.connection.host = "localhost";
+           this.connection.keepConnecting = true;
+           this.connection.connect();
+        });
   },
 }
