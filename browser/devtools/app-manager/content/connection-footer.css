@@ -49,3 +49,7 @@ body.edit-connection #banner-editing {
   width: 50%;
   align-items: center;
 }
+
+#start-simulator-button[simulators-count="0"] {
+  display: none;
+}
