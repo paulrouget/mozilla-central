@@ -3,6 +3,8 @@ const Ci = Components.interfaces;
 const Cu = Components.utils;
 const {devtools} = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
 const {require} = devtools;
+const ObservableObject = require("devtools/shared/observable-object");
+const EventEmitter = require("devtools/shared/event-emitter");
 const {ConnectionsManager} = require("devtools/client/connections-manager");
 const {AppProjects} = require("devtools/app-manager/app-projects");
 const {AppValidator} = require("devtools/app-manager/app-validator");
@@ -25,11 +27,19 @@ window.addEventListener("message", function(event) {
   } catch(e) {}
 }, false);
 
+let viewStore = new ObservableObject({
+  selectedApp: null,
+});
 
 let UI = {
 
   onload: function() {
-    this.template = new Template(document.body, AppProjects.store, (property, args) => {
+    this.store = this._mergeStores({
+      "app": AppProjects.store,
+      "view": viewStore,
+    });
+
+    this.template = new Template(document.body, this.store, (property, args) => {
       return "l10n?";
     });
     this.template.start();
@@ -40,6 +50,25 @@ let UI = {
       }
     });
   },
+
+  _mergeStores: function(stores) {
+
+    let finalStore = {object:{}};
+
+    EventEmitter.decorate(finalStore);
+
+    for (let key in stores) {
+      (function(key) {
+        finalStore.object[key] = stores[key].object,
+        stores[key].on("set", function(event, path, value) {
+          finalStore.emit("set", [key].concat(path), value);
+        });
+      })(key);
+    }
+
+    return finalStore;
+  },
+
 
   onNewConnection: function() {
     console.log("connection attached");
