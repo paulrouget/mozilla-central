@@ -20,8 +20,8 @@
   </head>
 
   <body onload="UI.onload()">
+    <h1 template='{"type":"textContent","path":"view.selectedApp"}'></h1>
     <section id="content">
-
       <div id="new-app">
         <div id="new-app-type">
           <button onclick="UI.addPackaged()">&projects.addPackaged;</button>
@@ -32,7 +32,7 @@
       </div>
 
       <h2>&projects.localApps;</h2>
-      <div id="projects" template-loop='{"arrayPath":"projects","childSelector":"#project-template"}'></div>
+      <div id="projects" template-loop='{"arrayPath":"app.projects","childSelector":"#project-template"}'></div>
 
 
     </section>
@@ -41,7 +41,7 @@
   </body>
 
   <template id="project-template">
-  <div class="project" template='{"type":"attribute","path":"location","name":"id"}'>
+  <div class="project" template='{"type":"attribute","path":"location","name":"id"}' onclick="UI.store.object.view.selectedApp = this.id">
     <div class="project-status" template='{"type":"attribute","path":"validationStatus","name":"status"}'></div>
     <img class="project-icon" template='{"type":"attribute","path":"icon","name":"src"}' />
     <div class="project-meta">
