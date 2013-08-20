@@ -22,10 +22,11 @@
 
         <!-- Connected -->
         <div id="banner-connected" class="banner">
+          <div class="connected-indicator"></div>
           <div id="status" class="banner-box">
             <div class="banner-content">
               <span template='{"type":"localizedContent","property":"connection.connectedToDevice","paths":["device.description.name"]}'></span>
-              <a href="#" onclick="UI.disconnect()">&connection.disconnect;</a>
+              <button class="action-cancel" onclick="UI.disconnect()">&connection.disconnect;</button>
             </div>
           </div>
           <div id="expand" class="banner-box">
@@ -37,28 +38,31 @@
 
         <!-- Disconnected -->
         <div id="banner-disconnected" class="banner">
+          <div class="connected-indicator"></div>
           <div class="banner-box">
             <div class="banner-content">
               <span>&connection.notConnected;</span>
-              <button onclick="UI.connect()" id="connect-button" template='{"type":"localizedContent","property":"connection.connectTo","paths":["connection.host","connection.port"]}'></button>
-              <a href="#" onclick="UI.editConnectionParameters()">&connection.changeHostAndPort;</a>
-              <button id="start-simulator-button" onclick="UI.startSimulator()" template='{"type":"attribute","path":"simulators.versions.length","name":"simulators-count"}'>&connection.startSimulator;</button>
+              <button class="action-primary left" onclick="UI.connect()" id="connect-button" template='{"type":"localizedContent","property":"connection.connectTo","paths":["connection.host","connection.port"]}'></button>
+              <button class="right" href="#" onclick="UI.editConnectionParameters()">&connection.changeHostAndPort;</button>
+              <button class="right" id="start-simulator-button" onclick="UI.startSimulator()" template='{"type":"attribute","path":"simulators.versions.length","name":"simulators-count"}'>&connection.startSimulator;</button>
             </div>
           </div>
         </div>
 
         <!-- Connecting -->
         <div id="banner-connecting" class="banner">
+          <div class="connected-indicator"></div>
           <div id="status" class="banner-box">
             <div class="banner-content">
               <span>&connection.connecting;</span>
-              <button onclick="UI.disconnect()">&connection.cancel;</button>
+              <button class="action-cancel" onclick="UI.disconnect()">&connection.cancel;</button>
             </div>
           </div>
         </div>
 
         <!-- Disconnecting -->
         <div id="banner-disconnecting" class="banner">
+          <div class="connected-indicator"></div>
           <div id="status" class="banner-box">
             <div class="banner-content">
               <span>&connection.disconnecting;</span>
@@ -68,6 +72,7 @@
 
         <!-- Editing -->
         <div id="banner-editing" class="banner">
+          <div class="connected-indicator"></div>
           <div class="banner-box">
             <div class="banner-content">
               <form onsubmit="UI.saveConnectionInfo()">
@@ -80,8 +85,11 @@
         </div>
 
         <!-- Logs -->
-        <div id="logs">
-          <pre></pre>
+        <div id="banner-logs">
+        <div id="logs" class="banner-box">
+          <pre><span class="icon-terminal"/>
+          </pre>
+        </div>
         </div>
 
       </div>

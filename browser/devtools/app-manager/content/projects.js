@@ -137,14 +137,14 @@ let UI = {
                 project.validationStatus = "valid";
 
                 if (validation.errors.length > 0) {
-                  project.errors = "Errors: " + validation.errors.join(",\n ");
+                  project.errors = validation.errors.join(",\n ");
                   project.validationStatus = "error";
                 } else {
                   project.errors = "";
                 }
 
                 if (validation.warnings.length > 0) {
-                  project.warnings = "Warnings: " + validation.warnings.join(",\n ");
+                  project.warnings = validation.warnings.join(",\n ");
                   project.validationStatus = "warning";
                 } else {
                   project.warnings = "";
