@@ -2,6 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const Ci = Components.interfaces;
+const Cu = Components.utils;
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.import("resource://gre/modules/Services.jsm");
+
 this.EXPORTED_SYMBOLS = ["DOMHelpers"];
 
 /**
@@ -120,5 +125,33 @@ DOMHelpers.prototype = {
   {
     delete this.window;
     delete this.treeWalker;
-  }
+  },
+
+  onceWindowLoaded: function Helpers_onLocationChange(callback) {
+    let progressListener = {
+      QueryInterface: XPCOMUtils.generateQI([Ci.nsIWebProgressListener, Ci.nsISupportsWeakReference]),
+      onStateChange: function (progress, request, flags, status) {
+        // We're only looking for the end of the frame load
+        if ((flags & Ci.nsIWebProgressListener.STATE_STOP) == 0)
+          return;
+        if ((flags & Ci.nsIWebProgressListener.STATE_IS_NETWORK) == 0)
+          return;
+        if ((flags & Ci.nsIWebProgressListener.STATE_IS_WINDOW) == 0)
+          return;
+        wp.removeProgressListener(progressListener, Ci.nsIWebProgress.NOTIFY_ALL);
+        Services.tm.mainThread.dispatch(callback, 0);
+      },
+      onProgressChange: function() {},
+      onSecurityChange: function() {},
+      onStatusChange: function() {},
+      onLocationChange: function () {},
+    };
+    let win = this.window;
+    let docShell = win.QueryInterface(Ci.nsIInterfaceRequestor)
+                      .getInterface(Ci.nsIWebNavigation)
+                      .QueryInterface(Ci.nsIDocShell);
+    let wp = docShell.QueryInterface(Ci.nsIInterfaceRequestor)
+                     .getInterface(Ci.nsIWebProgress);
+    wp.addProgressListener(progressListener, Ci.nsIWebProgress.NOTIFY_ALL);
+  },
 };
