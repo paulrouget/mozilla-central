@@ -130,6 +130,8 @@ let UI = {
                 if (validation.manifest) {
                   project.name = validation.manifest.name;
                   project.icon = UI._getLocalIconURL(project, validation.manifest);
+                  project.manifest = validation.manifest;
+                  project.manifestAsString = JSON.stringify(validation.manifest);
                 }
 
                 project.validationStatus = "valid";
@@ -169,5 +171,25 @@ let UI = {
       // TODO: eventually open hosted apps in firefox
       // when permissions are correctly supported by firefox
     }
+  },
+
+  selectProject: function(location) {
+    let projects = this.store.object.app.projects;
+    let idx = 0;
+    for (; idx < projects.length; idx++) {
+      if (projects[idx].location == location) {
+        break;
+      }
+    }
+    if (idx == projects.length) {
+      // Not found
+      return;
+    }
+
+    let template = '{"path":"app.projects.' + idx + '","childSelector":"#lense-template"}';
+
+    let lense = document.querySelector("#lense");
+    lense.setAttribute("template-for", template);
+    this.template._processFor(lense);
   },
 }
