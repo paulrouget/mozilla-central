@@ -110,8 +110,8 @@ button.action-cancel {
   flex: 0 0 10px;
 }
 #banner-connected .connected-indicator{
-  background: linear-gradient(to bottom, #90D11F, #77AD18 );
+  background: linear-gradient(to bottom, #69B8FF, #339FFF );
 }
 #banner-disconnected .connected-indicator{
-  background: linear-gradient(to bottom, #E34F22, #B83C16 );
+  background: linear-gradient(to bottom, #375A87, #1C4375 );
 }
