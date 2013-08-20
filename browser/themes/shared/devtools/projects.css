@@ -17,27 +17,21 @@ a {
   border-bottom: 1px dotted #999
 }
 
-button {
-  background: #EEE;
-  border: 1px solid #999;
-  cursor: pointer;
-  min-width: 50px;
-}
-
 .project {
   padding: 10px 0;
-  background: #F6F6F6;
-  margin: 5px;
+  background-color: #F6F6F6;
+  box-shadow: inset 0 -1px 0 rgba(0,0,0,0.1);
   color: #666;
+  line-height: 120%;
+  cursor: pointer;
+}
+
+.project:hover {
+  background-color: #EEE;
 }
 
 strong {
   color: #111;
-}
-
-.project {
-  position: relative;
-  padding-right: 14px;
 }
 
 .project-icon {
@@ -46,72 +40,253 @@ strong {
   margin: 0 10px;
 }
 
+.project-controls {
+  margin-left: 20px;
+  color: #BBB;
+}
+
 .project-controls > button {
-  margin: 0 3px;
-  font-size: 12px;
-  border: none;
-  color: white;
-  border-radius: 2px;
+  margin: 0;
+  font-size: 11px;
+  border: 1px solid #CCC;
+  border-left-width: 0;
+  padding: 5px 15px;
+  cursor: pointer;
+  background: #FFF;
+  text-transform: uppercase;
+}
+
+.project-controls > button:first-child {
+  border-left-width: 1px;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+.project-controls > button:last-child {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
 }
 
 .location {
   color: gray;
-  cursor: pointer;
-}
-
-.project-controls {
-  display: flex;
-  align-items: flex-start;
-  padding-top: 10px;
+  font-size: 10px;
 }
 
 .project-button-debug {
+  color: #3498DB;
+}
+.project-button-debug:hover {
   background-color: #3498DB;
+  color: #FFF;
 }
 
 .project-button-install,
 .project-button-start {
-  background-color: #18BC9C
+  color: #18BC9C
+}
+
+.project-button-install:hover,
+.project-button-start:hover {
+  background-color: #18BC9C;
+  color: #FFF;
 }
 
 .project-button-stop {
-  background-color: #E74C3C;
+  color: #E74C3C;
 }
-
+.project-button-stop:hover {
+  background-color: #E74C3C;
+  color: #FFF;
+}
 .project-button-refresh {
+  color: #777;
+}
+.project-button-refresh:hover {
   background-color: #777;
+  color: #FFF;
+}
+.project-button-remove {
+  color: #E61F00;
+}
+.project-button-remove:hover {
+  background-color: #E61F00;
+  color: #FFF;
 }
 
 .project-status {
-  width: 3px;
+  width: 10px;
   margin: -10px 0;
+  border-right: 1px solid rgba(0,0,0,0.1);
+  box-shadow: inset 0 0 1px 1px rgba(255,255,255,0.2), inset 0 -1px 0px 0px rgba(0,0,0,0.2);
 }
 
 .project-status[status="warning"] {
-  background: #FFAA48;
+  background: linear-gradient(to bottom, #F5BD56, #E3A93D );
 }
 
 .project-status[status="error"] {
-  background-color: #E74C3C;
+  background: linear-gradient(to bottom, #E34F22, #B83C16 );
 }
 
 .project-status[status="valid"] {
-  background-color: #18BC9C
+  background: linear-gradient(to bottom, #90D11F, #77AD18 );
+}
+.appDetails {
+  padding: 10px;
+}
+.appDetails[status="warning"] .warnings {
+  visibility: visible;
+  margin: 20px;
+  padding: 10px 10px;
+  border-left: 3px solid #ECB51E;
+  background-color: rgba(236, 181, 20, 0.1);
+}
+.appDetails[status="error"] .errors {
+  visibility: visible;
+  margin: 20px;
+  padding: 10px 10px;
+  border-left: 3px solid #E34F22;
+  background-color: rgba(227,79,34,0.1);
 }
 
-.project-button-remove {
-  width: 11px;
-  height: 11px;
-  min-width: 0;
-  display: block;
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  margin: 0!important;
-  background-image: linear-gradient(to top, #666, #666), linear-gradient(to left, #666, #666);
-  background-size: 100% 1px, 1px 100%;
+.appDetails[status="valid"] .validation {
+  color: #82BD1B;
+}
+.appDetails[status="warning"] .validation {
+  color: #ECB51F;
+}
+.appDetails[status="error"] .validation {
+  color: #C24119;
+}
+
+.warnings[status="warning"]{
+  background-image: url('warning.svg');
+}
+
+.errors[status="error"]{
+  background-image: url('error.svg');
+  color: rgb(227, 79, 34);
+}
+
+.warnings[status="warning"], .errors[status="error"] {
   background-repeat: no-repeat;
-  background-position: 0 center, center 0;
-  transform: rotate(45deg);
-  background-color: transparent;
+  background-size: 12px;
+  position: relative;
+  width: 12px;
+  height: 12px;
+  margin-top: 6px;
+  line-height: 12px;
+  font-size: 11px;
+  padding-left: 16px;
+  font-weight: bold;
+}
+
+#list {
+  background: #EEE;
+  position: relative;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.3);
+}
+
+#new-app {
+  box-shadow: 0 -1px 10px rgba(0,0,0,0.3);
+}
+
+#list button {
+  background: #EEE;
+  border: none;
+  border-top: 1px solid #DDD;
+  cursor: pointer;
+  width: 100%;
+  padding: 10px;
+  color: #333;
+  box-shadow: none;
+  text-align: left;
+  font-weight: bold;
+  position: relative;
+}
+
+#list button:after {
+  content: '+';
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  line-height: 18px;
+  font-weight: bold;
+  position: absolute;
+  right: 10px;
+  background: #AAA;
+  box-shadow: 0 1px 1px #EEE;
+  color: #FFF;
+  border-radius: 50%;
+}
+
+#list button:hover {
+  background: #DDD;
+}
+
+#list button input {
+  width: 90%;
+  box-shadow: none;
+  border-radius: 3px;
+  border: 1px solid #DDD;
+  padding: 4px;
+  margin-top: 4px;
+}
+
+#detail {
+  background-color: #FAFAFA;
+}
+.appHeader {
+  border-bottom: 1px solid #DDD;
+  margin: 10px 20px 10px 20px;
+  padding-bottom: 10px;
+}
+.appHeader div{
+  line-height: 160%;
+}
+.appHeader .project-icon {
+  flex: 0 0 84px;
+}
+.appHeader .project-icon img{
+  width: 64px;
+  height: 64px;
+}
+.appHeader .location {
+  font-size: 11px;
+  color: #999;
+}
+
+.appHeader .description {
+  font-style: italic;
+  color: #333;
+}
+
+.appHeader .appStatus {
+  position: absolute;
+  right: 20px;
+}
+.appHeader .appStatus p{
+  text-transform: uppercase;
+  font-size: 10px;
+  padding: 0 10px;
+  margin-top: 10px;
+  line-height: 10px;
+}
+.appHeader .appStatus p:first-child {
+  border-right: 1px solid #CCC;
+  padding-left: 0;
+}
+
+h1 {
+  font-size: 24px;
+}
+
+h2 {
+  padding: 4px 10px 4px 10px;
+  background: linear-gradient(to bottom, #49525A, #3E474F);
+  color: #9FA6AD;
+  border-bottom: 1px solid #30363B;
+  font-weight: normal;
+  text-shadow: 0 1px 1px #222;
+  box-shadow: inset 0 0 1px #6E7A85;
 }

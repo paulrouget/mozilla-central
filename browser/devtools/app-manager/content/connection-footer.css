@@ -33,11 +33,22 @@ body.edit-connection #banner-editing {
   display: flex !important;
 }
 
-#logs > pre {
-  overflow: auto;
+#banner-logs {
+  width: 30%;
+  display: flex;
+}
+
+#logs {
+  padding: 0;
   width: 100%;
 }
 
+#logs > pre {
+  overflow: auto;
+}
+#status.banner-box {
+  width: 100% !important;
+}
 .banner-box {
   display: flex;
   flex-direction: column;
@@ -46,8 +57,7 @@ body.edit-connection #banner-editing {
 }
 
 #banner-connected > .banner-box {
-  width: 50%;
-  align-items: center;
+  align-items: left;
 }
 
 #start-simulator-button[simulators-count="0"] {
