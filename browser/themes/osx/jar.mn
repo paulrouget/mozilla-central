@@ -313,6 +313,8 @@ browser.jar:
   skin/classic/browser/devtools/arrow-e.png                 (devtools/arrow-e.png)
   skin/classic/browser/devtools/connection-footer.css       (../shared/devtools/connection-footer.css)
   skin/classic/browser/devtools/device.css                  (../shared/devtools/device.css)
+  skin/classic/browser/devtools/warning.svg                 (../shared/devtools/warning.svg)
+  skin/classic/browser/devtools/error.svg                   (../shared/devtools/error.svg)
   skin/classic/browser/devtools/projects.css                (../shared/devtools/projects.css)
 #ifdef MOZ_SERVICES_SYNC
   skin/classic/browser/sync-throbber.png

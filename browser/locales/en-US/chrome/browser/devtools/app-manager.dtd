@@ -1,20 +1,20 @@
-<!ENTITY device.screenshot "screenshot">
+<!ENTITY device.screenshot "Screenshot">
 <!ENTITY device.killall "killall">
 <!ENTITY device.title "Device Control Center">
-<!ENTITY device.notConnected "Not connected">
-<!ENTITY device.startApp "start">
-<!ENTITY device.stopApp "stop">
-<!ENTITY device.debugApp "debug">
+<!ENTITY device.notConnected "Not Connected">
+<!ENTITY device.startApp "Start">
+<!ENTITY device.stopApp "Stop">
+<!ENTITY device.debugApp "Debug">
 
-<!ENTITY connection.disconnect "disconnect">
-<!ENTITY connection.showDeviceCtrlCenter "Click for more details">
-<!ENTITY connection.notConnected "Not connected">
-<!ENTITY connection.changeHostAndPort "change">
-<!ENTITY connection.startSimulator "start simulator">
-<!ENTITY connection.saveConnectionInfo "save">
-<!ENTITY connection.connecting "connecting…">
-<!ENTITY connection.disconnecting "disconnecting…">
-<!ENTITY connection.cancel "cancel">
+<!ENTITY connection.disconnect "Disconnect">
+<!ENTITY connection.showDeviceCtrlCenter "Click for More Details">
+<!ENTITY connection.notConnected "Not Connected">
+<!ENTITY connection.changeHostAndPort "Change">
+<!ENTITY connection.startSimulator "Start Simulator">
+<!ENTITY connection.saveConnectionInfo "Save">
+<!ENTITY connection.connecting "Connecting…">
+<!ENTITY connection.disconnecting "Disconnecting…">
+<!ENTITY connection.cancel "Cancel">
 
 <!ENTITY projects.or "or">
 <!ENTITY projects.localApps "Local Apps">
@@ -22,9 +22,11 @@
 <!ENTITY projects.addPackaged "Add Packaged App">
 <!ENTITY projects.addHosted "Add Hosted App">
 <!ENTITY projects.title "Local Apps">
-<!ENTITY projects.removeApp "remove">
-<!ENTITY projects.reloadFiles "update">
-<!ENTITY projects.installApp "install">
-<!ENTITY projects.startApp "start">
-<!ENTITY projects.stopApp "stop">
-<!ENTITY projects.debugApp "debug">
+<!ENTITY projects.appDetails "App Details">
+<!ENTITY projects.removeApp "Remove">
+<!ENTITY projects.reloadFiles "Update">
+<!ENTITY projects.installApp "Install">
+<!ENTITY projects.startApp "Start">
+<!ENTITY projects.stopApp "Stop">
+<!ENTITY projects.debugApp "Debug">
+<!ENTITY projects.deleteApp "Delete">
