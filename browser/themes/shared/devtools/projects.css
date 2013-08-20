@@ -33,7 +33,13 @@ a {
 strong {
   color: #111;
 }
-
+.project-meta .type {
+  font-size: 10px;
+  float: right;
+  padding-right: 10px;
+  color: #AAA;
+  text-transform: uppercase;
+}
 .project-icon {
   width: 32px;
   height: 32px;
