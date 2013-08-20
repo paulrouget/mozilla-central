@@ -34,6 +34,8 @@
       <h2>&projects.localApps;</h2>
       <div id="projects" template-loop='{"arrayPath":"app.projects","childSelector":"#project-template"}'></div>
 
+      <div id="lense">
+      </div>
 
     </section>
 
@@ -41,7 +43,7 @@
   </body>
 
   <template id="project-template">
-  <div class="project" template='{"type":"attribute","path":"location","name":"id"}' onclick="UI.store.object.view.selectedApp = this.id">
+  <div class="project" template='{"type":"attribute","path":"location","name":"id"}' onclick="UI.selectProject(this.id)">
     <div class="project-status" template='{"type":"attribute","path":"validationStatus","name":"status"}'></div>
     <img class="project-icon" template='{"type":"attribute","path":"icon","name":"src"}' />
     <div class="project-meta">
@@ -64,6 +66,12 @@
   </div>
   </template>
 
+  <template id="lense-template">
+  <div>
+    <p template='{"type":"textContent","path":"location"}'></p>
+    <pre template='{"type":"textContent","path":"manifestAsString"}'></pre>
+  </div>
+  </template>
 
 
   <script type="application/javascript;version=1.8" src="projects.js"></script>
