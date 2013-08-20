@@ -166,7 +166,7 @@ let UI = {
     this._getTargetForApp(manifest).then((target) => {
       gDevTools.showToolbox(target,
                             null,
-                            devtools.Toolbox.HostType.WINDOW,
+                            devtools.Toolbox.HostType.TAB,
                             this.connection.uid);
     }, console.error);
   },
