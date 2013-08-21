@@ -1,3 +1,6 @@
+<!ENTITY index.projects "Projects">
+<!ENTITY index.device "Device">
+
 <!ENTITY device.screenshot "Screenshot">
 <!ENTITY device.killall "killall">
 <!ENTITY device.title "Device Control Center">

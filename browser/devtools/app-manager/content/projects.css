@@ -15,12 +15,6 @@ body {
   flex-direction: column;
 }
 
-#connection-footer {
-  border-width: 0;
-  height: 50px;
-  min-height: 50px;
-}
-
 #content {
   flex-direction: row;
   display: flex;

@@ -1,0 +1,71 @@
+* {
+  margin: 0;
+  padding: 0;
+  -moz-box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  margin: 0;
+  background: #22272D;
+  flex-direction: column;
+}
+
+#content {
+  display: flex;
+  flex-grow: 1;
+}
+
+#tabs {
+  display: flex;
+  flex-direction: column;
+}
+
+.button {
+  width: 100px;
+  height: 100px;
+  -moz-appearance: none;
+  border-width: 0;
+  background: #2F373F;
+  color: white;
+  cursor: pointer;
+}
+
+.button[selected] {
+  color: black;
+  background: white;
+}
+
+.button::-moz-focus-inner {
+  border-width: 0;
+}
+
+.button:hover,
+.button:focus {
+  text-decoration: underline;
+}
+
+#tab-panels {
+  flex-grow: 1;
+}
+
+.panel {
+  border-width: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.panel:not([selected="true"]) {
+  display: none;
+}
+
+#connection-footer {
+  border-width: 0;
+  height: 50px;
+  min-height: 50px;
+}
+

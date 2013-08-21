@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+     - License, v. 2.0. If a copy of the MPL was not distributed with this
+     - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<!DOCTYPE html [
+  <!ENTITY % appMgrDTD SYSTEM "chrome://browser/locale/devtools/app-manager.dtd" >
+  %appMgrDTD;
+]>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf8"/>
+    <base href="chrome://browser/content/devtools/app-manager/"></base>
+    <link rel="stylesheet" href="index.css" type="text/css"/>
+    <!--<link rel="stylesheet" href="chrome://browser/skin/devtools/connection-footer.css" type="text/css"/>-->
+  </head>
+
+  <body>
+    <div id="content">
+      <div id="tabs">
+        <button class="button projects-button" onclick="selectTab('projects')">&index.projects;</button>
+        <button class="button device-button" onclick="selectTab('device')">&index.device;</button>
+      </div>
+      <div id="tab-panels">
+        <iframe class="panel projects-panel" src="projects.xhtml"/>
+        <iframe class="panel device-panel" src="device.xhtml"/>
+      </div>
+    </div>
+    <iframe id="connection-footer" src="connection-footer.xhtml"></iframe>
+  </body>
+
+  <script type="application/javascript;version=1.8">
+    window.addEventListener("message", function(event) {
+      let panels = document.querySelectorAll(".panel");
+      for (let frame of panels) {
+        frame.contentWindow.postMessage(event.data, "*");
+      }
+    }, false);
+
+    function selectTab(id) {
+      for (let type of ["button", "panel"]) {
+        let oldSelection = document.querySelector("." + type + "[selected]");
+        let newSelection = document.querySelector("." + id + "-" + type);
+        if (!newSelection) {
+          continue;
+        }
+        if (oldSelection) {
+          oldSelection.removeAttribute("selected");
+        }
+        newSelection.setAttribute("selected", "true");
+      }
+    }
+    selectTab("projects");
+  </script>
+</html>
