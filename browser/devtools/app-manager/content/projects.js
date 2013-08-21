@@ -193,5 +193,7 @@ let UI = {
     let lense = document.querySelector("#lense");
     lense.setAttribute("template-for", template);
     this.template._processFor(lense);
+
+    let m = new ManifestEditor(document.querySelector(".manifest-editor"), projects[idx].manifest);
   },
 }

@@ -16,6 +16,8 @@
     <title>&projects.title;</title>
 
     <link rel="stylesheet" href="projects.css" type="text/css"/>
+    <link rel="stylesheet" href="manifest-editor.css" type="text/css"/>
+    <link rel="stylesheet" href="chrome://browser/skin/devtools/light-theme.css" type="text/css"/>
     <link rel="stylesheet" href="chrome://browser/skin/devtools/projects.css" type="text/css"/>
   </head>
 
@@ -62,39 +64,41 @@
   <template id="lense-template">
   <div>
     <div class="app-details" template='{"type":"attribute","path":"validationStatus","name":"status"}'>
-    <div class="app-header">
-      <div class="project-icon">
-        <img template='
-      {"type":"attribute","path":"icon","name":"src"}' />
-      </div>
-      <div class="project-details">
-        <div class="title">
-          <h1 template='{"type":"textContent","path":"name"}'></h1>
-          <div class="app-status" template='{"type":"attribute","path":"validationStatus","name":"status"}'>
-            <p class="validation" template='{"type":"textContent","path":"validationStatus"}'></p>
-            <p class="type" template='{"type":"textContent","path":"type"}'></p>
-          </div>
+      <div class="app-header">
+        <div class="project-icon">
+          <img template='
+        {"type":"attribute","path":"icon","name":"src"}' />
         </div>
-        <span template='{"type":"textContent","path":"manifest.developer.name"}'></span>
-        <p class="location" template='{"type":"textContent","path":"location"}' onclick="UI.reveal(this.textContent)"></p>
-        <p class="description" template='{"type":"textContent","path":"manifest.description"}'></p>
+        <div class="project-details">
+          <div class="title">
+            <h1 template='{"type":"textContent","path":"name"}'></h1>
+            <div class="app-status" template='{"type":"attribute","path":"validationStatus","name":"status"}'>
+              <p class="validation" template='{"type":"textContent","path":"validationStatus"}'></p>
+              <p class="type" template='{"type":"textContent","path":"type"}'></p>
+            </div>
+          </div>
+          <span template='{"type":"textContent","path":"manifest.developer.name"}'></span>
+          <p class="location" template='{"type":"textContent","path":"location"}' onclick="UI.reveal(this.textContent)"></p>
+          <p class="description" template='{"type":"textContent","path":"manifest.description"}'></p>
+        </div>
       </div>
+      <div class="project-controls">
+        <button class="project-button-refresh" onclick="UI.update(this.dataset.location)" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.reloadFiles;</button>
+        <button class="project-button-install" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.installApp;</button>
+        <button class="project-button-start" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.startApp;</button>
+        <button class="project-button-stop" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.stopApp;</button>
+        <button class="project-button-debug" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.debugApp;</button>
+        <button class="project-button-remove" onclick="UI.remove(this.dataset.location)" template='{"type":"attribute","path":"location","name":"data-location"}' title="&projects.removeApp;">&projects.removeApp;</button>
+      </div>
+      <div class="errors" template='{"type":"textContent","path":"errors"}'></div>
+      <div class="warnings" template='{"type":"textContent","path":"warnings"}'></div>
     </div>
-    <div class="project-controls">
-      <button class="project-button-refresh" onclick="UI.update(this.dataset.location)" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.reloadFiles;</button>
-      <button class="project-button-install" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.installApp;</button>
-      <button class="project-button-start" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.startApp;</button>
-      <button class="project-button-stop" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.stopApp;</button>
-      <button class="project-button-debug" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.debugApp;</button>
-      <button class="project-button-remove" onclick="UI.remove(this.dataset.location)" template='{"type":"attribute","path":"location","name":"data-location"}' title="&projects.removeApp;">&projects.removeApp;</button>
-    </div>
-    <div class="errors" template='{"type":"textContent","path":"errors"}'></div>
-    <div class="warnings" template='{"type":"textContent","path":"warnings"}'></div>
-    </div>
+    <div class="manifest-editor"></div>
   </div>
   </template>
 
 
+  <script type="application/javascript;version=1.8" src="manifest-editor.js"></script>
   <script type="application/javascript;version=1.8" src="projects.js"></script>
   <script type="application/javascript;version=1.8" src="template.js"></script>
 </html>

@@ -1,0 +1,75 @@
+.manifest-editor,
+.manifest-editor * {
+   display: flex;
+}
+
+.manifest-editor-column-name {
+  width: 200px;
+}
+
+.manifest-editor-column-type {
+  width: 100px;
+  color: #AAA;
+}
+
+.manifest-editor-column-value {
+  flex-grow: 1;
+}
+
+.manifest-editor {
+  margin: 0 30px 30px;
+  background: white;
+  border-bottom: 1px solid #EEE;
+}
+
+.manifest-editor-column {
+  flex-direction: column;
+}
+
+.manifest-editor-cell {
+  padding: 0 5px 0 15px;
+  border-top: 1px solid #EEE;
+  height: 18px;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.manifest-editor-cell:nth-child(odd) {
+  background: #F6FBFB;
+}
+
+.manifest-editor-cell[collapse="true"] {
+  display: none;
+}
+
+.manifest-editor-cell[level="0"] {padding-left: calc(15px + 0 * 10px)}
+.manifest-editor-cell[level="1"] {padding-left: calc(15px + 1 * 10px)}
+.manifest-editor-cell[level="2"] {padding-left: calc(15px + 2 * 10px)}
+.manifest-editor-cell[level="3"] {padding-left: calc(15px + 3 * 10px)}
+.manifest-editor-cell[level="4"] {padding-left: calc(15px + 4 * 10px)}
+.manifest-editor-cell[level="5"] {padding-left: calc(15px + 5 * 10px)}
+.manifest-editor-cell[level="6"] {padding-left: calc(15px + 6 * 10px)}
+.manifest-editor-cell[level="7"] {padding-left: calc(15px + 7 * 10px)}
+.manifest-editor-cell[level="8"] {padding-left: calc(15px + 8 * 10px)}
+.manifest-editor-cell[level="9"] {padding-left: calc(15px + 9 * 10px)}
+
+
+.theme-twisty {
+  margin-left: -15px
+}
+
+.manifest-editor-cell > input {
+  border: none;
+  padding: 0 3px;
+  background: transparent;
+  border: 1px solid transparent;
+  -moz-appearance: none;
+  height: auto;
+  -moz-box-sizing: border-box;
+}
+
+.manifest-editor-cell > input:focus {
+  border-color: #CCC;
+}
