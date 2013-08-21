@@ -28,20 +28,24 @@ button {
   border-radius: 3px;
   padding: 3px 10px;
 }
+
 button.left{
   margin-right: 0px;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
+
 button.right{
   margin-left: -6px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
+
 button.action-primary {
   background: linear-gradient(to bottom, #276DA3, #1E5580);
   color: #EEE;
 }
+
 button.action-cancel {
   background: linear-gradient(to bottom, #B32B02, #942300);
   color: #EEE;
@@ -93,25 +97,28 @@ button.action-cancel {
   padding: 10px 20px;
   position: relative;
 }
+
 .connected-status {
   color: #B3BFC9;
   text-shadow: 0px 1px 2px rgba(0,0,0,0.9);
   padding-bottom: 10px;
 }
+
 .connected-status i{
   font-size: 150%;
   top: 10%;
   padding-right: 3px;
   position: relative;
 }
+
 .connected-indicator {
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 0px 1px rgba(255,255,255,0.3);
   height: 100%;
   flex: 0 0 10px;
 }
-#banner-connected .connected-indicator{
+#banner-connected .connected-indicator, #banner-connecting .connected-indicator{
   background: linear-gradient(to bottom, #69B8FF, #339FFF );
 }
-#banner-disconnected .connected-indicator{
+#banner-disconnected .connected-indicator, #banner-editing .connected-indicator, #banner-disconnecting .connected-indicator{
   background: linear-gradient(to bottom, #375A87, #1C4375 );
 }

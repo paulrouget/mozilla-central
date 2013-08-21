@@ -22,17 +22,16 @@
   <body onload="UI.onload()">
   <section id="content">
       <section id="list">
-        <h2>&projects.localApps;</h2>
         <div  id="projects">
           <div template-loop='{"arrayPath":"app.projects","childSelector":"#project-template"}'></div>
         </div>
-        <div id="new-app">
+        <div id="new-app-buttons">
           <div id="new-app-type">
-            <button onclick="UI.addPackaged()">&projects.addPackaged;
-            </button>
-            <button onclick="UI.addHosted()">&projects.addHosted;
+            <div class="button" onclick="UI.addPackaged()">&projects.addPackaged;
+            </div>
+            <div class="button" onclick="UI.addHosted()">&projects.addHosted;
               <input value="" id="hosted-manifest-url" type="url" pattern="https?://.+" placeholder="http://mydomain.com/app/webapp.manifest" size="50" />
-            </button>
+            </div>
           </div>
         </div>
       </section>
@@ -53,8 +52,8 @@
       <span class="type" template='{"type":"textContent","path":"type"}'></span>
       <p class="location" template='{"type":"textContent","path":"manifest.description"}'></p>
       <div class="validation">
-        <div class="errors" template='{"type":"attribute","path":"validationStatus","name":"status"}'>6</div>
-        <div class="warnings" template='{"type":"attribute","path":"validationStatus","name":"status"}'>2</div>
+        <div class="errors" template='{"type":"attribute","path":"validationStatus","name":"status"}'><span template='{"type":"textContent","path":"errorsCount"}'></span></div>
+        <div class="warnings" template='{"type":"attribute","path":"validationStatus","name":"status"}'><span template='{"type":"textContent","path":"warningsCount"}'></span></div>
       </div>
     </div>
   </div>
@@ -62,9 +61,8 @@
 
   <template id="lense-template">
   <div>
-    <h2>&projects.appDetails;</h2>
-    <div class="appDetails" template='{"type":"attribute","path":"validationStatus","name":"status"}'>
-    <div class="appHeader">
+    <div class="app-details" template='{"type":"attribute","path":"validationStatus","name":"status"}'>
+    <div class="app-header">
       <div class="project-icon">
         <img template='
       {"type":"attribute","path":"icon","name":"src"}' />
@@ -72,13 +70,13 @@
       <div class="project-details">
         <div class="title">
           <h1 template='{"type":"textContent","path":"name"}'></h1>
-          <div class="appStatus" template='{"type":"attribute","path":"validationStatus","name":"status"}'>
+          <div class="app-status" template='{"type":"attribute","path":"validationStatus","name":"status"}'>
             <p class="validation" template='{"type":"textContent","path":"validationStatus"}'></p>
             <p class="type" template='{"type":"textContent","path":"type"}'></p>
           </div>
         </div>
         <span template='{"type":"textContent","path":"manifest.developer.name"}'></span>
-        <p class="location" template='{"type":"textContent","path":"location"}'></p>
+        <p class="location" template='{"type":"textContent","path":"location"}' onclick="UI.reveal(this.textContent)"></p>
         <p class="description" template='{"type":"textContent","path":"manifest.description"}'></p>
       </div>
     </div>
