@@ -137,6 +137,7 @@ let UI = {
                 project.validationStatus = "valid";
 
                 if (validation.errors.length > 0) {
+                  project.errorsCount = validation.errors.length;
                   project.errors = validation.errors.join(",\n ");
                   project.validationStatus = "error";
                 } else {
@@ -144,6 +145,7 @@ let UI = {
                 }
 
                 if (validation.warnings.length > 0) {
+                  project.warningsCount = validation.warnings.length;
                   project.warnings = validation.warnings.join(",\n ");
                   project.validationStatus = "warning";
                 } else {
