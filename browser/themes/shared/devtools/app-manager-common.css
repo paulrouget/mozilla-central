@@ -24,6 +24,29 @@ h2 {
   box-shadow: inset 0 0 1px #6E7A85;
 }
 
+.list-item {
+  padding: 10px 0;
+  background-color: #F6F6F6;
+  box-shadow: inset 0 -1px 0 rgba(0,0,0,0.1);
+  color: #666;
+  line-height: 120%;
+  cursor: pointer;
+  display: flex;
+}
+
+.list-item:hover {
+  background-color: #EEE;
+}
+
+.list-item > * {
+  flex-shrink: 0;
+}
+
+.list-item.selected {
+  background: linear-gradient(to bottom, #276DA3, #1E5580);
+  color: #FFF;
+}
+
 .control-bar {
   display: flex;
   margin-left: 20px;
@@ -88,6 +111,52 @@ strong {
   border: 1px solid #DDD;
   padding: 4px;
   margin-top: 4px;
+}
+.project-button-debug {
+  color: #3498DB;
+}
+
+.project-button-debug:hover {
+  background-color: #3498DB;
+  color: #FFF;
+}
+
+.project-button-install,
+.project-button-start {
+  color: #18BC9C
+}
+
+.project-button-install:hover,
+.project-button-start:hover {
+  background-color: #18BC9C;
+  color: #FFF;
+}
+
+.project-button-stop {
+  color: #E74C3C;
+}
+
+.project-button-stop:hover {
+  background-color: #E74C3C;
+  color: #FFF;
+}
+
+.project-button-refresh {
+  color: #777;
+}
+
+.project-button-refresh:hover {
+  background-color: #777;
+  color: #FFF;
+}
+
+.project-button-remove {
+  color: #E61F00;
+}
+
+.project-button-remove:hover {
+  background-color: #E61F00;
+  color: #FFF;
 }
 
 #detail {

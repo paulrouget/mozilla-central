@@ -23,11 +23,11 @@
 
   <body onload="UI.init()">
 
-    <div id="notConnectedMessage">&device.notConnected;</div>
+    <div id="notConnectedMessage"><span>&device.notConnected;</span></div>
 
     <section id="content">
           <section id="list">
-            <div class="meta">
+            <div id="meta">
               <header>
                 <h1>
                   <span template='{"type":"textContent","path":"device.description.name"}'></span>
@@ -38,22 +38,39 @@
                   <span>Gecko </span>
                   <span template='{"type":"textContent","path":"device.description.geckoversion"}'></span>
                 </h3>
+                <p template='{"type":"localizedContent","property":"device.deviceSize", "paths":["device.description.width","device.description.height","device.description.dpi"]}'></p>
               </header>
-              <p template='{"type":"localizedContent","property":"device.deviceSize", "paths":["device.description.width","device.description.height","device.description.dpi"]}'></p>
               <details class="control-bar">
                 <button onclick="UI.screenshot()">&device.screenshot;</button>
                 <button>&device.killall;</button>
               </details>
               <div id="tabs-headers">
-                <div onclick="UI.setTab('apps')" class="list-item apps">Installed Apps</div>
-                <div onclick="UI.setTab('permissions')" class="list-item permissions">Permissions</div>
+                <div onclick="UI.setTab('apps')" class="tab list-item apps">Installed Apps</div>
+                <div onclick="UI.setTab('permissions')" class="tab list-item permissions">Permissions</div>
               </div>
             </div>
           </section>
           <section id="detail">
             <div id="tabs">
-              <div class="tabpanel apps" template-loop='{"arrayPath":"apps.all","childSelector":"#app-template"}'></div>
-              <div class="tabpanel permissions" template-loop='{"arrayPath":"device.permissions","childSelector":"#permission-template"}'></div>
+              <div class="tabpanel apps">
+                <div class="app-list" template-loop='{"arrayPath":"apps.all","childSelector":"#app-template"}'></div>
+              </div>
+              <div class="tabpanel permissions table">
+                <div class="table-header">
+                  <div class="name">&device.name;</div>
+                  <div class="app-permission">&device.app;</div>
+                  <div class="privileged-permission">&device.privileged;</div>
+                  <div class="certified-permission">&device.certified;</div>
+                </div>
+                <div class="cells" >
+                  <section template-loop='{"arrayPath":"device.permissions","childSelector":"#permission-template"}'></section>
+                </div>
+                <div class="table-footer">
+                  <div class="allow-label">&device.allow;</div>
+                  <div class="prompt-label">&device.prompt;</div>
+                  <div class="deny-label">&device.deny;</div>
+                </div>
+              </div>
             </div>
           </section>
     </section>
@@ -61,13 +78,11 @@
   </body>
 
   <template id="permission-template">
-    <div class="permission">
-      <p>
-      <span template='{"type":"textContent","path":"name"}'></span>
-      <span template='{"type":"textContent","path":"app"}'></span>/
-      <span template='{"type":"textContent","path":"privileged"}'></span>/
-      <span template='{"type":"textContent","path":"certified"}'></span>
-      </p>
+    <div class="row">
+      <div class="name" template='{"type":"textContent","path":"name"}'></div>
+      <div class="app-permission" template='{"type":"attribute", "name":"permission", "path":"app"}'></div>
+      <div class="privileged-permission" template='{"type":"attribute", "name":"permission","path":"privileged"}'></div>
+      <div class="certified-permission" template='{"type":"attribute", "name":"permission", "path":"certified"}'></div>
     </div>
   </template>
 
@@ -75,9 +90,11 @@
     <div class="app" template='{"type":"attribute","path":"running","name":"running"}'>
       <img class="app-icon" template='{"type":"attribute","path":"iconURL","name":"src"}'></img>
       <span class="app-name" template='{"type":"textContent","path":"name"}'></span>
-      <button class="app-button debug-app-button" template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.openToolbox(this.dataset.manifest)">&device.debugApp;</button>
-      <button class="app-button start-app-button" template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.startApp(this.dataset.manifest)">&device.startApp;</button>
-      <button class="app-button stop-app-button"  template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.stopApp(this.dataset.manifest)">&device.stopApp;</button>
+      <div class="control-bar">
+        <button class="project-button-debug" template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.openToolbox(this.dataset.manifest)">&device.debugApp;</button>
+        <button class="project-button-start" template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.startApp(this.dataset.manifest)">&device.startApp;</button>
+        <button class="project-button-stop"  template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.stopApp(this.dataset.manifest)">&device.stopApp;</button>
+      </div>
     </div>
   </template>
 

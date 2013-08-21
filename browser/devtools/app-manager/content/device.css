@@ -16,21 +16,23 @@ details.control-bar {
   margin: 0;
 }
 
+details.control-bar button {
+  flex-grow: 1;
+}
+
 #tabs-headers {
   flex-shrink: 0;
   display: flex;
+  flex-direction: column;
 }
 
 #tabs {
-  overflow: auto;
-  flex-shrink: 1;
-  flex-grow: 1;
-  flex-direction: row;
+  height: 100%;
 }
 
 .tab {
   display: block;
-  text-align: center;
+  text-align: left;
   flex-grow: 1;
 }
 
@@ -40,7 +42,7 @@ details.control-bar {
 }
 
 .tabpanel.selected {
-  height: auto;
+  height: 100%;
 }
 
 #battery[status="discharging"] > .charging,
@@ -51,6 +53,7 @@ details.control-bar {
 .apps {
   display: flex;
   flex-direction: column;
+  overflow: auto;
 }
 
 .app {
@@ -63,13 +66,13 @@ details.control-bar {
   flex-grow: 1;
 }
 
-.app > .app-button {
+.app .control-bar > button {
   display: none;
 }
 
-.app[running="false"] > .start-app-button,
-.app[running="true"] > .stop-app-button,
-.app[running="true"] > .restart-app-button,
-.app[running="true"] > .debug-app-button {
+.app[running="false"] > .control-bar > .project-button-start,
+.app[running="true"] > .control-bar > .project-button-stop,
+.app[running="true"] > .control-bar > .project-button-restart,
+.app[running="true"] > .control-bar > .project-button-debug {
   display: inline-block;
 }
