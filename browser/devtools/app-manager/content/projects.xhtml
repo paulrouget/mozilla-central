@@ -15,21 +15,23 @@
 
     <title>&projects.title;</title>
 
+    <link rel="stylesheet" href="layout.css" type="text/css"/>
     <link rel="stylesheet" href="projects.css" type="text/css"/>
+    <link rel="stylesheet" href="chrome://browser/skin/devtools/app-manager-common.css" type="text/css"/>
     <link rel="stylesheet" href="chrome://browser/skin/devtools/projects.css" type="text/css"/>
   </head>
 
   <body onload="UI.onload()">
   <section id="content">
       <section id="list">
-        <div  id="projects">
+        <div id="projects">
           <div template-loop='{"arrayPath":"app.projects","childSelector":"#project-template"}'></div>
         </div>
         <div id="new-app-buttons">
           <div id="new-app-type">
-            <div class="button" onclick="UI.addPackaged()">&projects.addPackaged;
+            <div class="button-plus button" onclick="UI.addPackaged()">&projects.addPackaged;
             </div>
-            <div class="button" onclick="UI.addHosted()">&projects.addHosted;
+            <div class="button-plus button" onclick="UI.addHosted()">&projects.addHosted;
               <input value="" id="hosted-manifest-url" type="url" pattern="https?://.+" placeholder="http://mydomain.com/app/webapp.manifest" size="50" />
             </div>
           </div>
@@ -44,7 +46,7 @@
   </body>
 
   <template id="project-template">
-  <div class="project" template='{"type":"attribute","path":"location","name":"id"}' onclick="UI.selectProject(this.id)">
+  <div class="list-item" template='{"type":"attribute","path":"location","name":"id"}' onclick="UI.selectProject(this.id)">
     <div class="project-status" template='{"type":"attribute","path":"validationStatus","name":"status"}'></div>
     <img class="project-icon" template='{"type":"attribute","path":"icon","name":"src"}' />
     <div class="project-meta">
@@ -80,7 +82,7 @@
         <p class="description" template='{"type":"textContent","path":"manifest.description"}'></p>
       </div>
     </div>
-    <div class="project-controls">
+    <div class="control-bar">
       <button class="project-button-refresh" onclick="UI.update(this.dataset.location)" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.reloadFiles;</button>
       <button class="project-button-install" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.installApp;</button>
       <button class="project-button-start" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.startApp;</button>
