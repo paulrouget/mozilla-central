@@ -15,7 +15,9 @@
     <base href="chrome://browser/content/devtools/app-manager/"></base>
     <title>&device.title;</title>
 
+    <link rel="stylesheet" href="layout.css" type="text/css"/>
     <link rel="stylesheet" href="device.css" type="text/css"/>
+    <link rel="stylesheet" href="chrome://browser/skin/devtools/app-manager-common.css" type="text/css"/>
     <link rel="stylesheet" href="chrome://browser/skin/devtools/device.css" type="text/css"/>
   </head>
 
@@ -23,36 +25,38 @@
 
     <div id="notConnectedMessage">&device.notConnected;</div>
 
-    <div id="content">
-      <div class="meta">
-        <header>
-          <h1>
-            <span template='{"type":"textContent","path":"device.description.name"}'></span>
-            <span template='{"type":"textContent","path":"device.description.version"}'></span>
-            (<span template='{"type":"textContent","path":"device.description.channel"}'></span>)
-          </h1>
-          <h2>
-            <span>Gecko </span>
-            <span template='{"type":"textContent","path":"device.description.geckoversion"}'></span>
-          </h2>
-        </header>
-        <details>
-          <p><button onclick="UI.screenshot()">&device.screenshot;</button>  <button>&device.killall;</button></p>
-          <p template='{"type":"localizedContent","property":"device.deviceSize", "paths":["device.description.width","device.description.height","device.description.dpi"]}'></p>
-        </details>
-      </div>
-
-      <div id="tabs-headers">
-        <h2 onclick="UI.setTab('apps')" class="tab apps">Installed Apps</h2>
-        <h2 onclick="UI.setTab('permissions')" class="tab permissions">Permissions</h2>
-      </div>
-
-      <div id="tabs">
-        <div class="tabpanel apps" template-loop='{"arrayPath":"apps.all","childSelector":"#app-template"}'></div>
-        <div class="tabpanel permissions" template-loop='{"arrayPath":"device.permissions","childSelector":"#permission-template"}'></div>
-      </div>
-    </div>
-
+    <section id="content">
+          <section id="list">
+            <div class="meta">
+              <header>
+                <h1>
+                  <span template='{"type":"textContent","path":"device.description.name"}'></span>
+                  <span template='{"type":"textContent","path":"device.description.version"}'></span>
+                  <span template='{"type":"textContent","path":"device.description.channel"}'></span>
+                </h1>
+                <h3>
+                  <span>Gecko </span>
+                  <span template='{"type":"textContent","path":"device.description.geckoversion"}'></span>
+                </h3>
+              </header>
+              <p template='{"type":"localizedContent","property":"device.deviceSize", "paths":["device.description.width","device.description.height","device.description.dpi"]}'></p>
+              <details class="control-bar">
+                <button onclick="UI.screenshot()">&device.screenshot;</button>
+                <button>&device.killall;</button>
+              </details>
+              <div id="tabs-headers">
+                <div onclick="UI.setTab('apps')" class="list-item apps">Installed Apps</div>
+                <div onclick="UI.setTab('permissions')" class="list-item permissions">Permissions</div>
+              </div>
+            </div>
+          </section>
+          <section id="detail">
+            <div id="tabs">
+              <div class="tabpanel apps" template-loop='{"arrayPath":"apps.all","childSelector":"#app-template"}'></div>
+              <div class="tabpanel permissions" template-loop='{"arrayPath":"device.permissions","childSelector":"#permission-template"}'></div>
+            </div>
+          </section>
+    </section>
     <iframe id="connection-footer" src="connection-footer.xhtml"></iframe>
   </body>
 

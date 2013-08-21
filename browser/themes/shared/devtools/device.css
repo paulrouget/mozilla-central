@@ -1,95 +1,85 @@
-* {
+body:not(.notconnected) > #notConnectedMessage,
+body.notconnected > #content {
+  display: none;
+}
+
+body.notconnected > #content {
+  display: none;
+}
+
+#notConnectedMessage {
+  flex-grow: 1;
+  flex-direction: column;
+}
+
+details.control-bar {
   margin: 0;
-  padding: 0;
-  -moz-box-sizing: border-box;
-  font-size: 0.9rem;
 }
 
-body {
-  color: #333;
-  background-color: white;
-  font-family: Lucida Grande, Helvetica, Helvetica Neue, sans-serif;
+details.control-bar button {
+  flex-grow: 1;
+  border-radius: 0 !important;
 }
 
-a {
-  color: #000!important;
-  text-decoration: none;
-  border-bottom: 1px dotted #999
+.list-item {
+  padding: 15px 10px;
 }
 
-button {
-  background: #EEE;
-  border: 1px solid #999;
-  cursor: pointer;
-}
-
-.meta {
-  margin-bottom: 40px;
-}
-
-.meta > header > *{
-  line-height: 1.2em;
-}
-
-.meta > header > h2 {
-  color: #666;
-}
-
-.tab {
-  cursor: pointer;
-  border-bottom: 4px solid #CCC;
-  color: #666;
-  height: 24px;
-}
-
-.tab.selected {
-  border-color: #F06;
-  color: #000;
+#tabs-headers {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 #tabs {
-  padding: 10px 0 0;
+  overflow: auto;
+  flex-shrink: 1;
+  flex-grow: 1;
+  flex-direction: row;
 }
 
-.permission {
-  border-top: 1px solid #CCC;
-  padding: 5px;
-  border-left: 3px solid transparent;
+.tab {
+  display: block;
+  text-align: center;
+  flex-grow: 1;
+}
+
+.tabpanel {
+  height: 0;
+  overflow: hidden;
+}
+
+.tabpanel.selected {
+  height: auto;
+}
+
+#battery[status="discharging"] > .charging,
+#battery[status="charging"] > .discharging {
+  display: none;
+}
+
+.apps {
+  display: flex;
+  flex-direction: column;
 }
 
 .app {
-  padding: 10px;
-  border-left: 3px solid transparent;
+  display: flex;
+  align-items: center;
+  order: 1;
 }
 
-.app > img {
-  width: 24px;
+.app-name {
+  flex-grow: 1;
 }
 
-.app > .app-name {
-  margin: 0 10px;
+.app > .app-button {
+  display: none;
 }
 
-.app[running="true"] {
-  color: #000;
-}
-
-.app-button {
-  margin: 0 3px;
-  font-size: 12px;
-  border: none;
-  color: white;
-  border-radius: 2px;
-}
-
-.debug-app-button {
-  background-color: #3498DB;
-}
-
-.start-app-button {
-  background-color: #18BC9C
-}
-
-.stop-app-button {
-  background-color: #E74C3C;
+.app[running="false"] > .start-app-button,
+.app[running="true"] > .stop-app-button,
+.app[running="true"] > .restart-app-button,
+.app[running="true"] > .debug-app-button {
+  display: inline-block;
 }
