@@ -314,6 +314,7 @@ browser.jar:
   skin/classic/browser/devtools/device.css                  (../shared/devtools/device.css)
   skin/classic/browser/devtools/warning.svg                 (../shared/devtools/warning.svg)
   skin/classic/browser/devtools/error.svg                   (../shared/devtools/error.svg)
+  skin/classic/browser/devtools/plus.svg                    (../shared/devtools/plus.svg)
   skin/classic/browser/devtools/projects.css                (../shared/devtools/projects.css)
 #ifdef MOZ_SERVICES_SYNC
   skin/classic/browser/sync-throbber.png

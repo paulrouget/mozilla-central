@@ -15,6 +15,12 @@ body {
   flex-direction: column;
 }
 
+#connection-footer {
+  border-width: 0;
+  height: 50px;
+  min-height: 50px;
+}
+
 #content {
   flex-direction: row;
   display: flex;
@@ -36,7 +42,7 @@ body {
   overflow: auto;
 }
 
-#new-app {
+#new-app-buttons {
   flex: 0 0 auto;
 }
 
@@ -45,21 +51,17 @@ body {
   overflow: auto;
 }
 
-#detail .appHeader {
+#detail .app-header {
   display: flex;
 }
 
-#detail .appHeader .appStatus {
+.app-status {
   display: flex;
 }
-#detail .appHeader .title{
+
+.app-header .title{
   flex-direction: row;
   display: flex;
-}
-#connection-footer {
-  border-width: 0;
-  height: 50px;
-  min-height: 50px;
 }
 
 .project {

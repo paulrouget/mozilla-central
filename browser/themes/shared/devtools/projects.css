@@ -17,6 +17,24 @@ a {
   border-bottom: 1px dotted #999
 }
 
+h1 {
+  font-size: 24px;
+}
+
+h2 {
+  padding: 4px 10px 4px 10px;
+  background: linear-gradient(to bottom, #49525A, #3E474F);
+  color: #9FA6AD;
+  border-bottom: 1px solid #30363B;
+  font-weight: normal;
+  text-shadow: 0 1px 1px #222;
+  box-shadow: inset 0 0 1px #6E7A85;
+}
+
+strong {
+  color: #111;
+}
+
 .project {
   padding: 10px 0;
   background-color: #F6F6F6;
@@ -30,9 +48,6 @@ a {
   background-color: #EEE;
 }
 
-strong {
-  color: #111;
-}
 .project-meta .type {
   font-size: 10px;
   float: right;
@@ -58,7 +73,7 @@ strong {
   border-left-width: 0;
   padding: 5px 15px;
   cursor: pointer;
-  background: #FFF;
+  background: rgba(255,255,255,0.4);
   text-transform: uppercase;
 }
 
@@ -76,11 +91,17 @@ strong {
 .location {
   color: gray;
   font-size: 10px;
+  cursor: pointer;
+}
+
+.location:hover {
+  text-decoration: underline;
 }
 
 .project-button-debug {
   color: #3498DB;
 }
+
 .project-button-debug:hover {
   background-color: #3498DB;
   color: #FFF;
@@ -100,20 +121,25 @@ strong {
 .project-button-stop {
   color: #E74C3C;
 }
+
 .project-button-stop:hover {
   background-color: #E74C3C;
   color: #FFF;
 }
+
 .project-button-refresh {
   color: #777;
 }
+
 .project-button-refresh:hover {
   background-color: #777;
   color: #FFF;
 }
+
 .project-button-remove {
   color: #E61F00;
 }
+
 .project-button-remove:hover {
   background-color: #E61F00;
   color: #FFF;
@@ -137,32 +163,25 @@ strong {
 .project-status[status="valid"] {
   background: linear-gradient(to bottom, #90D11F, #77AD18 );
 }
-.appDetails {
+
+.app-details {
   padding: 10px;
 }
-.appDetails[status="warning"] .warnings {
+
+.app-details[status="warning"] .warnings {
   visibility: visible;
   margin: 20px;
   padding: 10px 10px;
   border-left: 3px solid #ECB51E;
   background-color: rgba(236, 181, 20, 0.1);
 }
-.appDetails[status="error"] .errors {
+
+.app-details[status="error"] .errors {
   visibility: visible;
   margin: 20px;
   padding: 10px 10px;
   border-left: 3px solid #E34F22;
   background-color: rgba(227,79,34,0.1);
-}
-
-.appDetails[status="valid"] .validation {
-  color: #82BD1B;
-}
-.appDetails[status="warning"] .validation {
-  color: #ECB51F;
-}
-.appDetails[status="error"] .validation {
-  color: #C24119;
 }
 
 .warnings[status="warning"]{
@@ -177,11 +196,11 @@ strong {
 .warnings[status="warning"], .errors[status="error"] {
   background-repeat: no-repeat;
   background-size: 12px;
-  position: relative;
-  width: 12px;
-  height: 12px;
+  background-position: left center;
   margin-top: 6px;
-  line-height: 12px;
+}
+
+.warnings[status="warning"] span, .errors[status="error"] span{
   font-size: 11px;
   padding-left: 16px;
   font-weight: bold;
@@ -191,14 +210,16 @@ strong {
   background: #EEE;
   position: relative;
   box-shadow: 0 1px 6px rgba(0,0,0,0.3);
+  overflow: hidden;
 }
 
-#new-app {
+#new-app-buttons {
   box-shadow: 0 -1px 10px rgba(0,0,0,0.3);
 }
 
-#list button {
-  background: #EEE;
+.button {
+  background: url('plus.svg') no-repeat right 10px center #EEE;
+  background-size: 20px;
   border: none;
   border-top: 1px solid #DDD;
   cursor: pointer;
@@ -211,26 +232,11 @@ strong {
   position: relative;
 }
 
-#list button:after {
-  content: '+';
-  width: 20px;
-  height: 20px;
-  text-align: center;
-  line-height: 18px;
-  font-weight: bold;
-  position: absolute;
-  right: 10px;
-  background: #AAA;
-  box-shadow: 0 1px 1px #EEE;
-  color: #FFF;
-  border-radius: 50%;
+.button:hover {
+  background-color: #DDD;
 }
 
-#list button:hover {
-  background: #DDD;
-}
-
-#list button input {
+.button input {
   width: 90%;
   box-shadow: none;
   border-radius: 3px;
@@ -240,59 +246,64 @@ strong {
 }
 
 #detail {
-  background-color: #FAFAFA;
+  background-color: rgba(225, 225, 225, 1);
 }
-.appHeader {
-  border-bottom: 1px solid #DDD;
+
+.app-header {
+  border-bottom: 1px solid #CCC;
   margin: 10px 20px 10px 20px;
   padding-bottom: 10px;
 }
-.appHeader div{
+
+.app-header div{
   line-height: 160%;
 }
-.appHeader .project-icon {
+
+.app-header .project-icon {
   flex: 0 0 84px;
 }
-.appHeader .project-icon img{
+
+.app-header .project-icon img{
   width: 64px;
   height: 64px;
 }
-.appHeader .location {
+
+.app-header .location {
   font-size: 11px;
   color: #999;
 }
 
-.appHeader .description {
+.app-header .description {
   font-style: italic;
   color: #333;
 }
 
-.appHeader .appStatus {
+.app-status {
   position: absolute;
   right: 20px;
 }
-.appHeader .appStatus p{
+
+.app-status p{
   text-transform: uppercase;
   font-size: 10px;
-  padding: 0 10px;
-  margin-top: 10px;
+  padding: 2px 10px;
+  border-radius: 2px;
+  margin-top: 6px;
   line-height: 10px;
 }
-.appHeader .appStatus p:first-child {
-  border-right: 1px solid #CCC;
-  padding-left: 0;
+
+.app-status .validation {
+  color: #FFF;
 }
 
-h1 {
-  font-size: 24px;
+.app-status[status="valid"] .validation {
+  background-color: #82BD1B;
 }
 
-h2 {
-  padding: 4px 10px 4px 10px;
-  background: linear-gradient(to bottom, #49525A, #3E474F);
-  color: #9FA6AD;
-  border-bottom: 1px solid #30363B;
-  font-weight: normal;
-  text-shadow: 0 1px 1px #222;
-  box-shadow: inset 0 0 1px #6E7A85;
+.app-status[status="warning"] .validation {
+  background-color: #ECB51F;
+}
+
+.app-status[status="error"] .validation {
+  background-color: #C24119;
 }
