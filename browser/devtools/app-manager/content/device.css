@@ -20,6 +20,10 @@ details.control-bar button {
   flex-grow: 1;
 }
 
+#content {
+  display: flex;
+}
+
 #tabs-headers {
   flex-shrink: 0;
   display: flex;
