@@ -1,10 +1,17 @@
 <!ENTITY device.screenshot "Screenshot">
 <!ENTITY device.killall "killall">
 <!ENTITY device.title "Device Control Center">
-<!ENTITY device.notConnected "Not Connected">
+<!ENTITY device.notConnected "Not connected. Please connect your device below.">
 <!ENTITY device.startApp "Start">
 <!ENTITY device.stopApp "Stop">
 <!ENTITY device.debugApp "Debug">
+<!ENTITY device.name "Name">
+<!ENTITY device.app "App">
+<!ENTITY device.privileged "Privileged">
+<!ENTITY device.certified "Certified">
+<!ENTITY device.allow "Allow">
+<!ENTITY device.prompt "Prompt">
+<!ENTITY device.deny "Deny">
 
 <!ENTITY connection.disconnect "Disconnect">
 <!ENTITY connection.showDeviceCtrlCenter "Click for More Details">

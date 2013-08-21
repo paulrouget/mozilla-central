@@ -7,6 +7,7 @@ const {require} = devtools;
 
 const {ConnectionManager, Connection} = require("devtools/client/connection-manager");
 const {getDeviceFront} = require("devtools/server/actors/device");
+const {getMozSettingsFront} = require("devtools/server/actors/mozsettings");
 const EventEmitter = require("devtools/shared/event-emitter");
 const DeviceStore = require("devtools/app-manager/device-store");
 const WebappsStore = require("devtools/app-manager/webapps-store");
@@ -64,6 +65,11 @@ let UI = {
     this._onConnectionStatusChange();
   },
 
+  setWallpaper: function(dataurl) {
+      console.log(dataurl.toSource())
+      document.getElementById("meta").style.backgroundImage = "url(" + dataurl + ")";
+  },
+
   _mergeStores: function(stores) {
     let finalStore = {object:{}};
     EventEmitter.decorate(finalStore);
@@ -85,7 +91,13 @@ let UI = {
     } else {
       this.show();
       this.connection.client.listTabs(
-        response => this.listTabsResponse = response
+        response => {
+          this.listTabsResponse = response;
+          let front = getMozSettingsFront(this.connection.client, this.listTabsResponse);
+          front.getSettings("wallpaper.image").then(res => {
+            this.setWallpaper(res["wallpaper.image"]);
+          }, console.error);
+        }
       );
     }
   },

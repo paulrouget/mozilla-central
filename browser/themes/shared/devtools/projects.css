@@ -25,53 +25,6 @@
   text-decoration: underline;
 }
 
-.project-button-debug {
-  color: #3498DB;
-}
-
-.project-button-debug:hover {
-  background-color: #3498DB;
-  color: #FFF;
-}
-
-.project-button-install,
-.project-button-start {
-  color: #18BC9C
-}
-
-.project-button-install:hover,
-.project-button-start:hover {
-  background-color: #18BC9C;
-  color: #FFF;
-}
-
-.project-button-stop {
-  color: #E74C3C;
-}
-
-.project-button-stop:hover {
-  background-color: #E74C3C;
-  color: #FFF;
-}
-
-.project-button-refresh {
-  color: #777;
-}
-
-.project-button-refresh:hover {
-  background-color: #777;
-  color: #FFF;
-}
-
-.project-button-remove {
-  color: #E61F00;
-}
-
-.project-button-remove:hover {
-  background-color: #E61F00;
-  color: #FFF;
-}
-
 .project-status {
   width: 10px;
   margin: -10px 0;

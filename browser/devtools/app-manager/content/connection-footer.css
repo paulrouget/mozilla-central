@@ -57,7 +57,7 @@ body.edit-connection #banner-editing {
 }
 
 #banner-connected > .banner-box {
-  align-items: left;
+  align-items: flex-start;
 }
 
 #start-simulator-button[simulators-count="0"] {
