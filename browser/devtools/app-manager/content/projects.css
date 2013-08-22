@@ -7,6 +7,10 @@
   display: flex;
 }
 
+#lense {
+  height: 100%;
+}
+
 .app-status {
   display: flex;
 }

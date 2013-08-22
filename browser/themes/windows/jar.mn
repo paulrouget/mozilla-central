@@ -269,6 +269,8 @@ browser.jar:
         skin/classic/browser/devtools/error.svg                     (../shared/devtools/error.svg)
         skin/classic/browser/devtools/plus.svg                      (../shared/devtools/plus.svg)
         skin/classic/browser/devtools/index-icons.svg               (../shared/devtools/index-icons.svg)
+        skin/classic/browser/devtools/rocket.svg                    (../shared/devtools/rocket.svg)
+        skin/classic/browser/devtools/noise.png                     (../shared/devtools/noise.png)
         skin/classic/browser/devtools/projects.css                  (../shared/devtools/projects.css)
         skin/classic/browser/devtools/app-manager-common.css        (../shared/devtools/app-manager-common.css)
 #ifdef MOZ_SERVICES_SYNC

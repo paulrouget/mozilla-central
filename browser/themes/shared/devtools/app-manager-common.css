@@ -160,5 +160,14 @@ strong {
 }
 
 #detail {
-  background-color: rgba(225, 225, 225, 1);
+  background-color: rgb(225, 225, 225);
+  background-image: url('noise.png');
+}
+
+#watermark {
+  height: 100%;
+  background-image: url('rocket.svg');
+  background-repeat: no-repeat;
+  background-size: 35%;
+  background-position: center center;
 }
