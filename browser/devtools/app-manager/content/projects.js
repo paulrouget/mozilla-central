@@ -188,6 +188,13 @@ let UI = {
       return;
     }
 
+    let oldButton = document.querySelector("#projects .selected");
+    if (oldButton) {
+      oldButton.classList.remove("selected");
+    }
+    let button = document.getElementById(location);
+    button.classList.add("selected");
+
     let template = '{"path":"app.projects.' + idx + '","childSelector":"#lense-template"}';
 
     let lense = document.querySelector("#lense");
