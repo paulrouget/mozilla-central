@@ -23,21 +23,26 @@ body {
 #tabs {
   display: flex;
   flex-direction: column;
+  box-shadow: inset -1px 0 5px rgba(0,0,0,0.9);
 }
 
 .button {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   -moz-appearance: none;
-  border-width: 0;
+  border: none;
+  border-top: 1px solid #323234;
+  border-bottom: 1px solid #121214;
   background: #2F373F;
   color: white;
   cursor: pointer;
+  text-indent: -9999px;
 }
 
 .button[selected] {
-  color: black;
-  background: white;
+  color: #FFF;
+  border-color: #191B1E;
+  box-shadow: inset 0 0 15px #111;
 }
 
 .button::-moz-focus-inner {
@@ -61,6 +66,42 @@ body {
 
 .panel:not([selected="true"]) {
   display: none;
+}
+
+.projects-button {
+  background: url('chrome://browser/skin/devtools/index-icons.svg') no-repeat;
+  background-position: left 0px;
+
+}
+
+.projects-button[selected] {
+  background-position: right 0px;
+}
+
+.device-button {
+  background: url('chrome://browser/skin/devtools/index-icons.svg') no-repeat;
+  background-position: left -80px;
+}
+
+.device-button span {
+  top: 0;
+  left: -2px;
+  position: relative;
+  width: 1px;
+  height: 80px;
+  display: block;
+}
+
+.device-button.disconnected span {
+  background: linear-gradient(to bottom, transparent, #FF4800, transparent);
+}
+
+.device-button.connected span {
+  background: linear-gradient(to bottom, transparent, #B1FC0D, transparent);
+}
+
+.device-button[selected] {
+  background-position: right -80px;
 }
 
 #connection-footer {
