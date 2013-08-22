@@ -254,7 +254,7 @@ Connection.prototype = {
         this.log("disconnected (unexpected)");
         break;
       case Connection.Status.CONNECTING:
-        this.log("Connection error");
+        this.log("connection error. Possible causes: USB port not connected, port not forwarded (adb forward), wrong host or port, remote debugging not enabled on the device.");
         break;
       default:
         this.log("disconnected");
@@ -269,7 +269,7 @@ Connection.prototype = {
   },
 
   _onTimeout: function() {
-    this.log("connection timeout");
+    this.log("connection timeout. Possible causes: didn't click on 'accept' (prompt).");
     this.emit(Connection.Events.TIMEOUT, str);
     this.disconnect();
   },

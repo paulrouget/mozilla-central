@@ -42,6 +42,7 @@ body.edit-connection #banner-editing {
 
 #logs > pre {
   overflow: auto;
+  white-space: pre-line;
 }
 #status.banner-box {
   width: 100% !important;
