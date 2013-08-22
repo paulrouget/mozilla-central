@@ -1,3 +1,11 @@
+body button.device-action {
+  display: none;
+}
+
+body.connected button.device-action {
+  display: flex;
+}
+
 #projects {
   height: 100%;
   overflow: auto;

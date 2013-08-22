@@ -1,15 +1,18 @@
 const Cc = Components.classes;
 const Ci = Components.interfaces;
 const Cu = Components.utils;
+const Cr = Components.results;
 const {devtools} = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
 const {require} = devtools;
 const ObservableObject = require("devtools/shared/observable-object");
 const EventEmitter = require("devtools/shared/event-emitter");
-const {ConnectionManager} = require("devtools/client/connection-manager");
+const {ConnectionManager, Connection} = require("devtools/client/connection-manager");
 const {AppProjects} = require("devtools/app-manager/app-projects");
 const {AppValidator} = require("devtools/app-manager/app-validator");
 const {Services} = Cu.import("resource://gre/modules/Services.jsm");
 const {FileUtils} = Cu.import("resource://gre/modules/FileUtils.jsm");
+const {NetUtils} = Cu.import("resource://gre/modules/NetUtil.jsm");
+const promise = require("sdk/core/promise");
 
 window.addEventListener("message", function(event) {
   try {
@@ -69,9 +72,21 @@ let UI = {
     return finalStore;
   },
 
-
   onNewConnection: function() {
-    console.log("connection attached");
+    this.connection.on(Connection.Events.STATUS_CHANGED, () => this._onConnectionStatusChange());
+    this._onConnectionStatusChange();
+  },
+
+  _onConnectionStatusChange: function() {
+    if (this.connection.status != Connection.Status.CONNECTED) {
+      document.body.classList.remove("connected");
+      this.listTabsResponse = null;
+    } else {
+      document.body.classList.add("connected");
+      this.connection.client.listTabs(
+        response => {this.listTabsResponse = response}
+      );
+    }
   },
 
   _selectFolder: function() {
@@ -162,6 +177,206 @@ let UI = {
 
   remove: function(location) {
     AppProjects.remove(location);
+  },
+
+  _getProjectManifestURL: function (project) {
+    if (project.type == "packaged") {
+      return "app://" + project.packagedAppOrigin + "/manifest.webapp";
+    } else if (project.type == "hosted") {
+      return project.location;
+    }
+  },
+
+  start: function(location) {
+    let project = AppProjects.get(location);
+    let request = {
+      to: this.listTabsResponse.webappsActor,
+      type: "launch",
+      manifestURL: this._getProjectManifestURL(project)
+    };
+    this.connection.client.request(request, (res) => {
+
+    });
+  },
+
+  stop: function(location) {
+    let project = AppProjects.get(location);
+    let request = {
+      to: this.listTabsResponse.webappsActor,
+      type: "close",
+      manifestURL: this._getProjectManifestURL(project)
+    };
+    this.connection.client.request(request, (res) => {
+
+    });
+  },
+
+  install: function(button, location) {
+    let project = AppProjects.get(location);
+    if (project.type == "packaged") {
+      this._installPackaged(button, project);
+    } else {
+      alert("todo: hosted app install");
+    }
+  },
+
+  _addDirToZip: function (writer, dir, basePath) {
+    const PR_USEC_PER_MSEC = 1000;
+    let files = dir.directoryEntries;
+
+    while (files.hasMoreElements()) {
+      let file = files.getNext().QueryInterface(Ci.nsIFile);
+
+      if (file.isHidden() ||
+          file.isSymlink() ||
+          file.isSpecial() ||
+          file.equals(writer.file))
+      {
+        continue;
+      }
+
+      if (file.isDirectory()) {
+        writer.addEntryDirectory(basePath + file.leafName + "/",
+                                 file.lastModifiedTime * PR_USEC_PER_MSEC,
+                                 true);
+        this._addDirToZip(writer, file, basePath + file.leafName + "/");
+      } else {
+        writer.addEntryFile(basePath + file.leafName,
+                            Ci.nsIZipWriter.COMPRESSION_DEFAULT,
+                            file,
+                            true);
+      }
+    }
+  },
+
+  /**
+   * Convert an XPConnect result code to its name and message.
+   * We have to extract them from an exception per bug 637307 comment 5.
+   */
+  _getResultTest: function(code) {
+    let regexp =
+      /^\[Exception... "(.*)"  nsresult: "0x[0-9a-fA-F]* \((.*)\)"  location: ".*"  data: .*\]$/;
+    let ex = Cc["@mozilla.org/js/xpc/Exception;1"].
+             createInstance(Ci.nsIXPCException);
+    ex.initialize(null, code, null, null, null, null);
+    let [, message, name] = regexp.exec(ex.toString());
+    return { name: name, message: message };
+  },
+
+  _zipDirectory: function (zipFile, dirToArchive) {
+    let deferred = promise.defer();
+    let writer = Cc["@mozilla.org/zipwriter;1"].createInstance(Ci.nsIZipWriter);
+    const PR_RDWR = 0x04;
+    const PR_CREATE_FILE = 0x08;
+    const PR_TRUNCATE = 0x20;
+    writer.open(zipFile, PR_RDWR | PR_CREATE_FILE | PR_TRUNCATE);
+
+    this._addDirToZip(writer, dirToArchive, "");
+
+    writer.processQueue({
+      onStartRequest: function onStartRequest(request, context) {},
+      onStopRequest: (request, context, status) => {
+        if (status == Cr.NS_OK) {
+          writer.close();
+          deferred.resolve();
+        }
+        else {
+          let { name, message } = this._getResultText(status);
+          deferred.reject(name + ": " + message);
+        }
+      }
+    }, null);
+
+    return deferred.promise;
+  },
+
+  _uploadPackage: function (packageFile) {
+    let deferred = promise.defer();
+    const CHUNK_SIZE = 10000;
+
+    function newUpload(client, uploadActor) {
+      let request = {
+        to: uploadActor,
+        type: "upload"
+      };
+      client.request(request, (res) => {
+        getInputStream(client, res.actor);
+      });
+    }
+    newUpload(this.connection.client, this.listTabsResponse.fileUploadActor);
+
+    function getInputStream(client, actor) {
+      NetUtil.asyncFetch(packageFile, (inputStream, status) => {
+        if (!Components.isSuccessCode(status)) {
+          return;
+        }
+        uploadChunk(client, actor, inputStream);
+      });
+    }
+    function uploadChunk(client, actor, inputStream) {
+      let chunkSize = 0;
+      // When we read the whole stream, available() throws
+      try {
+        chunkSize = Math.min(CHUNK_SIZE, inputStream.available());
+      } catch(e) {}
+
+      if (chunkSize == 0) {
+        endsUpload(client, actor);
+        return;
+      }
+      let chunk = NetUtil.readInputStreamToString(inputStream, chunkSize);
+
+      let request = {
+        to: actor,
+        type: "chunk",
+        chunk: chunk
+      };
+      client.request(request, (res) => {
+        uploadChunk(client, actor, inputStream);
+      });
+    }
+    function endsUpload(client, actor) {
+      let request = {
+        to: actor,
+        type: "done"
+      };
+      client.request(request, (res) => {
+        deferred.resolve(actor);
+      });
+    }
+    return deferred.promise;
+  },
+
+  _installPackaged: function(button, project) {
+    button.textContent = "Installating...";
+    button.disabled = true;
+    let file = FileUtils.File(project.location);
+    let tmpZipFile = FileUtils.getDir("TmpD", [], true);
+    tmpZipFile.append("application-"+(new Date().getTime())+".zip");
+    this._zipDirectory(tmpZipFile, file)
+        .then(() => {
+      this._uploadPackage(tmpZipFile)
+          .then((fileActor) => {
+            let actor = this.listTabsResponse.webappsActor;
+            let request = {
+              to: actor,
+              type: "install",
+              appId: project.packagedAppOrigin,
+              upload: fileActor
+            };
+            this.connection.client.request(request, (res) => {
+              if (res.error) {
+                alert(res.error+":"+res.message);
+              } else {
+                button.textContent = "Installed!";
+                setTimeout(function() {
+                  button.textContent = "INSTALL";
+                }, 1500);
+              }
+              button.disabled = false;
+            });
+          });
+    });
   },
 
   reveal: function(location) {
