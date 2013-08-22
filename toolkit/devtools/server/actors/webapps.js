@@ -266,9 +266,27 @@ WebappsActor.prototype = {
     let appDir = FileUtils.getDir("TmpD", ["b2g", appId], false, false);
 
     if (!appDir || !appDir.exists()) {
-      return { error: "badParameterType",
-               message: "missing directory " + appDir.path
-             }
+      if (aRequest.upload) {
+        // Ensure creating the directory (recursively)
+        appDir = FileUtils.getDir("TmpD", ["b2g", appId], true, false);
+        let actor = this.conn.getActor(aRequest.upload);
+        if (!actor) {
+          return { error: "badParameter",
+                   message: "Unable to find upload actor '" + aRequest.upload
+                            + "'" };
+        }
+        let appFile = actor.getFile();
+        if (!appFile.exists()) {
+          return { error: "badParameter",
+                   message: "The uploading file doesn't exists on device" };
+        }
+        appFile.moveTo(appDir, "application.zip");
+      }
+      else {
+        return { error: "badParameterType",
+                 message: "missing directory " + appDir.path
+               }
+      }
     }
 
     let testFile = appDir.clone();

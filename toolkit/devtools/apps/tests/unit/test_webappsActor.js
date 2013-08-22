@@ -2,6 +2,7 @@
    http://creativecommons.org/publicdomain/zero/1.0/ */
 
 let gAppId = "actor-test";
+const APP_ORIGIN = "app://" + gAppId;
 
 add_test(function testLaunchInexistantApp() {
   let request = {type: "launch", manifestURL: "http://foo.com"};
@@ -34,7 +35,8 @@ add_test(function testInstallPackaged() {
 
   // The install request is asynchronous and send back an event to tell
   // if the installation succeed or failed
-  gClient.addListener("webappsEvent", function (aState, aType, aPacket) {
+  gClient.addListener("webappsEvent", function listener(aState, aType, aPacket) {
+    gClient.removeListener("webappsEvent", listener);
     do_check_eq(aType.appId, gAppId);
     if ("error" in aType) {
       do_print("Error: " + aType.error);
@@ -182,6 +184,75 @@ add_test(function testUninstall() {
   });
 });
 
+add_test(function testFileUploadInstall() {
+  function createUpload() {
+    let request = {
+      to: gListTabsResponse.fileUploadActor,
+      type: "upload"
+    };
+    gClient.request(request, function (aResponse) {
+      getPackageContent(aResponse.actor);
+    });
+  }
+  function getPackageContent(uploadActor) {
+    let packageFile = do_get_file("data/app.zip");
+    NetUtil.asyncFetch(packageFile, (inputStream, status) => {
+      if (!Components.isSuccessCode(status)) {
+        return;
+      }
+      let content = NetUtil.readInputStreamToString(inputStream, inputStream.available());
+      uploadChunk(uploadActor, content);
+    });
+  }
+  function uploadChunk(uploadActor, content) {
+    let request = {
+      to: uploadActor,
+      type: "chunk",
+      chunk: content
+    };
+    gClient.request(request, function (aResponse) {
+      endsUpload(uploadActor);
+    });
+  }
+  function endsUpload(uploadActor, content) {
+    let request = {
+      to: uploadActor,
+      type: "done"
+    };
+    gClient.request(request, function (aResponse) {
+      installApp(uploadActor);
+    });
+  }
+  function installApp(uploadActor) {
+    let request = {type: "install", appId: gAppId, upload: uploadActor};
+    webappActorRequest(request, function (aResponse) {
+      do_check_eq(aResponse.appId, gAppId);
+    });
+    gClient.addListener("webappsEvent", function listener(aState, aType, aPacket) {
+      gClient.removeListener("webappsEvent", listener);
+      do_check_eq(aType.appId, gAppId);
+      if ("error" in aType) {
+        do_print("Error: " + aType.error);
+      }
+      if ("message" in aType) {
+        do_print("Error message: " + aType.message);
+      }
+      do_check_eq("error" in aType, false);
+
+      removeUpload(uploadActor);
+    });
+  }
+  function removeUpload(uploadActor, content) {
+    let request = {
+      to: uploadActor,
+      type: "remove"
+    };
+    gClient.request(request, function (aResponse) {
+      run_next_test();
+    });
+  }
+  createUpload();
+});
 function run_test() {
   setup();
 

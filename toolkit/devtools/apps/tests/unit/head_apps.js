@@ -13,8 +13,9 @@ Cu.import("resource://gre/modules/devtools/dbg-client.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/FileUtils.jsm");
+Cu.import("resource://gre/modules/NetUtil.jsm");
 
-let gClient, gActor;
+let gClient, gActor, gListTabsResponse;
 let originalPrefValue;
 
 function connect(onDone) {
@@ -29,6 +30,7 @@ function connect(onDone) {
   gClient.connect(function onConnect() {
     gClient.listTabs(function onListTabs(aResponse) {
       gActor = aResponse.webappsActor;
+      gListTabsResponse = aResponse;
       onDone();
     });
   });
