@@ -10,12 +10,14 @@
 
 #logs {
   display: flex;
-  width: 30%;
+  width: 40%;
+  padding: 0;
+  width: 100%;
 }
 
 .banner {
   display: none;
-  width: 70%;
+  width: 60%;
 }
 
 #connection-footer[status="connected"]     #banner-connected,
@@ -34,13 +36,8 @@ body.edit-connection #banner-editing {
 }
 
 #banner-logs {
-  width: 30%;
+  width: 40%;
   display: flex;
-}
-
-#logs {
-  padding: 0;
-  width: 100%;
 }
 
 #logs > pre {
