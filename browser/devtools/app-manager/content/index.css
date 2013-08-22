@@ -4,26 +4,9 @@
   -moz-box-sizing: border-box;
 }
 
-body, html {
-  height: 100%;
-}
-
-body {
-  display: flex;
-  margin: 0;
-  background: #22272D;
-  flex-direction: column;
-}
-
-#content {
-  display: flex;
-  flex-grow: 1;
-}
-
 #tabs {
-  display: flex;
-  flex-direction: column;
   box-shadow: inset -1px 0 5px rgba(0,0,0,0.9);
+  background: #22272D;
 }
 
 .button {
@@ -54,14 +37,8 @@ body {
   text-decoration: underline;
 }
 
-#tab-panels {
-  flex-grow: 1;
-}
-
 .panel {
   border-width: 0;
-  width: 100%;
-  height: 100%;
 }
 
 .panel:not([selected="true"]) {
@@ -109,4 +86,3 @@ body {
   height: 50px;
   min-height: 50px;
 }
-

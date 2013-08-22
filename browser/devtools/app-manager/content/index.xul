@@ -2,33 +2,37 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
      - License, v. 2.0. If a copy of the MPL was not distributed with this
      - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
-<!DOCTYPE html [
+<!DOCTYPE window [
   <!ENTITY % appMgrDTD SYSTEM "chrome://browser/locale/devtools/app-manager.dtd" >
   %appMgrDTD;
 ]>
 
+<?xml-stylesheet href="chrome://global/skin/global.css"?>
+<?xml-stylesheet href="chrome://browser/content/devtools/app-manager/index.css"?>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta charset="utf8"/>
-    <base href="chrome://browser/content/devtools/app-manager/"></base>
-    <link rel="stylesheet" href="index.css" type="text/css"/>
-    <!--<link rel="stylesheet" href="chrome://browser/skin/devtools/connection-footer.css" type="text/css"/>-->
-  </head>
+<window id="app-manager-window"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        title="&index.title;"
+        windowtype="devtools:app-manager"
+        macanimationtype="document"
+        fullscreenbutton="true"
+        screenX="4" screenY="4"
+        width="800" height="600"
+        persist="screenX screenY width height sizemode">
 
-  <body>
-    <div id="content">
-      <div id="tabs">
+  <vbox flex="1">
+    <hbox id="content" flex="1">
+      <vbox id="tabs">
         <button class="button projects-button" onclick="selectTab('projects')"><span></span></button>
         <button class="button device-button" onclick="selectTab('device')"><span></span></button>
-      </div>
-      <div id="tab-panels">
-        <iframe class="panel projects-panel" src="projects.xhtml"/>
-        <iframe class="panel device-panel" src="device.xhtml"/>
-      </div>
-    </div>
-    <iframe id="connection-footer" src="connection-footer.xhtml"></iframe>
-  </body>
+      </vbox>
+      <hbox id="tab-panels" flex="1">
+        <iframe flex="1" class="panel projects-panel" src="chrome://browser/content/devtools/app-manager/projects.xhtml"/>
+        <iframe flex="1" class="panel device-panel" src="chrome://browser/content/devtools/app-manager/device.xhtml"/>
+      </hbox>
+    </hbox>
+    <iframe id="connection-footer" src="chrome://browser/content/devtools/app-manager/connection-footer.xhtml"></iframe>
+  </vbox>
 
   <script type="application/javascript;version=1.8">
     window.addEventListener("message", function(event) {
@@ -42,15 +46,11 @@
       for (let type of ["button", "panel"]) {
         let oldSelection = document.querySelector("." + type + "[selected]");
         let newSelection = document.querySelector("." + id + "-" + type);
-        if (!newSelection) {
-          continue;
-        }
-        if (oldSelection) {
-          oldSelection.removeAttribute("selected");
-        }
+        if (!newSelection) continue;
+        if (oldSelection) oldSelection.removeAttribute("selected");
         newSelection.setAttribute("selected", "true");
       }
     }
     selectTab("projects");
   </script>
-</html>
+</window>
