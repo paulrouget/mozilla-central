@@ -2,6 +2,31 @@
   flex: 0 0 auto;
 }
 
+.list-item.selected p, .list-item.selected span {
+ color: #80C3E4;
+}
+
+.list-item.selected strong, .list-item.selected .validation span {
+ color: #FFF;
+}
+
+.list-item button {
+   visibility: hidden;
+   float: right;
+   margin-right: 5px;
+   border: 1px solid #CCC;
+   background: #FFF;
+   border-radius: 3px;
+   text-transform: uppercase;
+   cursor: pointer;
+   font-size: 10px;
+}
+
+.list-item:hover button {
+  visibility: visible;
+  border-color: red;
+}
+
 .project-meta .type {
   font-size: 10px;
   float: right;
@@ -21,7 +46,7 @@
   cursor: pointer;
 }
 
-.location:hover {
+#detail .location:hover {
   text-decoration: underline;
 }
 

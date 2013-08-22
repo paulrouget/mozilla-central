@@ -56,6 +56,7 @@
       <div class="validation">
         <div class="errors" template='{"type":"attribute","path":"validationStatus","name":"status"}'><span template='{"type":"textContent","path":"errorsCount"}'></span></div>
         <div class="warnings" template='{"type":"attribute","path":"validationStatus","name":"status"}'><span template='{"type":"textContent","path":"warningsCount"}'></span></div>
+        <button class="project-button-remove" onclick="UI.remove(this.dataset.location)" template='{"type":"attribute","path":"location","name":"data-location"}' title="&projects.removeApp;">&projects.removeApp;</button>
       </div>
     </div>
   </div>
@@ -88,7 +89,6 @@
       <button class="project-button-start" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.startApp;</button>
       <button class="project-button-stop" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.stopApp;</button>
       <button class="project-button-debug" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.debugApp;</button>
-      <button class="project-button-remove" onclick="UI.remove(this.dataset.location)" template='{"type":"attribute","path":"location","name":"data-location"}' title="&projects.removeApp;">&projects.removeApp;</button>
     </div>
     <div class="errors" template='{"type":"textContent","path":"errors"}'></div>
     <div class="warnings" template='{"type":"textContent","path":"warnings"}'></div>
