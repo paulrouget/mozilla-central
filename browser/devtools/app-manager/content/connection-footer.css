@@ -58,6 +58,10 @@ body.edit-connection #banner-editing {
   align-items: flex-start;
 }
 
-#start-simulator-button[simulators-count="0"] {
+#start-simulator-box {
+  display: inline;
+}
+
+#start-simulator-box[simulators-count="0"] {
   display: none;
 }

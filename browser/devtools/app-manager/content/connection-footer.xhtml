@@ -38,8 +38,11 @@
             <div class="banner-content">
               <span>&connection.notConnected;</span>
               <button class="action-primary left" onclick="UI.connect()" id="connect-button" template='{"type":"localizedContent","property":"connection.connectTo","paths":["connection.host","connection.port"]}'></button>
-              <button class="right" href="#" onclick="UI.editConnectionParameters()">&connection.changeHostAndPort;</button>
-              <button class="right" id="start-simulator-button" onclick="UI.startSimulator()" template='{"type":"attribute","path":"simulators.versions.length","name":"simulators-count"}'>&connection.startSimulator;</button>
+              <button class="right" onclick="UI.editConnectionParameters()">&connection.changeHostAndPort;</button>
+              <div id="start-simulator-box" template='{"type":"attribute","path":"simulators.versions.length","name":"simulators-count"}'>
+                <span>&connection.or;</span>
+                <button id="start-simulator-button" class="action-primary" onclick="UI.startSimulator()">&connection.startSimulator;</button>
+              </div>
             </div>
           </div>
         </div>

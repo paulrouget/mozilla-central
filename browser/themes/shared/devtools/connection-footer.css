@@ -29,13 +29,13 @@ button {
   padding: 3px 10px;
 }
 
-button.left{
+button.left {
   margin-right: 0px;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
 
-button.right{
+button.right {
   margin-left: -6px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;

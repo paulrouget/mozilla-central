@@ -26,8 +26,8 @@
 <!ENTITY connection.connecting "Connecting…">
 <!ENTITY connection.disconnecting "Disconnecting…">
 <!ENTITY connection.cancel "Cancel">
+<!ENTITY connection.or "or">
 
-<!ENTITY projects.or "or">
 <!ENTITY projects.localApps "Local Apps">
 <!ENTITY projects.addApp "Add">
 <!ENTITY projects.addPackaged "Add Packaged App">
