@@ -30,7 +30,7 @@ body.connected button.device-action {
 
 .project-meta {
   flex-grow: 1;
-  flex-shrink: 1;
+  flex-shrink: 1 !important;
 }
 
 .project-controls {
