@@ -131,6 +131,7 @@ strong {
 #detail {
   padding: 0px;
 }
+
 .button-plus {
   background: url('plus.svg') no-repeat right 10px center #EEE;
   background-size: 20px;
@@ -182,17 +183,12 @@ strong {
   margin-right: 10px;
 }
 .app .control-bar {
-  opacity: 0.4;
   display: block;
 }
 
 .app .control-bar button {
   border-radius: 3px;
   border-width: 1px;
-}
-
-.app:hover .control-bar{
-  opacity: 1;
 }
 
 .table-footer, .table-header {

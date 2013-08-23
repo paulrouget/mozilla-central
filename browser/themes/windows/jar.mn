@@ -268,6 +268,7 @@ browser.jar:
         skin/classic/browser/devtools/warning.svg                   (../shared/devtools/warning.svg)
         skin/classic/browser/devtools/error.svg                     (../shared/devtools/error.svg)
         skin/classic/browser/devtools/plus.svg                      (../shared/devtools/plus.svg)
+        skin/classic/browser/devtools/remove.svg                    (../shared/devtools/remove.svg)
         skin/classic/browser/devtools/index-icons.svg               (../shared/devtools/index-icons.svg)
         skin/classic/browser/devtools/rocket.svg                    (../shared/devtools/rocket.svg)
         skin/classic/browser/devtools/noise.png                     (../shared/devtools/noise.png)
@@ -547,6 +548,15 @@ browser.jar:
         skin/classic/aero/browser/devtools/connection-footer.css     (../shared/devtools/connection-footer.css)
         skin/classic/aero/browser/devtools/device.css                (../shared/devtools/device.css)
         skin/classic/aero/browser/devtools/projects.css              (../shared/devtools/projects.css)
+        skin/classic/aero/browser/devtools/warning.svg               (../shared/devtools/warning.svg)
+        skin/classic/aero/browser/devtools/error.svg                 (../shared/devtools/error.svg)
+        skin/classic/aero/browser/devtools/plus.svg                  (../shared/devtools/plus.svg)
+        skin/classic/aero/browser/devtools/remove.svg                (../shared/devtools/remove.svg)
+        skin/classic/aero/browser/devtools/index-icons.svg           (../shared/devtools/index-icons.svg)
+        skin/classic/aero/browser/devtools/rocket.svg                (../shared/devtools/rocket.svg)
+        skin/classic/aero/browser/devtools/noise.png                 (../shared/devtools/noise.png)
+        skin/classic/aero/browser/devtools/projects.css              (../shared/devtools/projects.css)
+        skin/classic/aero/browser/devtools/app-manager-common.css    (../shared/devtools/app-manager-common.css)
 #ifdef MOZ_SERVICES_SYNC
         skin/classic/aero/browser/sync-throbber.png
         skin/classic/aero/browser/sync-16.png

@@ -43,8 +43,12 @@ h2 {
 }
 
 .list-item.selected {
-  background: linear-gradient(to bottom, #276DA3, #1E5580);
-  color: #FFF;
+  background-color: #FFF;
+  color: #000;
+}
+
+.list-item.selected * {
+  color: #000!important;
 }
 
 .control-bar {
@@ -100,7 +104,14 @@ strong {
   position: relative;
 }
 
-.button:hover {
+.button-remove {
+  background-image: url('remove.svg');
+  background-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.button-plus:hover {
   background-color: #DDD;
 }
 
@@ -112,6 +123,7 @@ strong {
   padding: 4px;
   margin-top: 4px;
 }
+
 .project-button-debug {
   color: #3498DB;
 }
@@ -147,15 +159,6 @@ strong {
 
 .project-button-refresh:hover {
   background-color: #777;
-  color: #FFF;
-}
-
-.project-button-remove {
-  color: #E61F00;
-}
-
-.project-button-remove:hover {
-  background-color: #E61F00;
   color: #FFF;
 }
 

@@ -2,14 +2,6 @@
   flex: 0 0 auto;
 }
 
-.list-item.selected p, .list-item.selected span {
- color: #80C3E4;
-}
-
-.list-item.selected strong, .list-item.selected .validation span {
- color: #FFF;
-}
-
 .list-item button {
    visibility: hidden;
    float: right;
@@ -22,18 +14,25 @@
    font-size: 10px;
 }
 
-.list-item:hover button {
-  visibility: visible;
-  border-color: red;
-}
-
 .project-meta .type {
   font-size: 10px;
+  line-height: 20px;
   float: right;
   padding-right: 10px;
   color: #AAA;
   text-transform: uppercase;
 }
+
+.project-meta .button-remove {
+  float: right;
+  margin-right: 10px;
+  opacity: 0;
+}
+
+.list-item:hover .button-remove {
+  opacity: 1;
+}
+
 .project-icon {
   width: 32px;
   height: 32px;
@@ -75,7 +74,7 @@
 
 .app-details[status="warning"] .warnings {
   visibility: visible;
-  margin: 20px;
+  margin: 20px 20px 0;
   padding: 10px 10px;
   border-left: 3px solid #ECB51E;
   background-color: rgba(236, 181, 20, 0.1);
