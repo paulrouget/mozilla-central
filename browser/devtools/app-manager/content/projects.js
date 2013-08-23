@@ -2,6 +2,7 @@ const Cc = Components.classes;
 const Ci = Components.interfaces;
 const Cu = Components.utils;
 const Cr = Components.results;
+Cu.import("resource:///modules/devtools/gDevTools.jsm");
 const {devtools} = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
 const {require} = devtools;
 const ObservableObject = require("devtools/shared/observable-object");
@@ -211,6 +212,48 @@ let UI = {
     });
   },
 
+  _getTargetForApp: function(manifest) { // FIXME <- already in device.js
+    if (!this.listTabsResponse)
+      return null;
+    let actor = this.listTabsResponse.webappsActor;
+    let deferred = promise.defer();
+    let request = {
+      to: actor,
+      type: "getAppActor",
+      manifestURL: manifest,
+    }
+    this.connection.client.request(request, (res) => {
+      if (res.error) {
+        deferred.reject(res.error);
+      } else {
+        let options = {
+          form: res.actor,
+          client: this.connection.client,
+          chrome: false
+        };
+
+        devtools.TargetFactory.forRemoteTab(options).then((target) => {
+          deferred.resolve(target)
+        }, (error) => {
+          deferred.reject(error);
+        });
+      }
+    });
+    return deferred.promise;
+  },
+
+  openToolbox: function(location) {
+    let project = AppProjects.get(location);
+    let manifest = this._getProjectManifestURL(project);
+    this._getTargetForApp(manifest).then((target) => {
+      gDevTools.showToolbox(target,
+                            null,
+                            devtools.Toolbox.HostType.WINDOW,
+                            this.connection.uid);
+    }, console.error);
+  },
+
+
   install: function(button, location) {
     let project = AppProjects.get(location);
     if (project.type == "packaged") {
@@ -348,7 +391,7 @@ let UI = {
   },
 
   _installPackaged: function(button, project) {
-    button.textContent = "Installating...";
+    button.textContent = "Installing...";
     button.disabled = true;
     let file = FileUtils.File(project.location);
     let tmpZipFile = FileUtils.getDir("TmpD", [], true);

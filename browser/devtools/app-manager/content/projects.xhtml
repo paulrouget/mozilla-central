@@ -90,7 +90,7 @@
         <button class="device-action project-button-install" onclick="UI.install(this, this.dataset.location)" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.installApp;</button>
         <button class="device-action project-button-start" onclick="UI.start(this.dataset.location)" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.startApp;</button>
         <button class="device-action project-button-stop" onclick="UI.stop(this.dataset.location)" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.stopApp;</button>
-        <button class="device-action project-button-debug" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.debugApp;</button>
+        <button class="device-action project-button-debug" onclick="UI.openToolbox(this.dataset.location)" template='{"type":"attribute","path":"location","name":"data-location"}'>&projects.debugApp;</button>
       </div>
       <div class="errors" template='{"type":"textContent","path":"errors"}'></div>
       <div class="warnings" template='{"type":"textContent","path":"warnings"}'></div>
