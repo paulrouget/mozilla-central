@@ -80,3 +80,54 @@ details.control-bar button {
 .app[running="true"] > .control-bar > .project-button-debug {
   display: inline-block;
 }
+
+.setting-value {
+  display: block;
+  text-align: left!important;
+}
+
+.setting-value > * {
+  display: none;
+}
+
+.setting-value[type="unknown"] > [type="unknown"],
+.setting-value[type="number"] > [type="number"],
+.setting-value[type="string"] > [type="text"],
+.setting-value[type="boolean"] > [type="checkbox"] {
+  display: inline-block;
+}
+
+.setting-value > input {
+  -moz-appearance: none;
+  border-width: 0;
+  background: transparent;
+  border-bottom: 1px dashed white;
+  margin: 0;
+  width: 100%;
+}
+
+.setting-value > [type=checkbox] {
+  cursor: pointer;
+}
+
+.setting-value > input:focus {
+  background: white;
+}
+
+.setting-value[type="string"] > input,
+.setting-value[type="string"] {
+  color: #77C;
+}
+
+.setting-value[type="number"] > input,
+.setting-value[type="number"] {
+  color: #C77;
+}
+
+.setting-value > [type="checkbox"][checked="true"] > :not([checked="true"]),
+.setting-value > [type="checkbox"][checked="false"] > [checked="true"] {
+  display: none;
+}
+
+
+

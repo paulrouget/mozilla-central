@@ -17,6 +17,7 @@
 
     <link rel="stylesheet" href="layout.css" type="text/css"/>
     <link rel="stylesheet" href="device.css" type="text/css"/>
+    <link rel="stylesheet" href="chrome://browser/skin/devtools/light-theme.css" type="text/css"/>
     <link rel="stylesheet" href="chrome://browser/skin/devtools/app-manager-common.css" type="text/css"/>
     <link rel="stylesheet" href="chrome://browser/skin/devtools/device.css" type="text/css"/>
   </head>
@@ -47,6 +48,7 @@
               <div id="tabs-headers">
                 <div onclick="UI.setTab('apps')" class="tab list-item apps">Installed Apps</div>
                 <div onclick="UI.setTab('permissions')" class="tab list-item permissions">Permissions</div>
+                <div onclick="UI.setTab('settings')" class="tab list-item settings">Settings</div>
               </div>
             </div>
           </section>
@@ -71,6 +73,14 @@
                   <div class="deny-label">&device.deny;</div>
                 </div>
               </div>
+
+              <div class="tabpanel settings table">
+                <div class="cells" >
+                  <section template-loop='{"arrayPath":"settings.all","childSelector":"#setting-template"}'></section>
+                </div>
+              </div>
+
+
             </div>
           </section>
     </section>
@@ -83,6 +93,22 @@
       <div class="privileged-permission" template='{"type":"attribute", "name":"permission","path":"privileged"}'></div>
       <div class="certified-permission" template='{"type":"attribute", "name":"permission", "path":"certified"}'></div>
     </div>
+  </template>
+
+  <template id="setting-template">
+    <form class="setting row" onsubmit="UI.changeSetting(this);return false" template='{"type":"attribute","path":"key","name":"data-key"}'>
+      <div class="setting-key" template='{"type":"textContent","path":"key"}'></div>
+      <div class="setting-value" template='{"type":"attribute","path":"type","name":"type"}'>
+        <div type="checkbox" template='{"type":"attribute","path":"value","name":"checked"}'>
+          <div class="theme-checkbox"  template='{"type":"attribute","path":"key","name":"data-key"}' checked="true" onclick="UI.changeBooleanSetting(this.dataset.key, false)"></div>
+          <div class="theme-checkbox" template='{"type":"attribute","path":"key","name":"data-key"}' onclick="UI.changeBooleanSetting(this.dataset.key, true)"></div>
+        </div>
+        <input type="number" template='{"type":"attribute","path":"value","name":"value"}'></input>
+        <input type="text" template='{"type":"attribute","path":"value","name":"value"}'></input>
+        <span type="unknown">[object]</span>
+      </div>
+      <input type="submit" value="sync" style="display:none"></input>
+    </form>
   </template>
 
   <template id="app-template">

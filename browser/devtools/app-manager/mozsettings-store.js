@@ -21,7 +21,7 @@ module.exports = MozSettingsStore = function(connection) {
 
   _knownMozSettingsStore.set(connection, this);
 
-  ObservableObject.call(this, {});
+  ObservableObject.call(this, {all:[]});
 
   this._resetStore();
 
@@ -43,7 +43,7 @@ MozSettingsStore.prototype = {
   },
 
   _resetStore: function() {
-    this.object = {};
+    this.object.all = [];
   },
 
   _onStatusChanged: function() {
@@ -56,38 +56,33 @@ MozSettingsStore.prototype = {
 
   _listTabs: function() {
     this._connection.client.listTabs((resp) => {
-      this._deviceFront = getDeviceFront(this._connection.client, resp);
+      this._front = getMozSettingsFront(this._connection.client, resp);
       this._feedStore();
     });
   },
 
   _feedStore: function() {
-    this._getDeviceDescription();
-    this._getDevicePermissionsTable();
-  },
+    this._front.getSettings("*").then(json => {
+      let array = [];
+      for (let key in json) {
+        let oneSetting = {};
 
-  _getDeviceDescription: function() {
-    return this._deviceFront.getDescription()
-    .then(json => {
-      json.dpi = Math.ceil(json.dpi);
-      this.object.description = json;
-    });
-  },
+        oneSetting.key = key;
+        oneSetting.type = "unknown";
 
-  _getDevicePermissionsTable: function() {
-    return this._deviceFront.getRawPermissionsTable()
-    .then(json => {
-      let permissionsTable = json.rawPermissionsTable;
-      let permissionsArray = [];
-      for (let name in permissionsTable) {
-        permissionsArray.push({
-          name: name,
-          app: permissionsTable[name].app,
-          privileged: permissionsTable[name].privileged,
-          certified: permissionsTable[name].certified,
-        });
+        let type = typeof json[key];
+        if (type == "number" ||
+            type == "string" ||
+            type == "boolean") {
+          oneSetting.type = type;
+        }
+
+        if (type != "unknown") {
+          oneSetting.value = json[key];
+        }
+        array.push(oneSetting);
       }
-      this.object.permissions = permissionsArray;
+      this.object.all = array;
     });
   },
 }

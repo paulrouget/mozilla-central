@@ -11,6 +11,7 @@ const {getMozSettingsFront} = require("devtools/server/actors/mozsettings");
 const EventEmitter = require("devtools/shared/event-emitter");
 const DeviceStore = require("devtools/app-manager/device-store");
 const WebappsStore = require("devtools/app-manager/webapps-store");
+const MozSettingsStore = require("devtools/app-manager/mozsettings-store");
 const promise = require("sdk/core/promise");
 
 window.addEventListener("message", function(event) {
@@ -55,6 +56,7 @@ let UI = {
     this.store = this._mergeStores({
       "device": new DeviceStore(this.connection),
       "apps": new WebappsStore(this.connection),
+      "settings": new MozSettingsStore(this.connection),
     });
 
     this.template = new Template(document.body, this.store, (property, args) => {
@@ -222,5 +224,16 @@ let UI = {
       });
     }
     return deferred.promise;
+  },
+
+  changeBooleanSetting: function(key, value) {
+    let f = getMozSettingsFront(this.connection.client, this.listTabsResponse);
+    f.setSetting(key, value);
+    for (let s of this.store.object.settings.all) {
+      if (s.key == key) {
+        s.value = value;
+        break;
+      }
+    }
   },
 }
