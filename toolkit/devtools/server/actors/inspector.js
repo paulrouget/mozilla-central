@@ -704,11 +704,11 @@ var ProgressListener = Class({
   initialize: function(webProgress) {
     Unknown.prototype.initialize.call(this);
     this.webProgress = webProgress;
-    this.webProgress.addProgressListener(this);
+    //this.webProgress.addProgressListener(this);
   },
 
   destroy: function() {
-    this.webProgress.removeProgressListener(this);
+    //this.webProgress.removeProgressListener(this);
   },
 
   onStateChange: makeInfallible(function stateChange(progress, request, flag, status) {
