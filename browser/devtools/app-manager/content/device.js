@@ -93,10 +93,13 @@ let UI = {
       this.connection.client.listTabs(
         response => {
           this.listTabsResponse = response;
-          let front = getMozSettingsFront(this.connection.client, this.listTabsResponse);
-          front.getSettings("wallpaper.image").then(res => {
-            this.setWallpaper(res["wallpaper.image"]);
-          }, console.error);
+          let front = getDeviceFront(this.connection.client, this.listTabsResponse);
+          front.getWallpaper().then(longstr => {
+            longstr.string().then(dataURL => {
+              longstr.release().then(null, Cu.reportError);
+              this.setWallpaper(dataURL);
+            });
+          });
         }
       );
     }
