@@ -16,6 +16,7 @@ loader.lazyGetter(this, "MarkupView", () => require("devtools/markupview/markup-
 loader.lazyGetter(this, "Selection", () => require("devtools/inspector/selection").Selection);
 loader.lazyGetter(this, "HTMLBreadcrumbs", () => require("devtools/inspector/breadcrumbs").HTMLBreadcrumbs);
 loader.lazyGetter(this, "Highlighter", () => require("devtools/inspector/highlighter").Highlighter);
+loader.lazyGetter(this, "RemoteHighlighter", () => require("devtools/inspector/highlighter").RemoteHighlighter);
 loader.lazyGetter(this, "ToolSidebar", () => require("devtools/framework/sidebar").ToolSidebar);
 loader.lazyGetter(this, "SelectorSearch", () => require("devtools/inspector/selector-search").SelectorSearch);
 
@@ -83,18 +84,6 @@ InspectorPanel.prototype = {
       this.browser.addEventListener("resize", this.scheduleLayoutChange, true);
 
       this.highlighter = new Highlighter(this.target, this, this._toolbox);
-      let button = this.panelDoc.getElementById("inspector-inspect-toolbutton");
-      button.hidden = false;
-      this.onLockStateChanged = function() {
-        if (this.highlighter.locked) {
-          button.removeAttribute("checked");
-          this._toolbox.raise();
-        } else {
-          button.setAttribute("checked", "true");
-        }
-      }.bind(this);
-      this.highlighter.on("locked", this.onLockStateChanged);
-      this.highlighter.on("unlocked", this.onLockStateChanged);
 
       // Show a warning when the debugger is paused.
       // We show the warning only when the inspector
@@ -122,6 +111,23 @@ InspectorPanel.prototype = {
       this.target.on("thread-resumed", this.updateDebuggerPausedWarning);
       this._toolbox.on("select", this.updateDebuggerPausedWarning);
       this.updateDebuggerPausedWarning();
+    } else {
+      this.highlighter = new RemoteHighlighter(this.walker, this._selection);
+    }
+
+    if (this.highlighter) {
+      let button = this.panelDoc.getElementById("inspector-inspect-toolbutton");
+      button.hidden = false;
+      this.onLockStateChanged = function() {
+        if (this.highlighter.locked) {
+          button.removeAttribute("checked");
+          this._toolbox.raise();
+        } else {
+          button.setAttribute("checked", "true");
+        }
+      }.bind(this);
+      this.highlighter.on("locked", this.onLockStateChanged);
+      this.highlighter.on("unlocked", this.onLockStateChanged);
     }
 
     this._initMarkup();

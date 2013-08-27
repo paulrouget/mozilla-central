@@ -510,6 +510,7 @@ let NodeFront = protocol.FrontClass(NodeActor, {
    */
   rawNode: function(rawNode) {
     if (!this.conn._transport._serverConnection) {
+      console.trace();
       console.warn("Tried to use rawNode on a remote connection.");
       return null;
     }
@@ -828,6 +829,53 @@ var WalkerActor = protocol.ActorClass({
     }
     return actor;
   },
+
+  pick: method(function() {
+    let deferred = promise.defer();
+    let window = this.rootDoc.defaultView;
+    let onClick = function(e) {
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      window.removeEventListener("click", onClick, true);
+      let u = window.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils);
+      let node = u.elementFromPoint(e.clientX, e.clientY, false, false);
+
+      node = this._ref(node);
+
+      let newParents = this.ensurePathToRoot(node);
+      deferred.resolve({
+        node: node,
+        newParents: [parent for (parent of newParents)]
+      });
+    }.bind(this);
+    window.addEventListener("click", onClick, true);
+    return deferred.promise;
+  }, { request: { }, response: RetVal("disconnectedNode") }),
+
+  _highlightedNode: null,
+  _previousHighlightedNodeStyle: null,
+
+  unhighlight: method(function() {
+    if (this._highlightedNode) {
+      if (this._previousHighlightedNodeStyle) {
+        this._highlightedNode.setAttribute("style", this._previousHighlightedNodeStyle);
+      } else {
+        this._highlightedNode.removeAttribute("style");
+      }
+      this._previousHighlightedNodeStyle = null;
+      this._highlightedNode = null;
+    }
+  }, {request: {},response: {}}),
+
+  highlight: method(function(node) {
+    this.unhighlight();
+    if (node && node.rawNode && node.rawNode.style) {
+      this._previousHighlightedNodeStyle = node.rawNode.getAttribute("style");
+      this._highlightedNode = node.rawNode;
+      node.rawNode.style.outline = "5px solid red";
+      node.rawNode.style.outlineOffset = "-5px";
+    }
+  }, { request: { node: Arg(0, "domnode") }}),
 
   /**
    * Watch the given document node for mutations using the DOM observer
@@ -1730,6 +1778,14 @@ var WalkerFront = exports.WalkerFront = protocol.FrontClass(WalkerActor, {
   // Set to true if cleanup should be requested after every mutation list.
   autoCleanup: true,
 
+  pick: protocol.custom(function() {
+    return this._pick().then(response => {
+      return response.node;
+    });
+  }, {
+    impl: "_pick"
+  }),
+
   initialize: function(client, form) {
     this._rootNodeDeferred = promise.defer();
     protocol.Front.prototype.initialize.call(this, client, form);
@@ -2111,7 +2167,8 @@ var InspectorActor = protocol.ActorClass({
   }, {
     request: {},
     response: { pageStyle: RetVal("pagestyle") }
-  })
+  }),
+
 });
 
 /**

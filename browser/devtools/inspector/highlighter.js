@@ -817,3 +817,42 @@ XPCOMUtils.defineLazyGetter(Highlighter.prototype, "strings", function () {
     return Services.strings.createBundle(
             "chrome://browser/locale/devtools/inspector.properties");
 });
+
+// RemoteHighlighter
+
+function RemoteHighlighter(aWalker, aSelection) {
+  this.walker = aWalker;
+  this.selection = aSelection;
+  this.selection.on("new-node-front", this.highlight.bind(this));
+  EventEmitter.decorate(this);
+  this.locked = true;
+}
+
+exports.RemoteHighlighter = RemoteHighlighter;
+
+RemoteHighlighter.prototype = {
+  destroy: function() {
+    this.walker = null;
+    this.selection = null;
+  },
+  onPick: function(node) {
+    this.selection.setNodeFront(node);
+    this.locked = true;
+    this.emit("locked");
+  },
+  toggleLockState: function() {
+    this.locked = !this.locked;
+    if (this.locked) {
+      this.emit("locked");
+      // FIXME: cancel pick
+    } else {
+      this.emit("unlocked");
+      this.walker.pick().then(this.onPick.bind(this));
+    }
+  },
+  highlight: function() {
+    this.walker.highlight(this.selection.nodeFront);
+  },
+  hide: function() {},
+  show: function() {},
+}
