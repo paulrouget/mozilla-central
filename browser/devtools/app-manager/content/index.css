@@ -56,15 +56,15 @@
 }
 
 .device-button {
-  background-image: url('chrome://browser/skin/devtools/index-icons.svg'), linear-gradient(to bottom, transparent, #FF4800, transparent);
+  background-image: url('chrome://browser/skin/devtools/index-icons.svg'), radial-gradient(at center left, red 40%, transparent);
   background-position: left -85px, top left;
   background-repeat: no-repeat, no-repeat;
-  background-size: 160px 160px, 1px 80px;
+  background-size: 160px 160px, 2px 80px;
 }
 
 
 .connected .device-button {
-  background-image: url('chrome://browser/skin/devtools/index-icons.svg'), linear-gradient(to bottom, transparent, #B1FC0D, transparent);
+  background-image: url('chrome://browser/skin/devtools/index-icons.svg'), radial-gradient(at center left, #B1FC0D 40%, transparent);
 }
 
 .device-button[selected] {
