@@ -174,3 +174,30 @@ strong {
   background-size: 35%;
   background-position: center center;
 }
+
+#no-project {
+  padding: 100px 20px 0;
+  font-weight: bold;
+  color: #BBB;
+}
+
+#no-project > span > button {
+  background: linear-gradient(to bottom, #49535C, #394148);
+  color: #9FA6AD;
+  text-shadow: 0px 1px 1px rgba(0,0,0,0.6);
+  border: 1px solid #111;
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 3px 10px;
+  background: linear-gradient(to bottom, #276DA3, #1E5580);
+  color: #EEE;
+}
+
+#no-project > span,
+#no-project > span > a {
+  font-size: 22px;
+}
+
+#no-project > span > a {
+  color: #999!important;
+}

@@ -26,8 +26,14 @@
   <body onload="UI.onload()">
   <section id="content">
       <section id="list">
-        <div id="projects">
+        <div id="projects" template='{"type":"attribute","path":"app.projects.length","name":"projects-count"}'>
           <div template-loop='{"arrayPath":"app.projects","childSelector":"#project-template"}'></div>
+          <div id="no-project">
+            <span>
+              No project linked. Add a new packaged app below (a directory) or a hosted app (link to a manifest file).
+              You can also <a>create a new project</a>.
+            </span>
+          </div>
         </div>
         <div id="new-app-buttons">
           <div id="new-app-type">
