@@ -41,6 +41,7 @@ function test() {
       checkDisabled("node-menu-copyouter");
       checkDisabled("node-menu-copyuniqueselector");
       checkDisabled("node-menu-delete");
+      checkDisabled("node-menu-screenshot");
 
       for (let name of ["hover", "active", "focus"]) {
         checkDisabled("node-menu-pseudo-" + name);
@@ -96,7 +97,34 @@ function test() {
 
     waitForClipboard("body > div:nth-child(1) > p:nth-child(2)",
                      function() { copyUniqueSelector.doCommand(); },
-                     testDeleteNode, testDeleteNode);
+                     testDeleteNode, testScreenshot);
+  }
+
+  function testScreenshot() {
+    let screenshot = inspector.panelDoc.getElementById("node-menu-screenshot");
+    ok(screenshot, "the popup menu has a screenshot menu item");
+
+    inspector.screenshot("inspector-screenshot-test");
+
+    let FileUtils = (Cu.import("resource://gre/modules/FileUtils.jsm", {})).FileUtils;
+
+    // while(1) until we find the file.
+    // no need for a timeout, the test will get killed anyway.
+
+    info("checking if file exists in 300ms");
+    function checkIfFileExist() {
+      let file = FileUtils.getFile("DfltDwnld", [ "inspector-screenshot-test.png" ]);
+
+      if (file.exists()) {
+        ok(true, "Screenshot file exists");
+        file.remove(false);
+        testDeleteNode();
+      } else {
+        setTimeout(checkIfFileExist, 300);
+      }
+    }
+
+    setTimeout(checkIfFileExist, 300);
   }
 
   function testDeleteNode() {

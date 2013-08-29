@@ -235,6 +235,36 @@ var NodeActor = protocol.ActorClass({
   }),
 
   /**
+   * Take a screenshot of the node.
+   */
+  screenshot: method(function() {
+    let rawNode = this.rawNode;
+    let nodeWindow = this.rawNode.ownerDocument.defaultView;
+    let previousX = nodeWindow.scrollX;
+    let previousY = nodeWindow.scrollY;
+    nodeWindow.scrollTo(0, 0);
+    let hiddenWindow = Services.appShell.hiddenDOMWindow;
+    let hiddenDoc = hiddenWindow.document;
+    let canvas = hiddenDoc.createElementNS("http://www.w3.org/1999/xhtml", "canvas");
+    hiddenDoc.documentElement.appendChild(canvas);
+    let rect = rawNode.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+    let ctx = canvas.getContext("2d");
+    ctx.drawWindow(nodeWindow, rect.left, rect.top, rect.width, rect.height, "#fff");
+    nodeWindow.scrollTo(previousX, previousY);
+    let dataurl = canvas.toDataURL("image/jpeg");
+    hiddenDoc.documentElement.removeChild(canvas);
+    return LongStringActor(this.conn, dataurl);
+  }, {
+    request: {},
+    response: {
+      value: RetVal("longstring")
+    }
+  }),
+
+
+  /**
    * Modify a node's attributes.  Passed an array of modifications
    * similar in format to "attributes" mutations.
    * {

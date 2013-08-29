@@ -46,6 +46,10 @@
         accesskey="&inspectorCopyUniqueSelector.accesskey;"
         oncommand="inspector.copyUniqueSelector()"/>
       <menuseparator/>
+      <menuitem id="node-menu-screenshot"
+        label="&inspectorHTMLScreenshot.label;"
+        accesskey="&inspectorHTMLScreenshot.accesskey;"
+        oncommand="inspector.screenshot()"/>
       <menuitem id="node-menu-delete"
         label="&inspectorHTMLDelete.label;"
         accesskey="&inspectorHTMLDelete.accesskey;"

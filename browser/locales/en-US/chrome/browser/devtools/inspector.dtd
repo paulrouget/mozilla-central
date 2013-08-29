@@ -7,6 +7,9 @@
 <!ENTITY inspectorCopyUniqueSelector.label       "Copy Unique Selector">
 <!ENTITY inspectorCopyUniqueSelector.accesskey   "U">
 
+<!ENTITY inspectorHTMLScreenshot.label          "Screenshot">
+<!ENTITY inspectorHTMLScreenshot.accesskey      "S">
+
 <!ENTITY inspectorHTMLDelete.label          "Delete Node">
 <!ENTITY inspectorHTMLDelete.accesskey      "D">
 

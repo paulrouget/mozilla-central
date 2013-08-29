@@ -12,6 +12,10 @@ let promise = require("sdk/core/promise");
 let EventEmitter = require("devtools/shared/event-emitter");
 let {CssLogic} = require("devtools/styleinspector/css-logic");
 
+let tempScope = {};
+Cu.import("resource:///modules/devtools/LayoutHelpers.jsm", tempScope);
+let LayoutHelpers = tempScope.LayoutHelpers;
+
 loader.lazyGetter(this, "MarkupView", () => require("devtools/markupview/markup-view").MarkupView);
 loader.lazyGetter(this, "Selection", () => require("devtools/inspector/selection").Selection);
 loader.lazyGetter(this, "HTMLBreadcrumbs", () => require("devtools/inspector/breadcrumbs").HTMLBreadcrumbs);
@@ -511,19 +515,22 @@ InspectorPanel.prototype = {
       deleteNode.removeAttribute("disabled");
     }
 
-    // Disable / enable "Copy Unique Selector", "Copy inner HTML" &
-    // "Copy outer HTML" as appropriate
+    // Disable / enable "Copy Unique Selector", "Copy inner HTML",
+    // "Copy outer HTML" & "Screenshot" as appropriate
     let unique = this.panelDoc.getElementById("node-menu-copyuniqueselector");
     let copyInnerHTML = this.panelDoc.getElementById("node-menu-copyinner");
     let copyOuterHTML = this.panelDoc.getElementById("node-menu-copyouter");
+    let screenshot = this.panelDoc.getElementById("node-menu-screenshot");
     if (this.selection.isElementNode()) {
       unique.removeAttribute("disabled");
       copyInnerHTML.removeAttribute("disabled");
       copyOuterHTML.removeAttribute("disabled");
+      screenshot.removeAttribute("disabled");
     } else {
       unique.setAttribute("disabled", "true");
       copyInnerHTML.setAttribute("disabled", "true");
       copyOuterHTML.setAttribute("disabled", "true");
+      screenshot.setAttribute("disabled", "true");
     }
   },
 
@@ -658,6 +665,39 @@ InspectorPanel.prototype = {
         clipboardHelper.copyString(toCopy);
       });
     }).then(null, console.error);
+  },
+
+  /**
+   * Take a screenshot of the selected Node.
+   *
+   * @param aFileName name of the screenshot file (used for tests).
+   */
+  screenshot: function InspectorPanel_screenshot(aFileName) {
+    if (!this.selection.isNode()) {
+      return;
+    }
+
+    this.selection.nodeFront.screenshot().then(longstr => {
+      return longstr.string().then(dataURL => {
+        longstr.release().then(null, Cu.reportError);
+        let filename = aFileName;
+        if (!filename) {
+          let date = new Date();
+          let month = ("0" + (date.getMonth() + 1)).substr(-2, 2);
+          let day = ("0" + (date.getDay() + 1)).substr(-2, 2);
+
+          let dateString = [date.getFullYear(), month, day].join("-");
+          let timeString = date.toTimeString().replace(/:/g, ".").split(" ")[0];
+
+          filename = this.strings.formatStringFromName("inspector.screenshotGeneratedFilename",
+                                                      [dateString, timeString], 2);
+        }
+
+        let browserWindow = this.browser.ownerGlobal;
+        let browserDocument = browserWindow.document;
+        browserWindow.saveURL(dataURL, filename + ".png", null, true, true, browserDocument.documentURIObject, browserDocument);
+      });
+    }, Cu.reportError);
   },
 
   /**
