@@ -138,6 +138,12 @@ Connection.Events = {
 Connection.prototype = {
   logs: "",
   log: function(str) {
+    let d = new Date();
+    let hours = ("0" + d.getHours()).slice(-2);
+    let minutes = ("0" + d.getMinutes()).slice(-2);
+    let seconds = ("0" + d.getSeconds()).slice(-2);
+    let timestamp = [hours, minutes, seconds].join(":") + ": ";
+    str = timestamp + str;
     this.logs +=  "\n" + str;
     this.emit(Connection.Events.NEW_LOG, str);
   },
@@ -215,7 +221,7 @@ Connection.prototype = {
     if (!this._host) {
       transport = DebuggerServer.connectPipe();
     } else {
-      transport = debuggerSocketConnect(this._host, this._port);
+      transport = debuggerSocketConnect(this.host, this.port);
     }
     this._client = new DebuggerClient(transport);
     this._client.addOneTimeListener("closed", this._onDisconnected);
