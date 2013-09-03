@@ -1,0 +1,237 @@
+body {
+  color: #333;
+  background-color:  rgb(225, 225, 225);
+  font-family: Lucida Grande, Helvetica, Helvetica Neue, sans-serif;
+}
+
+a {
+  color: #000!important;
+  text-decoration: none;
+  border-bottom: 1px dotted #999
+}
+
+header {
+  padding: 10px;
+}
+
+h1 span {
+  font-size: 20px;
+}
+
+h2 {
+  padding: 4px 10px 4px 10px;
+  background: linear-gradient(to bottom, #49525A, #3E474F);
+  color: #9FA6AD;
+  border-bottom: 1px solid #30363B;
+  font-weight: normal;
+  text-shadow: 0 1px 1px #222;
+  box-shadow: inset 0 0 1px #6E7A85;
+}
+
+#notConnectedMessage {
+  margin: 50px auto;
+}
+
+#notConnectedMessage span {
+  padding: 20px;
+  border: 1px solid #CCC;
+  border-radius: 5px;
+}
+
+#notConnectedMessage span:before {
+  content: '';
+  background: url('error.svg') no-repeat;
+  background-size: 18px;
+  height: 24px;
+  width: 24px;
+  position: relative;
+  top: 10px;
+  display: inline-block;
+}
+
+.list-item {
+  padding: 15px 10px;
+  background-color: #F6F6F6;
+  box-shadow: inset 0 -1px 0 rgba(0,0,0,0.1);
+  color: #666;
+  line-height: 120%;
+  cursor: pointer;
+  display: flex;
+}
+
+.list-item:hover {
+  background-color: #EEE;
+}
+
+.list-item > * {
+  flex-shrink: 0;
+}
+
+.list-item.selected {
+  background: linear-gradient(to bottom, #276DA3, #155282);
+  color: #FFF;
+}
+
+.control-bar {
+  display: flex;
+  margin-left: 20px;
+  color: #BBB;
+}
+
+#list .control-bar > button {
+  margin: 0;
+  font-size: 11px;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-left-width: 0;
+  padding: 8px 15px;
+  cursor: pointer;
+  background: rgba(0,0,0,0.7);
+  text-transform: uppercase;
+  color: #FFF;
+}
+
+#list .control-bar > button:hover {
+  background: #111;
+  color: #65B6FF;
+}
+
+#list .control-bar > button:first-child {
+  border-radius: 0;
+  border-left-width: 0px;
+}
+
+#list .control-bar > button:last-child {
+  border-radius: 0;
+  border-right-width: 0px;
+}
+
+strong {
+  color: #111;
+}
+
+#list {
+  background: #EEE;
+  position: relative;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.3);
+}
+
+#list header {
+  padding-top: 140px;
+  background-image: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.7));
+  color: #FFF;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+#meta {
+  background-size: 100%;
+  padding-top: 50px;
+}
+
+
+#detail {
+  padding: 0px;
+}
+
+.button-plus {
+  background: url('plus.svg') no-repeat right 10px center #EEE;
+  background-size: 20px;
+  border: none;
+  border-top: 1px solid #DDD;
+  cursor: pointer;
+  width: 100%;
+  padding: 10px;
+  color: #333;
+  box-shadow: none;
+  text-align: left;
+  font-weight: bold;
+  position: relative;
+}
+
+.button:hover {
+  background-color: #DDD;
+}
+
+.button input {
+  width: 90%;
+  box-shadow: none;
+  border-radius: 3px;
+  border: 1px solid #DDD;
+  padding: 4px;
+  margin-top: 4px;
+}
+
+#detail {
+  background-color: rgba(225, 225, 225, 1);
+}
+
+.app {
+  padding: 10px 20px;
+  border-bottom: 1px solid #CCC;
+}
+
+.app:hover {
+  background-color: #EFEFEF;
+}
+
+.app-name {
+  font-weight: bold;
+}
+
+.app-icon {
+  width: 32px;
+  height: 32px;
+  margin-right: 10px;
+}
+.app .control-bar {
+  display: block;
+}
+
+.app .control-bar button {
+  border-radius: 3px;
+  border-width: 1px;
+}
+
+.table-footer, .table-header {
+  height: 80px;
+  background: #FFF;
+  box-shadow: none;
+  border-top: 1px solid #CCC;
+  z-index: 2;
+}
+
+.table-footer div, .table-header div {
+  background: transparent;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+.table-header {
+  border: 0;
+  border-bottom: 1px solid #CCC;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+.table-footer {
+  box-shadow: 0 -1px 4px rgba(0,0,0,0.3);
+}
+
+.row div[permission="1"]:before, .allow-label:after {
+  color: #98CF39;
+  content: '   \2713';
+}
+
+.row div[permission="2"]:before, .deny-label:after {
+  color: #CC4908;
+  content: '   \2715';
+}
+
+.row div[permission="3"]:before, .prompt-label:after{
+  color: #009EED;
+  content: '   !';
+}
+
+#connection-footer {
+  border-width: 0;
+  height: 50px;
+  min-height: 50px;
+}

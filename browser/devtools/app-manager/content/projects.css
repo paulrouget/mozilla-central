@@ -1,0 +1,55 @@
+body button.device-action {
+  display: none;
+}
+
+body.connected button.device-action {
+  display: flex;
+}
+
+#projects {
+  height: 100%;
+  overflow: auto;
+}
+
+#detail .app-header {
+  display: flex;
+}
+
+#lense {
+  height: 100%;
+}
+
+.app-status {
+  display: flex;
+}
+
+.app-header .title{
+  flex-direction: row;
+  display: flex;
+}
+
+.project-meta {
+  flex-grow: 1;
+  flex-shrink: 1 !important;
+}
+
+.project-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.errors, .warnings {
+  visibility: hidden;
+}
+
+.warnings[status="warning"] {
+  visibility: visible;
+}
+.errors[status="error"] {
+  visibility: visible;
+}
+
+#projects:not([projects-count="0"]) > #no-project {
+  display: none;
+}

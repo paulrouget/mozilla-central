@@ -1,0 +1,73 @@
+body:not(.notconnected) > #notConnectedMessage,
+body.notconnected > #content {
+  display: none;
+}
+
+body.notconnected > #content {
+  display: none;
+}
+
+#notConnectedMessage {
+  flex-grow: 1;
+  flex-direction: column;
+}
+
+details.control-bar {
+  margin: 0;
+}
+
+details.control-bar button {
+  flex-grow: 1;
+}
+
+#tabs-headers {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#tabs {
+  height: 100%;
+}
+
+.tab {
+  display: block;
+  text-align: left;
+  flex-grow: 1;
+}
+
+.tabpanel {
+  height: 0;
+  overflow: hidden;
+}
+
+.tabpanel.selected {
+  height: 100%;
+}
+
+.apps {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.app {
+  display: flex;
+  align-items: center;
+  order: 1;
+}
+
+.app-name {
+  flex-grow: 1;
+}
+
+.app .control-bar > button {
+  display: none;
+}
+
+.app[running="false"] > .control-bar > .project-button-start,
+.app[running="true"] > .control-bar > .project-button-stop,
+.app[running="true"] > .control-bar > .project-button-restart,
+.app[running="true"] > .control-bar > .project-button-debug {
+  display: inline-block;
+}

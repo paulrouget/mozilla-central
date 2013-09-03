@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+     - License, v. 2.0. If a copy of the MPL was not distributed with this
+     - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<!DOCTYPE html [
+  <!ENTITY % appMgrDTD SYSTEM "chrome://browser/locale/devtools/app-manager.dtd" >
+  %appMgrDTD;
+]>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+  <head>
+    <meta charset="utf8"/>
+    <base href="chrome://browser/content/devtools/app-manager/"></base>
+    <title>&device.title;</title>
+
+    <link rel="stylesheet" href="layout.css" type="text/css"/>
+    <link rel="stylesheet" href="device.css" type="text/css"/>
+    <link rel="stylesheet" href="chrome://browser/skin/devtools/app-manager/app-manager-common.css" type="text/css"/>
+    <link rel="stylesheet" href="chrome://browser/skin/devtools/app-manager/device.css" type="text/css"/>
+  </head>
+
+  <body onload="UI.init()">
+
+    <div id="notConnectedMessage"><span>&device.notConnected;</span></div>
+
+    <section id="content">
+          <section id="list">
+            <div id="meta">
+              <header>
+                <h1>
+                  <span template='{"type":"textContent","path":"device.description.name"}'></span>
+                  <span template='{"type":"textContent","path":"device.description.version"}'></span>
+                  <span template='{"type":"textContent","path":"device.description.channel"}'></span>
+                </h1>
+                <h3>
+                  <span>Gecko </span>
+                  <span template='{"type":"textContent","path":"device.description.geckoversion"}'></span>
+                </h3>
+                <p template='{"type":"localizedContent","property":"device.deviceSize", "paths":["device.description.width","device.description.height","device.description.dpi"]}'></p>
+              </header>
+              <details class="control-bar">
+                <button onclick="UI.screenshot()">&device.screenshot;</button>
+              </details>
+              <div id="tabs-headers">
+                <div onclick="UI.setTab('apps')" class="tab list-item apps">&device.installedApps;</div>
+                <div onclick="UI.setTab('permissions')" class="tab list-item permissions">&device.permissions;</div>
+              </div>
+            </div>
+          </section>
+          <section id="detail">
+            <div id="tabs">
+              <div class="tabpanel apps">
+                <div class="app-list" template-loop='{"arrayPath":"apps.all","childSelector":"#app-template"}'></div>
+              </div>
+              <div class="tabpanel permissions table">
+                <div class="table-header">
+                  <div class="name">&device.name;</div>
+                  <div class="app-permission">&device.app;</div>
+                  <div class="privileged-permission">&device.privileged;</div>
+                  <div class="certified-permission">&device.certified;</div>
+                </div>
+                <div class="cells" >
+                  <section template-loop='{"arrayPath":"device.permissions","childSelector":"#permission-template"}'></section>
+                </div>
+                <div class="table-footer">
+                  <div class="allow-label">&device.allow;</div>
+                  <div class="prompt-label">&device.prompt;</div>
+                  <div class="deny-label">&device.deny;</div>
+                </div>
+              </div>
+            </div>
+          </section>
+    </section>
+    <iframe id="connection-footer" src="chrome://browser/content/devtools/app-manager/connection-footer.xhtml"></iframe>
+  </body>
+
+  <template id="permission-template">
+    <div class="row">
+      <div class="name" template='{"type":"textContent","path":"name"}'></div>
+      <div class="app-permission" template='{"type":"attribute", "name":"permission", "path":"app"}'></div>
+      <div class="privileged-permission" template='{"type":"attribute", "name":"permission","path":"privileged"}'></div>
+      <div class="certified-permission" template='{"type":"attribute", "name":"permission", "path":"certified"}'></div>
+    </div>
+  </template>
+
+  <template id="app-template">
+    <div class="app" template='{"type":"attribute","path":"running","name":"running"}'>
+      <img class="app-icon" template='{"type":"attribute","path":"iconURL","name":"src"}'></img>
+      <span class="app-name" template='{"type":"textContent","path":"name"}'></span>
+      <div class="control-bar">
+        <button class="project-button-debug" template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.openToolbox(this.dataset.manifest)">&device.debugApp;</button>
+        <button class="project-button-start" template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.startApp(this.dataset.manifest)">&device.startApp;</button>
+        <button class="project-button-stop"  template='{"type":"attribute","path":"manifestURL","name":"data-manifest"}' onclick="UI.stopApp(this.dataset.manifest)">&device.stopApp;</button>
+      </div>
+    </div>
+  </template>
+
+  <script type="application/javascript;version=1.8" src="utils.js"></script>
+  <script type="application/javascript;version=1.8" src="template.js"></script>
+  <script type="application/javascript;version=1.8" src="device.js"></script>
+
+</html>

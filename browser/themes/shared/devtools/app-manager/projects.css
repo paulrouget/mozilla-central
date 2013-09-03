@@ -1,0 +1,174 @@
+#new-app-buttons {
+  flex: 0 0 auto;
+}
+
+.list-item button {
+   visibility: hidden;
+   float: right;
+   margin-right: 5px;
+   border: 1px solid #CCC;
+   background: #FFF;
+   border-radius: 3px;
+   text-transform: uppercase;
+   cursor: pointer;
+   font-size: 10px;
+}
+
+.project-meta .type {
+  font-size: 10px;
+  line-height: 20px;
+  float: right;
+  padding-right: 10px;
+  color: #AAA;
+  text-transform: uppercase;
+}
+
+.project-meta .button-remove {
+  float: right;
+  margin-right: 10px;
+  opacity: 0;
+}
+
+.list-item:hover .button-remove {
+  opacity: 1;
+}
+
+.project-icon {
+  width: 32px;
+  height: 32px;
+  margin: 0 10px;
+}
+
+.location {
+  color: gray;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+#detail .location:hover {
+  text-decoration: underline;
+}
+
+.project-status {
+  width: 10px;
+  margin: -10px 0;
+  border-right: 1px solid rgba(0,0,0,0.1);
+  box-shadow: inset 0 0 1px 1px rgba(255,255,255,0.2), inset 0 -1px 0px 0px rgba(0,0,0,0.2);
+}
+
+.project-status[status="warning"] {
+  background: linear-gradient(to bottom, #F5BD56, #E3A93D );
+}
+
+.project-status[status="error"] {
+  background: linear-gradient(to bottom, #E34F22, #B83C16 );
+}
+
+.project-status[status="valid"] {
+  background: linear-gradient(to bottom, #90D11F, #77AD18 );
+}
+
+.app-details {
+  padding: 10px;
+}
+
+.app-details[status="warning"] .warnings {
+  visibility: visible;
+  margin: 20px 20px 0;
+  padding: 10px 10px;
+  border-left: 3px solid #ECB51E;
+  background-color: rgba(236, 181, 20, 0.1);
+}
+
+.app-details[status="error"] .errors {
+  visibility: visible;
+  margin: 20px;
+  padding: 10px 10px;
+  border-left: 3px solid #E34F22;
+  background-color: rgba(227,79,34,0.1);
+}
+
+.warnings[status="warning"]{
+  background-image: url('warning.svg');
+}
+
+.errors[status="error"]{
+  background-image: url('error.svg');
+  color: rgb(227, 79, 34);
+}
+
+.warnings[status="warning"], .errors[status="error"] {
+  background-repeat: no-repeat;
+  background-size: 12px;
+  background-position: left center;
+  margin-top: 6px;
+}
+
+.warnings[status="warning"] span, .errors[status="error"] span{
+  font-size: 11px;
+  padding-left: 16px;
+  font-weight: bold;
+}
+
+#new-app-buttons {
+  box-shadow: 0 -1px 10px rgba(0,0,0,0.3);
+}
+
+.app-header {
+  border-bottom: 1px solid #CCC;
+  margin: 10px 20px 10px 20px;
+  padding-bottom: 10px;
+}
+
+.app-header div{
+  line-height: 160%;
+}
+
+.app-header .project-icon {
+  flex: 0 0 84px;
+}
+
+.app-header .project-icon img{
+  width: 64px;
+  height: 64px;
+}
+
+.app-header .location {
+  font-size: 11px;
+  color: #999;
+}
+
+.app-header .description {
+  font-style: italic;
+  color: #333;
+}
+
+.app-status {
+  position: absolute;
+  right: 20px;
+}
+
+.app-status p{
+  text-transform: uppercase;
+  font-size: 10px;
+  padding: 2px 10px;
+  border-radius: 2px;
+  margin-top: 6px;
+  line-height: 10px;
+}
+
+.app-status .validation {
+  color: #FFF;
+}
+
+.app-status[status="valid"] .validation {
+  background-color: #82BD1B;
+}
+
+.app-status[status="warning"] .validation {
+  background-color: #ECB51F;
+}
+
+.app-status[status="error"] .validation {
+  background-color: #C24119;
+}
