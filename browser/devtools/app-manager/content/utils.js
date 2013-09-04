@@ -19,18 +19,20 @@ let Utils = (function() {
   const EventEmitter = require("devtools/shared/event-emitter");
 
 
+  function _forwardSetEvent(key, store, finalStore) {
+    store.on("set", function(event, path, value) {
+      finalStore.emit("set", [key].concat(path), value);
+    });
+  }
+
   function mergeStores(stores) {
-      let finalStore = {object:{}};
-      EventEmitter.decorate(finalStore);
-      for (let key in stores) {
-        (function(key) {
-          finalStore.object[key] = stores[key].object,
-          stores[key].on("set", function(event, path, value) {
-            finalStore.emit("set", [key].concat(path), value);
-          });
-        })(key);
-      }
-      return finalStore;
+    let finalStore = {object:{}};
+    EventEmitter.decorate(finalStore);
+    for (let key in stores) {
+      finalStore.object[key] = stores[key].object,
+      _forwardSetEvent(key, stores[key], finalStore);
+    }
+    return finalStore;
   }
 
 
