@@ -11,7 +11,6 @@ const {devtools} = Cu.import("resource://gre/modules/devtools/Loader.jsm", {});
 const {require} = devtools;
 
 const {ConnectionManager, Connection} = require("devtools/client/connection-manager");
-const EventEmitter = require("devtools/shared/event-emitter");
 const ConnectionStore = require("devtools/app-manager/connection-store");
 const DeviceStore = require("devtools/app-manager/device-store");
 
@@ -66,7 +65,7 @@ let UI = {
     let winUtils = window.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowUtils);
     winUtils.loadSheet(scrollbarsUrl, winUtils.AGENT_SHEET);
     let computedStyle = window.getComputedStyle(document.documentElement);
-    if (computedStyle) {
+    if (computedStyle) { // Force a reflow to take the new css into account
       let display = computedStyle.display; // Save display value
       document.documentElement.style.display = "none";
       window.getComputedStyle(document.documentElement).display; // Flush
