@@ -27,8 +27,8 @@
         <button class="button device-button" onclick="selectTab('device')">&index.device;</button>
       </vbox>
       <hbox id="tab-panels" flex="1">
-        <iframe flex="1" class="panel projects-panel" src="chrome://browser/content/devtools/app-manager/projects.xhtml#hideFooter"/>
-        <iframe flex="1" class="panel device-panel" src="chrome://browser/content/devtools/app-manager/device.xhtml#hideFooter"/>
+        <iframe flex="1" class="panel projects-panel" src="chrome://browser/content/devtools/app-manager/projects.xhtml"/>
+        <iframe flex="1" class="panel device-panel" src="chrome://browser/content/devtools/app-manager/device.xhtml"/>
       </hbox>
     </hbox>
     <iframe id="connection-footer" src="chrome://browser/content/devtools/app-manager/connection-footer.xhtml"></iframe>

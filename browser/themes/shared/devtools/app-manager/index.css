@@ -25,7 +25,7 @@
   color: white;
   cursor: pointer;
   text-align: center;
-  -moz-box-align: end;  
+  -moz-box-align: end;
   font-size: 10px;
   text-shadow: 0 1px 2px #111;
   color: #9FA6AD;
@@ -64,7 +64,6 @@
   background-repeat: no-repeat, no-repeat;
   background-size: 160px 160px, 2px 80px;
 }
-
 
 .connected .device-button {
   background-image: url('chrome://browser/skin/devtools/app-manager/index-icons.svg'), radial-gradient(at center left, #B1FC0D 40%, transparent);

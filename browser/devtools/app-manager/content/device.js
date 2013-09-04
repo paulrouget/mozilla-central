@@ -35,8 +35,7 @@ window.addEventListener("message", function(event) {
 
 let UI = {
   init: function() {
-    window.onhashchange = () => this.hideFooterIfNeeded();
-    this.hideFooterIfNeeded();
+    this.showFooterIfNeeded();
     this._onConnectionStatusChange = this._onConnectionStatusChange.bind(this);
     this.setTab("apps");
     if (this.connection) {
@@ -46,12 +45,14 @@ let UI = {
     }
   },
 
-  hideFooterIfNeeded: function() {
+  showFooterIfNeeded: function() {
     let footer = document.querySelector("#connection-footer");
-    if (window.location.hash.contains("hideFooter")) {
-      footer.setAttribute("hidden", "true");
-    } else {
+    if (window.parent == window) {
+      // We're alone. Let's add a footer.
       footer.removeAttribute("hidden");
+      footer.src = "chrome://browser/content/devtools/app-manager/connection-footer.xhtml";
+    } else {
+      footer.setAttribute("hidden", "true");
     }
   },
 
