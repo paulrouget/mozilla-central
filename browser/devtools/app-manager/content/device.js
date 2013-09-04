@@ -19,7 +19,7 @@ window.addEventListener("message", function(event) {
   try {
     let message = JSON.parse(event.data);
     if (message.name == "connection") {
-      let cid = +message.cid;
+      let cid = parseInt(message.cid);
       for (let c of ConnectionManager.connections) {
         if (c.uid == cid) {
           UI.connection = c;
@@ -134,7 +134,7 @@ let UI = {
     }).then(null, console.error);
   },
 
-  _getTargetForApp: function(manifest) {
+  _getTargetForApp: function(manifest) { // FIXME <- will be implemented in bug 912476
     if (!this.listTabsResponse)
       return null;
 
