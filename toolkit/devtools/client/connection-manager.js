@@ -218,7 +218,7 @@ Connection.prototype = {
 
   _clientConnect: function () {
     let transport;
-    if (!this._host) {
+    if (!this.host) {
       transport = DebuggerServer.connectPipe();
     } else {
       transport = debuggerSocketConnect(this.host, this.port);
