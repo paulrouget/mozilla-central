@@ -148,12 +148,16 @@ let DeviceActor = protocol.ActorClass({
   getWallpaper: method(function() {
     let deferred = promise.defer();
     this._getSetting("wallpaper.image").then((blob) => {
-      let win = Services.wm.getMostRecentWindow(DebuggerServer.chromeWindowType);
-      let reader = new win.FileReader();
+      let CC = Components.Constructor;
+      let FileReader = CC("@mozilla.org/files/filereader;1");
+      let reader = new FileReader();
       let conn = this.conn;
-      reader.addEventListener("loadend", function() {
+      reader.addEventListener("load", function() {
         let str = new LongStringActor(conn, reader.result);
         deferred.resolve(str);
+      });
+      reader.addEventListener("error", function() {
+        deferred.reject(reader.error);
       });
       reader.readAsDataURL(blob);
     });
