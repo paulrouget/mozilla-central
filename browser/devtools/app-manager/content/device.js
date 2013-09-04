@@ -11,7 +11,6 @@ const {require} = devtools;
 
 const {ConnectionManager, Connection} = require("devtools/client/connection-manager");
 const {getDeviceFront} = require("devtools/server/actors/device");
-const EventEmitter = require("devtools/shared/event-emitter");
 const DeviceStore = require("devtools/app-manager/device-store");
 const WebappsStore = require("devtools/app-manager/webapps-store");
 const promise = require("sdk/core/promise");

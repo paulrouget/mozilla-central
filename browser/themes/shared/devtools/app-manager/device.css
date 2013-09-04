@@ -91,7 +91,6 @@ button {
 
 .app[running="false"] > .app-buttons > .button-start,
 .app[running="true"] > .app-buttons > .button-stop,
-.app[running="true"] > .app-buttons > .button-restart,
 .app[running="true"] > .app-buttons > .button-debug {
   display: inline-block;
 }
@@ -105,12 +104,10 @@ button {
   color: #FFF;
 }
 
-.button-install,
 .button-start {
   color: #18BC9C
 }
 
-.button-install:hover,
 .button-start:hover {
   background-color: #18BC9C;
   color: #FFF;
@@ -345,19 +342,16 @@ body.notconnected > #content {
 #notConnectedMessage {
   flex-grow: 1;
   flex-direction: column;
-}
-
-#notConnectedMessage {
   margin: 50px auto;
 }
 
-#notConnectedMessage span {
+#notConnectedMessage > span {
   padding: 20px;
   border: 1px solid #CCC;
   border-radius: 5px;
 }
 
-#notConnectedMessage span:before {
+#notConnectedMessage > span:before {
   content: '';
   background: url('error.svg') no-repeat;
   background-size: 18px;
