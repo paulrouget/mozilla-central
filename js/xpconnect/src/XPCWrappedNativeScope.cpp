@@ -6,8 +6,6 @@
 /* Class used to manage the wrapped native objects within a JS scope. */
 
 #include "xpcprivate.h"
-#include "XPCWrapper.h"
-#include "jsproxy.h"
 #include "nsContentUtils.h"
 #include "nsCycleCollectionNoteRootCallback.h"
 #include "nsPrincipal.h"
@@ -291,7 +289,7 @@ JSObject *GetXBLScope(JSContext *cx, JSObject *contentScopeArg)
     JSObject *scope = EnsureCompartmentPrivate(contentScope)->scope->EnsureXBLScope(cx);
     NS_ENSURE_TRUE(scope, nullptr); // See bug 858642.
     scope = js::UncheckedUnwrap(scope);
-    xpc_UnmarkGrayObject(scope);
+    JS::ExposeObjectToActiveJS(scope);
     return scope;
 }
 

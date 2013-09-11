@@ -12,6 +12,7 @@
 #include "nsIDOMSimpleGestureEvent.h" // Constants for gesture events
 #include "InputData.h"
 #include "UIABridgePrivate.h"
+#include "MetroAppShell.h"
 
 // System headers (alphabetical)
 #include <windows.ui.core.h> // ABI::Window::UI::Core namespace
@@ -96,6 +97,38 @@ namespace {
                      // draft says that the value should be 0.0 if no value
                      // known.
                      pressure);
+  }
+
+  /**
+   * Test if a touchpoint position has moved. See Touch.Equals for
+   * criteria.
+   *
+   * @param aTouch previous touch point
+   * @param aPoint new winrt touch point
+   * @return true if the point has moved
+   */
+  bool
+  HasPointMoved(Touch* aTouch, UI::Input::IPointerPoint* aPoint) {
+    WRL::ComPtr<UI::Input::IPointerPointProperties> props;
+    Foundation::Point position;
+    Foundation::Rect contactRect;
+    float pressure;
+
+    aPoint->get_Properties(props.GetAddressOf());
+    aPoint->get_Position(&position);
+    props->get_ContactRect(&contactRect);
+    props->get_Pressure(&pressure);
+    nsIntPoint touchPoint = MetroUtils::LogToPhys(position);
+    nsIntPoint touchRadius;
+    touchRadius.x = MetroUtils::LogToPhys(contactRect.Width) / 2;
+    touchRadius.y = MetroUtils::LogToPhys(contactRect.Height) / 2;
+
+    // from Touch.Equals
+    return touchPoint != aTouch->mRefPoint ||
+           pressure != aTouch->Force() ||
+           /* mRotationAngle == aTouch->RotationAngle() || */
+           touchRadius.x != aTouch->RadiusX() ||
+           touchRadius.y != aTouch->RadiusY();
   }
 
   /**
@@ -468,9 +501,16 @@ MetroInput::OnPointerMoved(UI::Core::ICoreWindow* aSender,
     return S_OK;
   }
 
+  // If the point hasn't moved, filter it out per the spec. Pres shell does
+  // this as well, but we need to know when our first touchmove is going to
+  // get delivered so we can check the result.
+  if (!HasPointMoved(touch, currentPoint.Get())) {
+    return S_OK;
+  }
+
   // If we've accumulated a batch of pointer moves and we're now on a new batch
   // at a new position send the previous batch. (perf opt)
-  if (touch->mChanged) {
+  if (!mIsFirstTouchMove && touch->mChanged) {
     nsTouchEvent* touchEvent =
       new nsTouchEvent(true, NS_TOUCH_MOVE, mWidget.Get());
     InitTouchEventTouchList(touchEvent);
@@ -510,12 +550,8 @@ MetroInput::OnPointerMoved(UI::Core::ICoreWindow* aSender,
 void
 MetroInput::OnFirstPointerMoveCallback()
 {
-  nsTouchEvent* event = static_cast<nsTouchEvent*>(mInputEventQueue.PopFront());
-  MOZ_ASSERT(event);
-  nsEventStatus status;
-  mWidget->DispatchEvent(event, status);
+  nsEventStatus status = DeliverNextQueuedTouchEvent();
   mTouchMoveDefaultPrevented = (nsEventStatus_eConsumeNoDefault == status);
-  delete event;
 }
 
 // This event is raised when the user lifts the left mouse button, lifts a
@@ -574,6 +610,11 @@ MetroInput::OnPointerReleased(UI::Core::ICoreWindow* aSender,
   if (!mTouchStartDefaultPrevented) {
     mGestureRecognizer->ProcessUpEvent(currentPoint.Get());
   }
+
+  // Make sure all gecko events are dispatched and the dom is up to date
+  // so that when ui automation comes in looking for focus info it gets
+  // the right information.
+  MetroAppShell::MarkEventQueueForPurge();
 
   return S_OK;
 }
@@ -1031,17 +1072,6 @@ MetroInput::DeliverNextQueuedEventIgnoreStatus()
   delete event;
 }
 
-nsEventStatus
-MetroInput::DeliverNextQueuedEvent()
-{
-  nsGUIEvent* event = static_cast<nsGUIEvent*>(mInputEventQueue.PopFront());
-  MOZ_ASSERT(event);
-  nsEventStatus status;
-  mWidget->DispatchEvent(event, status);
-  delete event;
-  return status;
-}
-
 void
 MetroInput::DispatchAsyncTouchEventIgnoreStatus(nsTouchEvent* aEvent)
 {
@@ -1061,7 +1091,8 @@ MetroInput::DeliverNextQueuedTouchEvent()
   MOZ_ASSERT(event);
   nsEventStatus status;
   mWidget->DispatchEvent(event, status);
-  if (status != nsEventStatus_eConsumeNoDefault && MetroWidget::sAPZC) {
+  // Deliver to the apz if content has *not* cancelled touchstart or the first touchmove.
+  if (!mTouchStartDefaultPrevented && !mTouchMoveDefaultPrevented && MetroWidget::sAPZC) {
     MultiTouchInput inputData(*event);
     MetroWidget::sAPZC->ReceiveInputEvent(inputData);
   }
