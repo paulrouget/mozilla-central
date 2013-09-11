@@ -78,3 +78,20 @@
   height: 50px;
   min-height: 50px;
 }
+
+/* Assistant */
+
+#assistant {
+  display: none;
+  border-width: 0;
+}
+
+.show-assistant > #assistant {
+  display: -moz-box;
+}
+
+
+.show-assistant > #content,
+.show-assistant > #connection-footer {
+  display: none;
+}

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+     - License, v. 2.0. If a copy of the MPL was not distributed with this
+     - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<!DOCTYPE html [
+  <!ENTITY % appMgrDTD SYSTEM "chrome://browser/locale/devtools/app-manager.dtd" >
+  %appMgrDTD;
+]>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+  <head>
+    <meta charset="utf8"/>
+    <base href="chrome://browser/content/devtools/app-manager/"></base>
+    <title>&assistant.title;</title>
+    <link rel="stylesheet" href="chrome://browser/skin/devtools/app-manager/assistant.css" type="text/css"/>
+  </head>
+
+  <body show="intro">
+
+    <header>
+      <h1>&assistant.h1;</h1>
+    </header>
+
+    <section id="page-intro">
+      <p>Welcome to the App Manager. This tool will help you build and install apps for Html web apps compatible devices (like Firefox OS).</p>
+      <p>To be able to debug web applications, it's recommended to use a device (like a Firefox OS phone) or install the Firefox OS simulator. This assistant will help you setup your device or install the simulator.</p>
+      <ul>
+        <li><a href="#setupdevice">Setup a device</a></li>
+        <li><a href="#installsimulator">Install a simulator</a></li>
+      </ul>
+    </section>
+
+    <section id="page-setupdevice">
+      <h2>Setup a device</h2>
+      <p>To connect a device, it needs to be plugged to your computer via USB. It also needs to be linked to your computer via a tool named <strong>adb</strong>.
+      Firefox can handle the adb connection for you (no need to install adb), or you can do it manually (install and start adb yourself).</p>
+      <ul>
+        <li><a href="#setupdevice-adbaddon">Let Firefox control adb</a></li>
+        <li><a href="#setupdevice-manualadb">Setup adb manually</a></li>
+      </ul>
+    </section>
+
+
+    <!-- ADB ADDON -->
+
+
+    <section id="page-setupdevice-adbaddon">
+      <h2>Setup a device: install adb addon</h2>
+      <p>For Firefox to be able to control adb itself, an addon needs to be installed (no restart required).</p>
+      <p><a href="http://addons.mozilla.org/">install adb addon</a></p>
+
+      <p is-adb-addon-ready="false">
+        <style scoped="">
+          :scope > * {
+            display: none;
+          }
+          :scope[is-adb-addon-installed="true"] > .ready,
+          :scope[is-adb-addon-installed="false"] > .notready {
+            display: inline;
+          }
+        </style>
+        <span class="notready">Adb addon not installed.</span>
+        <span class="tready">Adb addon installed. <a href="#setupdevice-adbaddon-testconnection">Scan for devices</a>.</span>
+      </p>
+    </section>
+
+    <section id="page-setupdevice-adbaddon-testconnection">
+      <h2>Setup a device: scan for devices</h2>
+      <div device-count="0">
+        <style scoped="">
+          :scope > * {
+            display: none;
+          }
+          :scope[device-count=0] > .nodevice,
+          :scope[device-count=1] > .onedevice,
+          :scope[device-count] > .multipledevice {
+            display: block;
+          }
+        </style>
+        <p class="nodevice">No device found. Plug a compatible device. If your device is not recognised, see the <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Firefox_OS/Using_the_App_Manager#Troubleshooting">toubleshooting section on MDN</a>.</p>
+        <p class="onedevice">One device found.</p>
+        <p class="multipledevice"><span>42</span> devices found.</p>
+        <div>
+          <p>We're ready for the next step.
+          Turn on <em>remote debugging</em> on your device (<a href="https://developer.mozilla.org/en-US/docs/Mozilla/Firefox_OS/Using_the_App_Manager#Configuring_the_device">see how to setup your device on MDN</a>) and then select a device:</p>
+          <ul>
+            <li><button>full_keon</button></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="page-setupdevice-adbaddon-testconnection-success">
+      <h2>Setup a device: succes</h2>
+      <p>Congratulation. Your device is connected and ready for app development.</p>
+      <button>close</button>
+    </section>
+
+    <section id="page-setupdevice-adbaddon-testconnection-failure">
+      <h2>Setup a device: failed</h2>
+      <p>Your device is visible but doesn't appear to be debuggable. See the <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Firefox_OS/Using_the_App_Manager#Troubleshooting">toubleshooting section on MDN</a>.</p>
+    </section>
+
+
+    <!-- MANUAL ADB SETUP -->
+
+
+    <section id="page-setupdevice-manualadb">
+      <h2>Setup a device: configure adb</h2>
+      <p>Make sure to have adb installed on your computer. Then, start the <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Firefox_OS/Using_the_App_Manager#Configuring_the_device">adb forward command as explained on MDN</a>.
+      Once done, try to connect your device.</p>
+      <label>
+        <span>port:</span>
+        <input type="number"></input>
+      </label>
+
+    </section>
+
+  </body>
+
+ <script type="application/javascript;version=1.8" src="first-run.js"></script>
+</html>

@@ -32,6 +32,7 @@
       </hbox>
     </hbox>
     <iframe id="connection-footer" src="chrome://browser/content/devtools/app-manager/connection-footer.xhtml"></iframe>
+    <iframe id="assistant" flex="1" src="chrome://browser/content/devtools/app-manager/assistant.xhtml"></iframe>
   </vbox>
 
   <script type="application/javascript;version=1.8" src="chrome://browser/content/devtools/app-manager/index.js"></script>
