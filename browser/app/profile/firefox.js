@@ -860,8 +860,6 @@ pref("browser.sessionstore.restore_pinned_tabs_on_demand", false);
 pref("browser.sessionstore.upgradeBackup.latestBuildID", "");
 // End-users should not run sessionstore in debug mode
 pref("browser.sessionstore.debug", false);
-// Enable asynchronous data collection by default.
-pref("browser.sessionstore.async", true);
 
 // allow META refresh by default
 pref("accessibility.blockautorefresh", false);
@@ -1091,6 +1089,9 @@ pref("devtools.inspector.activeSidebar", "ruleview");
 pref("devtools.inspector.markupPreview", false);
 pref("devtools.inspector.remote", false);
 pref("devtools.inspector.show_pseudo_elements", true);
+
+// DevTools default color unit
+pref("devtools.defaultColorUnit", "hex");
 
 // Enable the Responsive UI tool
 pref("devtools.responsiveUI.enabled", true);
