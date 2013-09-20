@@ -16,9 +16,11 @@ XPCOMUtils.defineLazyModuleGetter(this, "Services",
 this.EXPORTED_SYMBOLS = ["LayoutHelpers"];
 
 this.LayoutHelpers = LayoutHelpers = function(aTopLevelWindow) {
-  this._topDocShell = aTopLevelWindow.QueryInterface(Ci.nsIInterfaceRequestor)
-                                     .getInterface(Ci.nsIWebNavigation)
-                                     .QueryInterface(Ci.nsIDocShell);
+  if (aTopLevelWindow) {
+    this._topDocShell = aTopLevelWindow.QueryInterface(Ci.nsIInterfaceRequestor)
+                                       .getInterface(Ci.nsIWebNavigation)
+                                       .QueryInterface(Ci.nsIDocShell);
+  }
 }
 
 LayoutHelpers.prototype = {
@@ -341,7 +343,23 @@ LayoutHelpers.prototype = {
                    .getInterface(Ci.nsIWebNavigation)
                    .QueryInterface(Ci.nsIDocShell);
 
-    return docShell === this._topDocShell;
+    return this._topDocShell && (docShell === this._topDocShell);
+  },
+
+  /**
+   * Check a window is part of the top level window.
+   */
+  isIncludedInTopLevelWindow: function LH_isIncludedInTopLevelWindow(win) {
+    if (!this._topDocShell || this.isTopLevelWindow(win)) {
+      return true;
+    }
+
+    let parent = this.getParentWindow(win);
+    if (!parent || parent === win) {
+      return false;
+    }
+
+    return this.isIncludedInTopLevelWindow(parent);
   },
 
   /**

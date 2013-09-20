@@ -24,6 +24,7 @@ loader.lazyServiceGetter(this, "gActivityDistributor",
 loader.lazyImporter(this, "gDevTools", "resource:///modules/devtools/gDevTools.jsm");
 loader.lazyImporter(this, "devtools", "resource://gre/modules/devtools/Loader.jsm");
 loader.lazyImporter(this, "VariablesView", "resource:///modules/devtools/VariablesView.jsm");
+loader.lazyImporter(this, "LayoutHelpers", "resource://gre/modules/devtools/LayoutHelpers.jsm");
 
 // Match the function name from the result of toString() or toSource().
 //
@@ -929,6 +930,7 @@ exports.JSPropertyProvider = JSPropertyProvider;
 function ConsoleServiceListener(aWindow, aListener)
 {
   this.window = aWindow;
+  this.layoutHelpers = new LayoutHelpers(this.window);
   this.listener = aListener;
 }
 exports.ConsoleServiceListener = ConsoleServiceListener;
@@ -979,7 +981,7 @@ ConsoleServiceListener.prototype =
       }
 
       let errorWindow = Services.wm.getOuterWindowWithId(aMessage.outerWindowID);
-      if (!errorWindow || errorWindow.top != this.window) {
+      if (!errorWindow || !this.layoutHelpers.isIncludedInTopLevelWindow(errorWindow)) {
         return;
       }
     }
@@ -1101,6 +1103,7 @@ function ConsoleAPIListener(aWindow, aOwner)
 {
   this.window = aWindow;
   this.owner = aOwner;
+  this.layoutHelpers = new LayoutHelpers(this.window);
 }
 exports.ConsoleAPIListener = ConsoleAPIListener;
 
@@ -1152,7 +1155,7 @@ ConsoleAPIListener.prototype =
     let apiMessage = aMessage.wrappedJSObject;
     if (this.window) {
       let msgWindow = Services.wm.getOuterWindowWithId(apiMessage.ID);
-      if (!msgWindow || msgWindow.top != this.window) {
+      if (!msgWindow || !this.layoutHelpers.isIncludedInTopLevelWindow(msgWindow)) {
         // Not the same window!
         return;
       }
