@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="utf8">
+  <title>Console.log from mozbrowser iframe</title>
+  <script type="text/javascript" src="/tests/SimpleTest/SimpleTest.js"></script>
+  <link rel="stylesheet" type="text/css" href="/tests/SimpleTest/test.css" />
+</head>
+<body>
+<p>Console.log from mozbrowser iframe</p>
+
+<script class="testbody" type="text/javascript;version=1.8">
+
+SimpleTest.waitForExplicitFinish();
+
+let iframeSrc = 'data:text/html;charset=utf-8,<script>console.log(window.parent==window)<%2Fscript>';
+
+
+// Load a chrome script in order to dispatch devtool debugger requests.
+// Because of wrapping issues, we can't use SpecialPowers.Cu.import to load
+// devtools jsm into mochitest scope. We end up not receiving
+// DebuggerClient.addListener callback arguments...
+let scriptUrl = SimpleTest.getTestFileURL("debugger-helper-plain-mochitest.js");
+
+function onAttach(aState, aResponse)
+{
+  try {
+    onConsoleAPICall = onConsoleAPICall.bind(null, aState);
+    aState.dbgClient.addListener("consoleAPICall", onConsoleAPICall);
+    SpecialPowers.addPermission("browser", true, document);
+    SpecialPowers.pushPrefEnv({ "set": [["dom.mozBrowserFramesEnabled", true]]},
+                              function () {
+                                let iframe = document.createElement("iframe");
+                                SpecialPowers.wrap(iframe).mozbrowser = true;
+                                iframe.src = "data:text/html,<html style='background:blue;'>";
+                                document.body.appendChild(iframe);
+                                doConsoleCalls(aState.actor);
+                              });
+  } catch(e) {
+    is(false, "Exception: " + e);
+  }
+}
+
+function onConsoleAPICall(aState, aType, aPacket)
+{
+  info("received message level: " + aPacket.message.level);
+  is(aPacket.from, aState.actor, "console API call actor");
+
+  let consoleCall = aPacket.message;
+
+  aState.dbgClient.removeListener("consoleAPICall", onConsoleAPICall);
+
+  info("checking received console call");
+  checkConsoleAPICall(consoleCall, expectedConsoleCall);
+
+  closeDebugger(aState, function() {
+    SimpleTest.finish();
+  });
+}
+
+addEventListener("load", startTest);
+</script>
+</body>
+</html>

@@ -28,6 +28,13 @@ function doConsoleCalls(aState)
   top.console.dir(top.document, top.location);
   top.console.log("foo", longString);
 
+
+  let iframe = document.createElement("iframe");
+  iframe.setAttribute("mozbrowser", "true");
+  document.documentElement.appendChild(iframe);
+  iframe.src = 'data:text/html;charset=utf-8,<script>console.log(window.parent==window)<%2Fscript>';
+
+
   expectedConsoleCalls = [
     {
       level: "log",
@@ -107,6 +114,13 @@ function doConsoleCalls(aState)
         },
       ],
     },
+    {
+      level: "log",
+      filename: /data:text/,
+      functionName: null,
+      timeStamp: /^\d+$/,
+      arguments: [true],
+    },
   ];
 }
 
@@ -121,7 +135,33 @@ function onAttach(aState, aResponse)
 {
   onConsoleAPICall = onConsoleAPICall.bind(null, aState);
   aState.dbgClient.addListener("consoleAPICall", onConsoleAPICall);
-  doConsoleCalls(aState.actor);
+
+  document.getElementById("d").style.display = 'none';
+  SpecialPowers.addPermission("browser", true, document);
+  SpecialPowers.pushPrefEnv({
+    "set": [
+      ["dom.ipc.browser_frames.oop_by_default", true],
+      ["dom.mozBrowserFramesEnabled", true]
+    ]
+
+     info("0");
+     try {
+     SpecialPowers.addPermission("browser", true, document);
+     } catch(e) {
+       info(e);
+       return;
+     }
+     info("0.5");
+     SpecialPowers.addPermission("embed-apps", true, document);
+ 
+     info("1");
+     SpecialPowers.pushPrefEnv({
+       set: [["dom.mozBrowserFramesEnabled", true], ["security.apps.privileged.CSP.default", "default-src *; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'"] ] },
+       function() {
+         info("prefs set");
+         doConsoleCalls(aState.actor);
+     });
+     info("2");
 }
 
 let consoleCalls = [];
