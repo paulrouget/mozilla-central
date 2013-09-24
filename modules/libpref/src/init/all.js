@@ -369,6 +369,8 @@ pref("gfx.content.azure.backends", "cairo");
 
 #ifdef ANDROID
 pref("gfx.textures.poweroftwo.force-enabled", false);
+pref("gfx.content.azure.backends", "cairo");
+pref("gfx.content.azure.enabled", true);
 #endif
 
 pref("gfx.work-around-driver-bugs", true);
@@ -4164,7 +4166,7 @@ pref("gfx.apitrace.enabled",false);
 #endif
 
 #ifdef MOZ_X11
-#ifdef MOZ_WIDGET_GTK2
+#ifdef MOZ_WIDGET_GTK
 pref("gfx.xrender.enabled",true);
 #endif
 #endif
