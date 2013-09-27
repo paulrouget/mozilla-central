@@ -69,10 +69,27 @@
           <p class="project-description" template='{"type":"textContent","path":"manifest.description"}'></p>
         </div>
       </div>
-      <div class="project-buttons">
-        <button class="project-button-update" onclick="UI.update(this, this.dataset.location)" template='{"type":"attribute","path":"location","name":"data-location"}' title="&projects.updateAppTooltip;">&projects.updateApp;</button>
-        <button class="device-action project-button-debug" onclick="UI.debug(this, this.dataset.location)" template='{"type":"attribute","path":"location","name":"data-location"}' title="&projects.debugAppTooltip;">&projects.debugApp;</button>
+
+      <div class="project-buttons-and-throbber">
+        <span class="project-buttons device-is-not-connected" template='{"type":"attribute","path":"location","name":"data-location"}'>
+          <button class="project-button-validate" onclick="UI.validateSelectedApp(this.parentNode.dataset.location)" title="&projects.validateAppTooltip;">&projects.validateApp;</button>
+        </span>
+        <span class="project-buttons device-is-connected app-is-not-running" template='{"type":"attribute","path":"location","name":"data-location"}'>
+          <button class="project-button-validate" onclick="UI.validateSelectedApp(this.parentNode.dataset.location)" title="&projects.validateAppTooltip;">&projects.validateApp;</button>
+          <button class="project-button-install" onclick="UI.validateAndInstallSelectedApp(this.parentNode.dataset.location)" title="&projects.installAppTooltip;">&projects.installApp;</button>
+          <button class="project-button-debug" onclick="UI.startAndDebugSelectedApp(this.parentNode.dataset.location)" title="&projects.debugAppTooltip;">&projects.debugApp;</button>
+          <button class="project-button-start" onclick="UI.startSelectedApp(this.parentNode.dataset.location)" title="&projects.startAppTooltip;">&projects.startApp;</button>
+        </span>
+        <span class="project-buttons device-is-connected app-is-running" template='{"type":"attribute","path":"location","name":"data-location"}'>
+          <button class="project-button-validate" onclick="UI.validateSelectedApp(this.parentNode.dataset.location)" title="&projects.validateAppTooltip;">&projects.validateApp;</button>
+          <button class="project-button-install" onclick="UI.validateAndInstallSelectedApp(this.parentNode.dataset.location)" title="&projects.installAppTooltip;">&projects.installApp;</button>
+          <button class="project-button-debug" onclick="UI.debugSelectedApp(this.parentNode.dataset.location)" title="&projects.debugAppTooltip;">&projects.debugApp;</button>
+          <button class="project-button-stop" onclick="UI.stopSelectedApp(this.parentNode.dataset.location)" title="&projects.stopAppTooltip;">&projects.stopApp;</button>
+          <!-- FIXME: <button class="project-button-start" onclick="UI.restartSelectedApp(this.parentNode.dataset.location)" title="&projects.restartAppTooltip;">&projects.restartApp;</button> -->
+        </span>
+        <img class="project-throbber" src="chrome://browser/skin/devtools/app-manager/throbber.svg"/>
       </div>
+
       <div class="project-errors" template='{"type":"textContent","path":"errors"}'></div>
       <div class="project-warnings" template='{"type":"textContent","path":"warnings"}'></div>
     </div>

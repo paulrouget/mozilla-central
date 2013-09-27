@@ -693,7 +693,7 @@ WebappsActor.prototype = {
     return deferred.promise;
   },
 
-  close: function wa_actorLaunch(aRequest) {
+  close: function wa_actorClose(aRequest) {
     debug("close");
 
     let manifestURL = aRequest.manifestURL;

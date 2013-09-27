@@ -25,10 +25,6 @@ body {
   overflow: hidden;
 }
 
-body:not(.connected) button.device-action {
-  display: none;
-}
-
 strong {
   color: #111;
 }
@@ -358,15 +354,50 @@ strong {
   color: #FFF;
 }
 
-.project-button-update {
+.project-button-validate {
   color: #777;
 }
 
-.project-button-update:hover {
+.project-button-validate:hover {
   background-color: #777;
   color: #FFF;
 }
 
+.project-button-install {
+  color: #777;
+}
+
+.project-button-install:hover {
+  background-color: #777;
+  color: #FFF;
+}
+
+.project-button-start {
+  color: #777;
+}
+
+.project-button-stop:hover {
+  background-color: #777;
+  color: #FFF;
+}
+
+.project-button-stop {
+  color: #777;
+}
+
+.project-button-start:hover {
+  background-color: #777;
+  color: #FFF;
+}
+
+.project-button-restart {
+  color: #777;
+}
+
+.project-button-restart:hover {
+  background-color: #777;
+  color: #FFF;
+}
 
 
 /********* ERRORS AND WARNINGS ***********/
@@ -423,4 +454,34 @@ strong {
   font-size: 11px;
   padding-left: 16px;
   font-weight: bold;
+}
+
+body:not(.selected-app-running) .app-is-running,
+body.selected-app-running .app-is-not-running,
+body:not(.connected) .device-is-connected,
+body.connected .device-is-not-connected {
+  display: none;
+}
+
+.project-buttons-and-throbber {
+  display: flex;
+  align-items: center;
+}
+
+.project-throbber {
+  width: 20px;
+  height: 20px;
+  margin-left: 20px;
+  opacity: 0.8;
+  transition: opacity 300ms;
+}
+
+body.project-buttons-frozen .project-buttons > button {
+  background-color: transparent;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+body:not(.project-buttons-frozen) .project-throbber {
+  opacity: 0;
 }

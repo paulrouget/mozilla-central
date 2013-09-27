@@ -15,6 +15,7 @@ const {AppValidator} = require("devtools/app-manager/app-validator");
 const {Services} = Cu.import("resource://gre/modules/Services.jsm");
 const {FileUtils} = Cu.import("resource://gre/modules/FileUtils.jsm");
 const {installHosted, installPackaged, getTargetForApp} = require("devtools/app-actor-front");
+const WebappsStore = require("devtools/app-manager/webapps-store");
 
 const promise = require("sdk/core/promise");
 
@@ -35,6 +36,8 @@ window.addEventListener("message", function(event) {
 }, false);
 
 let UI = {
+  _displayedProject: null,
+
   onload: function() {
     this.template = new Template(document.body, AppProjects.store, Utils.l10n);
     this.template.start();
@@ -47,6 +50,7 @@ let UI = {
   onNewConnection: function() {
     this.connection.on(Connection.Events.STATUS_CHANGED, () => this._onConnectionStatusChange());
     this._onConnectionStatusChange();
+    this._listenToRunningApps();
   },
 
   _onConnectionStatusChange: function() {
@@ -146,29 +150,6 @@ let UI = {
 
   },
 
-  update: function(button, location) {
-    button.disabled = true;
-    let project = AppProjects.get(location);
-    this.validate(project)
-        .then(() => {
-           // Install the app to the device if we are connected,
-           // and there is no error
-           if (project.errorsCount == 0 && this.listTabsResponse) {
-             return this.install(project);
-           }
-         })
-        .then(
-         () => {
-           button.disabled = false;
-         },
-         (res) => {
-           button.disabled = false;
-           let message = res.error + ": " + res.message;
-           alert(message);
-           this.connection.log(message);
-         });
-  },
-
   remove: function(location, event) {
     if (event) {
       // We don't want the "click" event to be propagated to the project item.
@@ -245,31 +226,194 @@ let UI = {
     return deferred.promise;
   },
 
-  stop: function(location) {
-    let project = AppProjects.get(location);
+  stop: function(project) {
     let deferred = promise.defer();
+    let manifest = this._getProjectManifestURL(project);
     let request = {
       to: this.listTabsResponse.webappsActor,
       type: "close",
       manifestURL: this._getProjectManifestURL(project)
     };
     this.connection.client.request(request, (res) => {
-      promive.resolve(res);
+      if (res.error) {
+        deferred.reject(res.error);
+      } else {
+        deferred.resolve();
+      }
     });
     return deferred.promise;
   },
 
-  debug: function(button, location) {
-    button.disabled = true;
+  reveal: function(location) {
+    let project = AppProjects.get(location);
+    if (project.type == "packaged") {
+      let projectFolder = FileUtils.File(project.location);
+      projectFolder.reveal();
+    } else {
+      // TODO: eventually open hosted apps in firefox
+      // when permissions are correctly supported by firefox
+    }
+  },
+
+  selectProject: function(location) {
+    let projects = AppProjects.store.object.projects;
+    let idx = 0;
+
+    for (; idx < projects.length; idx++) {
+      if (projects[idx].location == location) {
+        break;
+      }
+    }
+
+    let oldButton = document.querySelector(".project-item.selected");
+    if (oldButton) {
+      oldButton.classList.remove("selected");
+    }
+
+    if (idx == projects.length) {
+      // Not found. Empty lense.
+      let lense = document.querySelector("#lense");
+      lense.setAttribute("template-for", '{"path":"","childSelector":""}');
+      this.template._processFor(lense);
+      this._displayedProject = null;
+      this._checkIfDisplayedProjectIsRunning();
+      return;
+    }
+
+    let button = document.getElementById(location);
+    button.classList.add("selected");
+
+    let template = '{"path":"projects.' + idx + '","childSelector":"#lense-template"}';
+
+    let lense = document.querySelector("#lense");
+    lense.setAttribute("template-for", template);
+    this.template._processFor(lense);
+    this._displayedProject = this._getProjectManifestURL(projects[idx]);
+    this._checkIfDisplayedProjectIsRunning();
+  },
+
+  _checkIfDisplayedProjectIsRunning: function() {
+    let runningApps = this.webappsStore.object.running;
+    let currentApp = this._displayedProject;
+    if (!currentApp) {
+      document.body.classList.remove("selected-app-running");
+      return;
+    }
+    if (runningApps.indexOf(currentApp) > -1) {
+      document.body.classList.add("selected-app-running");
+    } else {
+      document.body.classList.remove("selected-app-running");
+    }
+  },
+
+  _listenToRunningApps: function() {
+    let onWebappsStoreChange = (e, paths) => {
+      if (paths[0] == "running") {
+        this._checkIfDisplayedProjectIsRunning();
+      }
+    }
+    if (this.webappsStore) {
+      this.webappsStore.off("set", onWebappsStoreChange)
+    }
+    this.webappsStore = new WebappsStore(this.connection),
+    this.webappsStore.on("set", onWebappsStoreChange)
+    this._checkIfDisplayedProjectIsRunning();
+  },
+
+  // Project buttons
+  freezeButtons: function() {
+    document.body.classList.add("project-buttons-frozen");
+  },
+
+  unfreezeButtons: function() {
+    document.body.classList.remove("project-buttons-frozen");
+  },
+
+  // FIXME: remove .properties strings because we remove button (or use them in the throbber)
+  validateSelectedApp: function(location) {
+    this.freezeButtons("validating");
+    let project = AppProjects.get(location);
+    return this.validate(project).then(() => this.unfreezeButtons())
+  },
+
+  validateAndInstallSelectedApp: function(location) {
+    this.freezeButtons("validatingAndInstallingSelectedApp");
+    return this.validateSelectedApp(location)
+               .then(() => {
+                 // Install the app to the device if we are connected,
+                 // and there is no error
+                 let project = AppProjects.get(location);
+                 if (project.errorsCount == 0 && this.listTabsResponse) {
+                   return this.install(project);
+                 }
+               }).then(() => {
+                 this.unfreezeButtons()
+               }, (res) => {
+                 this.unfreezeButtons()
+                 let message = res.error + ": " + res.message;
+                 alert(message);
+                 this.connection.log(message);
+               });
+  },
+
+  startSelectedApp: function(location) {
+    this.freezeButtons("startingSelectedApp");
+    let project = AppProjects.get(location);
+    return this.start(project)
+               .then(() => {
+                       this.unfreezeButtons();
+                     }, (err) => {
+                       this.unfreezeButtons();
+                       // If not installed, install and open it
+                       if (err.error == "NO_SUCH_APP") {
+                         return this.validateAndInstallSelectedApp(location).then(
+                           () => this.startSelectedApp(location)
+                         )
+                       } else {
+                          let message = err.error ? err.error + ": " + err.message : String(err);
+                          alert(message);
+                          this.connection.log(message);
+                       }
+                     });
+  },
+
+  stopSelectedApp: function(location) {
+    this.freezeButtons("stoppingSelectingApp");
+    let project = AppProjects.get(location);
+    return this.stop(project)
+               .then(() => {
+                       this.unfreezeButtons();
+                     }, (err) => {
+                       this.unfreezeButtons();
+                       let message = err.error ? err.error + ": " + err.message : String(err);
+                       alert(message);
+                       this.connection.log(message);
+                     });
+  },
+
+  // FIXME: doesn't work. `close` call return too early
+  restartSelectedApp: function(location) {
+    this.freezeButtons("restartingSelectedApp");
+    return this.stopSelectedApp(location)
+               .then(() => {
+                   this.startSelectedApp(location);
+                 });
+  },
+
+  startAndDebugSelectedApp: function(location) {
+    this.freezeButtons("startingAndDebuggingSelectedApp");
+    return this.startSelectedApp(location).then(
+      () => {
+        this.debugSelectedApp(location);
+      }
+    );
+  },
+
+  debugSelectedApp: function(location) {
+    this.freezeButtons("debuggingSelectedApp");
     let project = AppProjects.get(location);
 
     let onFailedToStart = (error) => {
-      // If not installed, install and open it
-      if (error == "NO_SUCH_APP") {
-        return this.install(project);
-      } else {
-        throw error;
-      }
     };
     let onStarted = () => {
       // Once we asked the app to launch, the app isn't necessary completely loaded.
@@ -329,48 +473,5 @@ let UI = {
            alert(message);
            this.connection.log(message);
          });
-  },
-
-  reveal: function(location) {
-    let project = AppProjects.get(location);
-    if (project.type == "packaged") {
-      let projectFolder = FileUtils.File(project.location);
-      projectFolder.reveal();
-    } else {
-      // TODO: eventually open hosted apps in firefox
-      // when permissions are correctly supported by firefox
-    }
-  },
-
-  selectProject: function(location) {
-    let projects = AppProjects.store.object.projects;
-    let idx = 0;
-    for (; idx < projects.length; idx++) {
-      if (projects[idx].location == location) {
-        break;
-      }
-    }
-
-    let oldButton = document.querySelector(".project-item.selected");
-    if (oldButton) {
-      oldButton.classList.remove("selected");
-    }
-
-    if (idx == projects.length) {
-      // Not found. Empty lense.
-      let lense = document.querySelector("#lense");
-      lense.setAttribute("template-for", '{"path":"","childSelector":""}');
-      this.template._processFor(lense);
-      return;
-    }
-
-    let button = document.getElementById(location);
-    button.classList.add("selected");
-
-    let template = '{"path":"projects.' + idx + '","childSelector":"#lense-template"}';
-
-    let lense = document.querySelector("#lense");
-    lense.setAttribute("template-for", template);
-    this.template._processFor(lense);
   },
 }
