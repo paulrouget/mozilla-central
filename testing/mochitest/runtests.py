@@ -1,4 +1,3 @@
-#
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -24,6 +23,7 @@ import optparse
 import re
 import shutil
 import signal
+import subprocess
 import tempfile
 import time
 import traceback
@@ -721,8 +721,11 @@ class Mochitest(MochitestUtilsMixin):
         if os.path.exists(crashinject) and subprocess.Popen([crashinject, str(processPID)]).wait() == 0:
           return
       else:
-        # ABRT will get picked up by Breakpad's signal handler
-        os.kill(processPID, signal.SIGABRT)
+        try:
+          os.kill(processPID, signal.SIGABRT)
+        except OSError:
+          # https://bugzilla.mozilla.org/show_bug.cgi?id=921509
+          log.info("Can't trigger Breakpad, process no longer exists")
         return
     log.info("Can't trigger Breakpad, just killing process")
     killPid(processPID)
@@ -887,8 +890,13 @@ class Mochitest(MochitestUtilsMixin):
     # create mozrunner instance and start the system under test process
     self.lastTestSeen = self.test_name
     startTime = datetime.now()
-    runner_cls = mozrunner.runners.get(mozinfo.info.get('appname', 'firefox'),
-                                       mozrunner.Runner)
+
+    # b2g desktop requires FirefoxRunner even though appname is b2g
+    if mozinfo.info.get('appname') == 'b2g' and mozinfo.info.get('toolkit') != 'gonk':
+        runner_cls = mozrunner.FirefoxRunner
+    else:
+        runner_cls = mozrunner.runners.get(mozinfo.info.get('appname', 'firefox'),
+                                           mozrunner.Runner)
     runner = runner_cls(profile=self.profile,
                         binary=cmd,
                         cmdargs=args,
@@ -909,7 +917,7 @@ class Mochitest(MochitestUtilsMixin):
     log.info("INFO | runtests.py | Application pid: %d", proc.pid)
 
     # set process information on the output handler
-    outputHandler.setProcess(proc, timeout)
+    outputHandler.setProcess(proc if interactive else proc.proc, timeout)
 
     if onLaunch is not None:
       # Allow callers to specify an onLaunch callback to be fired after the
@@ -926,11 +934,16 @@ class Mochitest(MochitestUtilsMixin):
     status = proc.wait()
     runner.process_handler = None
 
+    if timeout is None:
+      didTimeout = False
+    else:
+      didTimeout = proc.didTimeout
+
     # finalize output handler
-    outputHandler.finish(proc.didTimeout)
+    outputHandler.finish(didTimeout)
 
     # handle timeout
-    if proc.didTimeout:
+    if didTimeout:
       browserProcessId = outputHandler.browserProcessId
       self.handleTimeout(timeout, proc, utilityPath, debuggerInfo, browserProcessId)
 
@@ -1145,10 +1158,9 @@ class Mochitest(MochitestUtilsMixin):
       return (stackFixerFunction, stackFixerCommand)
 
     def setProcess(self, proc, outputTimeout=None):
-      self.proc = proc
       if self.stackFixerCommand:
         self.stackFixerProcess = mozprocess.ProcessHandler(self.stackFixerCommand,
-                                                           stdin=proc.proc.stdout,
+                                                           stdin=proc.stdout,
                                                            processOutputLine=[self],
           )
         self.stackFixerProcess.run(outputTimeout=outputTimeout)

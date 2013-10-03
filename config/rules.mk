@@ -363,7 +363,7 @@ SIMPLE_PROGRAMS :=
 endif
 
 ifndef TARGETS
-TARGETS			= $(LIBRARY) $(SHARED_LIBRARY) $(PROGRAM) $(SIMPLE_PROGRAMS) $(HOST_LIBRARY) $(HOST_PROGRAM) $(HOST_SIMPLE_PROGRAMS) $(JAVA_LIBRARY)
+TARGETS			= $(LIBRARY) $(SHARED_LIBRARY) $(PROGRAM) $(SIMPLE_PROGRAMS) $(HOST_LIBRARY) $(HOST_PROGRAM) $(HOST_SIMPLE_PROGRAMS)
 endif
 
 COBJS = $(notdir $(CSRCS:.c=.$(OBJ_SUFFIX)))
@@ -729,7 +729,9 @@ GLOBAL_DEPS += Makefile.in
 endif
 
 ##############################################
-compile:: $(OBJS) $(HOST_OBJS)
+OBJ_TARGETS = $(OBJS) $(PROGOBJS) $(HOST_OBJS) $(HOST_PROGOBJS)
+
+compile:: $(OBJ_TARGETS)
 
 include $(topsrcdir)/config/makefiles/target_libs.mk
 
@@ -1254,35 +1256,12 @@ $(DEPTH)/config/autoconf.mk: $(topsrcdir)/config/autoconf.mk.in
 # Bunch of things that extend the 'export' rule (in order):
 ###############################################################################
 
-################################################################################
-# Copy each element of EXPORTS to $(DIST)/include
-
 ifneq ($(XPI_NAME),)
 $(FINAL_TARGET):
 	$(NSINSTALL) -D $@
 
 export:: $(FINAL_TARGET)
 endif
-
-ifndef NO_DIST_INSTALL
-ifneq (,$(EXPORTS))
-EXPORTS_FILES := $(EXPORTS)
-EXPORTS_DEST := $(DIST)/include
-EXPORTS_TARGET := export
-INSTALL_TARGETS += EXPORTS
-endif
-endif # NO_DIST_INSTALL
-
-define EXPORT_NAMESPACE_RULE
-ifndef NO_DIST_INSTALL
-EXPORTS_$(namespace)_FILES := $$(EXPORTS_$(namespace))
-EXPORTS_$(namespace)_DEST := $$(DIST)/include/$(namespace)
-EXPORTS_$(namespace)_TARGET := export
-INSTALL_TARGETS += EXPORTS_$(namespace)
-endif # NO_DIST_INSTALL
-endef
-
-$(foreach namespace,$(EXPORTS_NAMESPACES),$(eval $(EXPORT_NAMESPACE_RULE)))
 
 ################################################################################
 # Copy each element of PREF_JS_EXPORTS

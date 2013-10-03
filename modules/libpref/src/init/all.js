@@ -103,6 +103,9 @@ pref("dom.workers.enabled", true);
 // The number of workers per domain allowed to run concurrently.
 pref("dom.workers.maxPerDomain", 20);
 
+// Whether or not Shared Web Workers are enabled.
+pref("dom.workers.sharedWorkers.enabled", false);
+
 // Whether nonzero values can be returned from performance.timing.*
 pref("dom.enable_performance", true);
 
@@ -273,6 +276,12 @@ pref("media.video_stats.enabled", true);
 // Whether to enable the audio writing APIs on the audio element
 pref("media.audio_data.enabled", true);
 
+// Whether to lock touch scrolling to one axis at a time
+// 0 = FREE (No locking at all)
+// 1 = STANDARD (Once locked, remain locked until scrolling ends)
+// 2 = STICKY (Allow lock to be broken, with hysteresis)
+pref("apzc.axis_lock_mode", 0);
+
 #ifdef XP_MACOSX
 // Whether to run in native HiDPI mode on machines with "Retina"/HiDPI display;
 //   <= 0 : hidpi mode disabled, display will just use pixel-based upscaling
@@ -368,6 +377,10 @@ pref("gfx.content.azure.backends", "cairo");
 #endif
 #endif
 
+#ifdef MOZ_WIDGET_GTK2
+pref("gfx.content.azure.enabled", true);
+pref("gfx.content.azure.backends", "cairo");
+#endif
 #ifdef ANDROID
 pref("gfx.textures.poweroftwo.force-enabled", false);
 pref("gfx.content.azure.backends", "cairo");
@@ -482,6 +495,9 @@ pref("toolkit.telemetry.debugSlowSql", false);
 // Identity module
 pref("toolkit.identity.enabled", false);
 pref("toolkit.identity.debug", false);
+
+// AsyncShutdown delay before crashing in case of shutdown freeze
+pref("toolkit.asyncshutdown.timeout.crash", 60000);
 
 // Enable deprecation warnings.
 pref("devtools.errorconsole.deprecation_warnings", true);
@@ -1092,8 +1108,8 @@ pref("network.http.bypass-cachelock-threshold", 250);
 
 // Try and use SPDY when using SSL
 pref("network.http.spdy.enabled", true);
-pref("network.http.spdy.enabled.v2", true);
 pref("network.http.spdy.enabled.v3", true);
+pref("network.http.spdy.enabled.v3-1", true);
 pref("network.http.spdy.chunk-size", 4096);
 pref("network.http.spdy.timeout", 180);
 pref("network.http.spdy.coalesce-hostnames", true);
@@ -4044,6 +4060,9 @@ pref("image.mem.discardable", true);
 // them to be decoded on demand when they are drawn.
 pref("image.mem.decodeondraw", true);
 
+// Allows image locking of decoded image data in content processes.
+pref("image.mem.allow_locking_in_content_processes", true);
+
 // Minimum timeout for image discarding (in milliseconds). The actual time in
 // which an image must inactive for it to be discarded will vary between this
 // value and twice this value.
@@ -4108,10 +4127,6 @@ pref("stagefright.disabled", false);
 pref("network.tcp.sendbuffer", 131072);
 #endif
 
-// Asynchonous video compositing using the ImageBridge IPDL protocol.
-// requires off-main-thread compositing.
-pref("layers.async-video.enabled",false);
-
 // Whether to disable acceleration for all widgets.
 pref("layers.acceleration.disabled", false);
 
@@ -4133,17 +4148,25 @@ pref("layers.frame-counter", false);
 // Max number of layers per container. See Overwrite in mobile prefs.
 pref("layers.max-active", -1);
 
+// Set the default values, and then override per-platform as needed
+pref("layers.offmainthreadcomposition.enabled", false);
 // Whether to use the deprecated texture architecture rather than the new one.
+pref("layers.use-deprecated-textures", true);
+// Asynchonous video compositing using the ImageBridge IPDL protocol.
+// requires off-main-thread compositing.
+pref("layers.async-video.enabled",false);
+
 #ifdef XP_MACOSX
 pref("layers.offmainthreadcomposition.enabled", true);
 pref("layers.use-deprecated-textures", false);
-#else
-#ifdef MOZ_WIDGET_GONK
-pref("layers.use-deprecated-textures", false);
-#else
-pref("layers.offmainthreadcomposition.enabled", false);
-pref("layers.use-deprecated-textures", true);
+pref("layers.async-video.enabled",true);
 #endif
+
+// ANDROID covers android and b2g
+#ifdef ANDROID
+pref("layers.offmainthreadcomposition.enabled", true);
+pref("layers.use-deprecated-textures", false);
+pref("layers.async-video.enabled",true);
 #endif
 
 // same effect as layers.offmainthreadcomposition.enabled, but specifically for
@@ -4399,9 +4422,6 @@ pref("dom.mms.retrievalRetryIntervals", "60000,300000,600000,1800000");
 // Debug enabler for MMS.
 pref("mms.debugging.enabled", false);
 
-// Number of RadioInterface instances to create.
-pref("ril.numRadioInterfaces", 1);
-
 // If the user puts a finger down on an element and we think the user
 // might be executing a pan gesture, how long do we wait before
 // tentatively deciding the gesture is actually a tap and activating
@@ -4424,8 +4444,20 @@ pref("dom.forms.inputmode", false);
 pref("dom.forms.inputmode", true);
 #endif
 
+// InputMethods for soft keyboards in B2G
+pref("dom.mozInputMethod.enabled", false);
+
+// DataStore is disabled by default
+pref("dom.datastore.enabled", false);
+
 // Telephony API
 pref("dom.telephony.enabled", false);
 
 // DOM Inter-App Communication API.
 pref("dom.inter-app-communication-api.enabled", false);
+
+// The tables used for Safebrowsing phishing and malware checks.
+pref("urlclassifier.malware_table", "goog-malware-shavar");
+pref("urlclassifier.phish_table", "goog-phish-shavar");
+pref("urlclassifier.download_block_table", "goog-badbinurl-shavar");
+pref("urlclassifier.download_allow_table", "goog-downloadwhite-digest256");

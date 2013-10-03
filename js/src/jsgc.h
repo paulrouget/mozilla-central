@@ -882,7 +882,6 @@ class GCHelperThread {
     }
 };
 
-
 struct GCChunkHasher {
     typedef gc::Chunk *Lookup;
 
@@ -1350,10 +1349,8 @@ const int ZealAllocValue = 2;
 const int ZealFrameGCValue = 3;
 const int ZealVerifierPreValue = 4;
 const int ZealFrameVerifierPreValue = 5;
-// These two values used to be distinct.  They no longer are, but both were
-// kept to avoid breaking fuzz tests.  Avoid using ZealStackRootingValue__2.
 const int ZealStackRootingValue = 6;
-const int ZealStackRootingValue__2 = 7;
+const int ZealGenerationalGCValue = 7;
 const int ZealIncrementalRootsThenFinish = 8;
 const int ZealIncrementalMarkAllThenFinish = 9;
 const int ZealIncrementalMultipleSlices = 10;
@@ -1408,6 +1405,24 @@ class AutoSuppressGC
         suppressGC_--;
     }
 };
+
+#ifdef DEBUG
+/* Disable OOM testing in sections which are not OOM safe. */
+class AutoEnterOOMUnsafeRegion
+{
+    uint32_t saved_;
+
+  public:
+    AutoEnterOOMUnsafeRegion() : saved_(OOM_maxAllocations) {
+        OOM_maxAllocations = UINT32_MAX;
+    }
+    ~AutoEnterOOMUnsafeRegion() {
+        OOM_maxAllocations = saved_;
+    }
+};
+#else
+class AutoEnterOOMUnsafeRegion {};
+#endif /* DEBUG */
 
 } /* namespace gc */
 
