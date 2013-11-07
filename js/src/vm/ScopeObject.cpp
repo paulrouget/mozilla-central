@@ -32,75 +32,6 @@ typedef Rooted<ArgumentsObject *> RootedArgumentsObject;
 
 /*****************************************************************************/
 
-StaticScopeIter::StaticScopeIter(ExclusiveContext *cx, JSObject *objArg)
-  : obj(cx, objArg), onNamedLambda(false)
-{
-    JS_ASSERT_IF(obj, obj->is<StaticBlockObject>() || obj->is<JSFunction>());
-}
-
-bool
-StaticScopeIter::done() const
-{
-    return !obj;
-}
-
-void
-StaticScopeIter::operator++(int)
-{
-    if (obj->is<StaticBlockObject>()) {
-        obj = obj->as<StaticBlockObject>().enclosingStaticScope();
-    } else if (onNamedLambda || !obj->as<JSFunction>().isNamedLambda()) {
-        onNamedLambda = false;
-        obj = obj->as<JSFunction>().nonLazyScript()->enclosingStaticScope();
-    } else {
-        onNamedLambda = true;
-    }
-    JS_ASSERT_IF(obj, obj->is<StaticBlockObject>() || obj->is<JSFunction>());
-    JS_ASSERT_IF(onNamedLambda, obj->is<JSFunction>());
-}
-
-bool
-StaticScopeIter::hasDynamicScopeObject() const
-{
-    return obj->is<StaticBlockObject>()
-           ? obj->as<StaticBlockObject>().needsClone()
-           : obj->as<JSFunction>().isHeavyweight();
-}
-
-Shape *
-StaticScopeIter::scopeShape() const
-{
-    JS_ASSERT(hasDynamicScopeObject());
-    JS_ASSERT(type() != NAMED_LAMBDA);
-    return type() == BLOCK
-           ? block().lastProperty()
-           : funScript()->bindings.callObjShape();
-}
-
-StaticScopeIter::Type
-StaticScopeIter::type() const
-{
-    if (onNamedLambda)
-        return NAMED_LAMBDA;
-    return obj->is<StaticBlockObject>() ? BLOCK : FUNCTION;
-}
-
-StaticBlockObject &
-StaticScopeIter::block() const
-{
-    JS_ASSERT(type() == BLOCK);
-    return obj->as<StaticBlockObject>();
-}
-
-JSScript *
-StaticScopeIter::funScript() const
-{
-    JS_ASSERT(type() == FUNCTION);
-    return obj->as<JSFunction>().nonLazyScript();
-}
-
-/*****************************************************************************/
-
 static JSObject *
 InnermostStaticScope(JSScript *script, jsbytecode *pc)
 {
@@ -115,9 +46,9 @@ InnermostStaticScope(JSScript *script, jsbytecode *pc)
 }
 
 Shape *
-js::ScopeCoordinateToStaticScopeShape(JSContext *cx, JSScript *script, jsbytecode *pc)
+js::ScopeCoordinateToStaticScopeShape(JSScript *script, jsbytecode *pc)
 {
-    StaticScopeIter ssi(cx, InnermostStaticScope(script, pc));
+    StaticScopeIter<NoGC> ssi(InnermostStaticScope(script, pc));
     ScopeCoordinate sc(pc);
     while (true) {
         if (ssi.hasDynamicScopeObject()) {
@@ -131,9 +62,9 @@ js::ScopeCoordinateToStaticScopeShape(JSContext *cx, JSScript *script, jsbytecod
 }
 
 PropertyName *
-js::ScopeCoordinateName(JSContext *cx, JSScript *script, jsbytecode *pc)
+js::ScopeCoordinateName(JSScript *script, jsbytecode *pc)
 {
-    Shape::Range<NoGC> r(ScopeCoordinateToStaticScopeShape(cx, script, pc));
+    Shape::Range<NoGC> r(ScopeCoordinateToStaticScopeShape(script, pc));
     ScopeCoordinate sc(pc);
     while (r.front().slot() != sc.slot)
         r.popFront();
@@ -141,14 +72,14 @@ js::ScopeCoordinateName(JSContext *cx, JSScript *script, jsbytecode *pc)
 
     /* Beware nameless destructuring formal. */
     if (!JSID_IS_ATOM(id))
-        return cx->runtime()->atomState.empty;
+        return script->runtimeFromAnyThread()->atomState.empty;
     return JSID_TO_ATOM(id)->asPropertyName();
 }
 
 JSScript *
-js::ScopeCoordinateFunctionScript(JSContext *cx, JSScript *script, jsbytecode *pc)
+js::ScopeCoordinateFunctionScript(JSScript *script, jsbytecode *pc)
 {
-    StaticScopeIter ssi(cx, InnermostStaticScope(script, pc));
+    StaticScopeIter<NoGC> ssi(InnermostStaticScope(script, pc));
     ScopeCoordinate sc(pc);
     while (true) {
         if (ssi.hasDynamicScopeObject()) {
@@ -158,14 +89,14 @@ js::ScopeCoordinateFunctionScript(JSContext *cx, JSScript *script, jsbytecode *p
         }
         ssi++;
     }
-    if (ssi.type() != StaticScopeIter::FUNCTION)
+    if (ssi.type() != StaticScopeIter<NoGC>::FUNCTION)
         return nullptr;
     return ssi.funScript();
 }
 
 /*****************************************************************************/
 
-inline void
+void
 ScopeObject::setEnclosingScope(HandleObject obj)
 {
     JS_ASSERT_IF(obj->is<CallObject>() || obj->is<DeclEnvObject>() || obj->is<BlockObject>(),
@@ -361,8 +292,8 @@ DeclEnvObject::createTemplateObject(JSContext *cx, HandleFunction fun, gc::Initi
     Rooted<jsid> id(cx, AtomToId(fun->atom()));
     const Class *clasp = obj->getClass();
     unsigned attrs = JSPROP_ENUMERATE | JSPROP_PERMANENT | JSPROP_READONLY;
-    if (!JSObject::putProperty(cx, obj, id, clasp->getProperty, clasp->setProperty,
-                               lambdaSlot(), attrs, 0, 0))
+    if (!JSObject::putProperty<SequentialExecution>(cx, obj, id, clasp->getProperty,
+                                                    clasp->setProperty, lambdaSlot(), attrs, 0, 0))
     {
         return nullptr;
     }
@@ -709,11 +640,12 @@ StaticBlockObject::addVar(ExclusiveContext *cx, Handle<StaticBlockObject*> block
      * block's shape later.
      */
     uint32_t slot = JSSLOT_FREE(&BlockObject::class_) + index;
-    return JSObject::addPropertyInternal(cx, block, id,
-                                         /* getter = */ nullptr, /* setter = */ nullptr,
-                                         slot, JSPROP_ENUMERATE | JSPROP_PERMANENT,
-                                         Shape::HAS_SHORTID, index, spp,
-                                         /* allowDictionary = */ false);
+    return JSObject::addPropertyInternal<SequentialExecution>(
+        cx, block, id,
+        /* getter = */ nullptr, /* setter = */ nullptr,
+        slot, JSPROP_ENUMERATE | JSPROP_PERMANENT,
+        Shape::HAS_SHORTID, index, spp,
+        /* allowDictionary = */ false);
 }
 
 const Class BlockObject::class_ = {
@@ -1508,7 +1440,7 @@ DebugScopeObject::create(JSContext *cx, ScopeObject &scope, HandleObject enclosi
     JS_ASSERT(scope.compartment() == cx->compartment());
     RootedValue priv(cx, ObjectValue(scope));
     JSObject *obj = NewProxyObject(cx, &DebugScopeProxy::singleton, priv,
-                                   nullptr /* proto */, &scope.global(), ProxyNotCallable);
+                                   nullptr /* proto */, &scope.global());
     if (!obj)
         return nullptr;
 
@@ -1555,9 +1487,9 @@ DebugScopeObject::isForDeclarative() const
 }
 
 bool
-js_IsDebugScopeSlow(ObjectProxyObject *proxy)
+js_IsDebugScopeSlow(ProxyObject *proxy)
 {
-    JS_ASSERT(proxy->hasClass(&ObjectProxyObject::class_));
+    JS_ASSERT(proxy->hasClass(&ProxyObject::uncallableClass_));
     return proxy->handler() == &DebugScopeProxy::singleton;
 }
 
@@ -2194,7 +2126,7 @@ RemoveReferencedNames(JSContext *cx, HandleScript script, PropertyNameSet &remai
           case JSOP_GETALIASEDVAR:
           case JSOP_CALLALIASEDVAR:
           case JSOP_SETALIASEDVAR:
-            name = ScopeCoordinateName(cx, script, pc);
+            name = ScopeCoordinateName(script, pc);
             break;
 
           default:

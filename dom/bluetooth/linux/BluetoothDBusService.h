@@ -22,9 +22,11 @@ BEGIN_BLUETOOTH_NAMESPACE
  */
 
 class BluetoothDBusService : public BluetoothService
-                           , private mozilla::ipc::RawDBusConnection
 {
 public:
+  BluetoothDBusService();
+  ~BluetoothDBusService();
+
   bool IsReady();
 
   virtual nsresult StartInternal() MOZ_OVERRIDE;
@@ -60,9 +62,6 @@ public:
   static bool
   AddReservedServicesInternal(const nsTArray<uint32_t>& aServices,
                               nsTArray<uint32_t>& aServiceHandlesContainer);
-
-  static bool
-  RemoveReservedServicesInternal(const nsTArray<uint32_t>& aServiceHandles);
 
   virtual nsresult
   GetScoSocket(const nsAString& aObjectPath,
@@ -136,6 +135,17 @@ public:
   virtual void
   IsScoConnected(BluetoothReplyRunnable* aRunnable) MOZ_OVERRIDE;
 
+#ifdef MOZ_B2G_RIL
+  virtual void
+  AnswerWaitingCall(BluetoothReplyRunnable* aRunnable);
+
+  virtual void
+  IgnoreWaitingCall(BluetoothReplyRunnable* aRunnable);
+
+  virtual void
+  ToggleCalls(BluetoothReplyRunnable* aRunnable);
+#endif
+
   virtual void
   SendMetaData(const nsAString& aTitle,
                const nsAString& aArtist,
@@ -163,11 +173,6 @@ public:
   virtual nsresult
   SendInputMessage(const nsAString& aDeviceAddresses,
                    const nsAString& aMessage) MOZ_OVERRIDE;
-
-protected:
-  BluetoothDBusService();
-  ~BluetoothDBusService();
-
 private:
   /**
    * For DBus Control method of "UpdateNotification", event id should be
@@ -204,6 +209,8 @@ private:
                                 const char* aInterface,
                                 const nsAString& aMessage,
                                 mozilla::ipc::DBusReplyCallback aCallback);
+
+  nsRefPtr<mozilla::ipc::RawDBusConnection> mConnection;
 };
 
 END_BLUETOOTH_NAMESPACE

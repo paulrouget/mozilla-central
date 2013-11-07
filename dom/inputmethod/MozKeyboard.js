@@ -42,8 +42,9 @@ MozKeyboard.prototype = {
 
   init: function mozKeyboardInit(win) {
     let principal = win.document.nodePrincipal;
-    let perm = Services.perms
-               .testExactPermissionFromPrincipal(principal, "keyboard");
+    // Limited the deprecated mozKeyboard API to certified apps only
+    let perm = Services.perms.testExactPermissionFromPrincipal(principal,
+                                                               "input-manage");
     if (perm != Ci.nsIPermissionManager.ALLOW_ACTION) {
       dump("No permission to use the keyboard API for " +
            principal.origin + "\n");
@@ -475,7 +476,8 @@ MozInputContext.prototype = {
 
   QueryInterface: XPCOMUtils.generateQI([
     Ci.nsIB2GInputContext,
-    Ci.nsIObserver
+    Ci.nsIObserver,
+    Ci.nsISupportsWeakReference
   ]),
 
   classInfo: XPCOMUtils.generateCI({

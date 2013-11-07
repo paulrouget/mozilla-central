@@ -54,13 +54,26 @@ namespace frontend { struct Definition; }
  *
  * (See also AssertDynamicScopeMatchesStaticScope.)
  */
+template <AllowGC allowGC>
 class StaticScopeIter
 {
-    RootedObject obj;
+    typename MaybeRooted<JSObject*, allowGC>::RootType obj;
     bool onNamedLambda;
 
   public:
-    explicit StaticScopeIter(ExclusiveContext *cx, JSObject *obj);
+    StaticScopeIter(ExclusiveContext *cx, JSObject *obj)
+      : obj(cx, obj), onNamedLambda(false)
+    {
+        JS_STATIC_ASSERT(allowGC == CanGC);
+        JS_ASSERT_IF(obj, obj->is<StaticBlockObject>() || obj->is<JSFunction>());
+    }
+
+    StaticScopeIter(JSObject *obj)
+      : obj((ExclusiveContext *) nullptr, obj), onNamedLambda(false)
+    {
+        JS_STATIC_ASSERT(allowGC == NoGC);
+        JS_ASSERT_IF(obj, obj->is<StaticBlockObject>() || obj->is<JSFunction>());
+    }
 
     bool done() const;
     void operator++(int);
@@ -106,15 +119,15 @@ struct ScopeCoordinate
  * accessed by the ALIASEDVAR op at 'pc'.
  */
 extern Shape *
-ScopeCoordinateToStaticScopeShape(JSContext *cx, JSScript *script, jsbytecode *pc);
+ScopeCoordinateToStaticScopeShape(JSScript *script, jsbytecode *pc);
 
 /* Return the name being accessed by the given ALIASEDVAR op. */
 extern PropertyName *
-ScopeCoordinateName(JSContext *cx, JSScript *script, jsbytecode *pc);
+ScopeCoordinateName(JSScript *script, jsbytecode *pc);
 
 /* Return the function script accessed by the given ALIASEDVAR op, or nullptr. */
 extern JSScript *
-ScopeCoordinateFunctionScript(JSContext *cx, JSScript *script, jsbytecode *pc);
+ScopeCoordinateFunctionScript(JSScript *script, jsbytecode *pc);
 
 /*****************************************************************************/
 
@@ -171,7 +184,7 @@ class ScopeObject : public JSObject
         return getReservedSlot(SCOPE_CHAIN_SLOT).toObject();
     }
 
-    inline void setEnclosingScope(HandleObject obj);
+    void setEnclosingScope(HandleObject obj);
 
     /*
      * Get or set an aliased variable contained in this scope. Unaliased
@@ -620,7 +633,7 @@ extern JSObject *
 GetDebugScopeForFrame(JSContext *cx, AbstractFramePtr frame);
 
 /* Provides debugger access to a scope. */
-class DebugScopeObject : public ObjectProxyObject
+class DebugScopeObject : public ProxyObject
 {
     /*
      * The enclosing scope on the dynamic scope chain. This slot is analogous
@@ -732,11 +745,11 @@ template<>
 inline bool
 JSObject::is<js::DebugScopeObject>() const
 {
-    extern bool js_IsDebugScopeSlow(js::ObjectProxyObject *proxy);
+    extern bool js_IsDebugScopeSlow(js::ProxyObject *proxy);
 
-    // Note: don't use is<ObjectProxyObject>() here -- it also matches subclasses!
-    return hasClass(&js::ObjectProxyObject::class_) &&
-           js_IsDebugScopeSlow(&const_cast<JSObject*>(this)->as<js::ObjectProxyObject>());
+    // Note: don't use is<ProxyObject>() here -- it also matches subclasses!
+    return hasClass(&js::ProxyObject::uncallableClass_) &&
+           js_IsDebugScopeSlow(&const_cast<JSObject*>(this)->as<js::ProxyObject>());
 }
 
 template<>

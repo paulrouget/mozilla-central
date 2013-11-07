@@ -25,6 +25,8 @@
 
 #include "jsobjinlines.h"
 
+#include "vm/ScopeObject-inl.h"
+
 using namespace js;
 using namespace JS;
 
@@ -41,7 +43,7 @@ PerThreadDataFriendFields::PerThreadDataFriendFields()
     PodArrayZero(thingGCRooters);
 #endif
 #if defined(DEBUG) && defined(JS_GC_ZEAL) && defined(JSGC_ROOT_ANALYSIS) && !defined(JS_THREADSAFE)
-    skipGCRooters = NULL;
+    skipGCRooters = nullptr;
 #endif
 }
 
@@ -97,7 +99,7 @@ JS_GetObjectFunction(JSObject *obj)
 {
     if (obj->is<JSFunction>())
         return &obj->as<JSFunction>();
-    return NULL;
+    return nullptr;
 }
 
 JS_FRIEND_API(bool)
@@ -135,11 +137,12 @@ JS_NewObjectWithUniqueType(JSContext *cx, const JSClass *clasp, JSObject *protoA
      * TypeObject attached to our proto with information about our object, since
      * we're not going to be using that TypeObject anyway.
      */
-    RootedObject obj(cx, NewObjectWithGivenProto(cx, (const js::Class *)clasp, NULL, parent, SingletonObject));
+    RootedObject obj(cx, NewObjectWithGivenProto(cx, (const js::Class *)clasp, nullptr,
+                                                 parent, SingletonObject));
     if (!obj)
-        return NULL;
+        return nullptr;
     if (!JS_SplicePrototype(cx, obj, proto))
-        return NULL;
+        return nullptr;
     return obj;
 }
 
@@ -230,7 +233,7 @@ JS_SetCompartmentPrincipals(JSCompartment *compartment, JSPrincipals *principals
     // Clear out the old principals, if any.
     if (compartment->principals) {
         JS_DropPrincipals(compartment->runtimeFromMainThread(), compartment->principals);
-        compartment->principals = NULL;
+        compartment->principals = nullptr;
         // We'd like to assert that our new principals is always same-origin
         // with the old one, but JSPrincipals doesn't give us a way to do that.
         // But we can at least assert that we're not switching between system
@@ -384,6 +387,20 @@ js::GetGlobalForObjectCrossCompartment(JSObject *obj)
     return &obj->global();
 }
 
+JS_FRIEND_API(void)
+js::AssertSameCompartment(JSContext *cx, JSObject *obj)
+{
+    assertSameCompartment(cx, obj);
+}
+
+#ifdef DEBUG
+JS_FRIEND_API(void)
+js::AssertSameCompartment(JSObject *objA, JSObject *objB)
+{
+    JS_ASSERT(objA->compartment() == objB->compartment());
+}
+#endif
+
 JS_FRIEND_API(JSObject *)
 js::DefaultObjectForContextOrNull(JSContext *cx)
 {
@@ -431,15 +448,15 @@ js::GetOutermostEnclosingFunctionOfScriptedCaller(JSContext *cx)
 {
     ScriptFrameIter iter(cx);
     if (iter.done())
-        return NULL;
+        return nullptr;
 
     if (!iter.isFunctionFrame())
-        return NULL;
+        return nullptr;
 
     RootedFunction scriptedCaller(cx, iter.callee());
     RootedScript outermost(cx, scriptedCaller->nonLazyScript());
-    for (StaticScopeIter i(cx, scriptedCaller); !i.done(); i++) {
-        if (i.type() == StaticScopeIter::FUNCTION)
+    for (StaticScopeIter<NoGC> i(scriptedCaller); !i.done(); i++) {
+        if (i.type() == StaticScopeIter<NoGC>::FUNCTION)
             outermost = i.funScript();
     }
     return outermost;
@@ -455,7 +472,7 @@ js::DefineFunctionWithReserved(JSContext *cx, JSObject *objArg, const char *name
     assertSameCompartment(cx, obj);
     JSAtom *atom = Atomize(cx, name, strlen(name));
     if (!atom)
-        return NULL;
+        return nullptr;
     Rooted<jsid> id(cx, AtomToId(atom));
     return DefineFunction(cx, obj, id, call, nargs, attrs, JSFunction::ExtendedFinalizeKind);
 }
@@ -474,7 +491,7 @@ js::NewFunctionWithReserved(JSContext *cx, JSNative native, unsigned nargs, unsi
     if (name) {
         atom = Atomize(cx, name, strlen(name));
         if (!atom)
-            return NULL;
+            return nullptr;
     }
 
     JSFunction::Flags funFlags = JSAPIToJSFunctionFlags(flags);
@@ -509,7 +526,7 @@ js::InitClassWithReserved(JSContext *cx, JSObject *objArg, JSObject *parent_prot
     CHECK_REQUEST(cx);
     assertSameCompartment(cx, obj, parent_proto);
     return js_InitClass(cx, obj, parent_proto, Valueify(clasp), constructor,
-                        nargs, ps, fs, static_ps, static_fs, NULL,
+                        nargs, ps, fs, static_ps, static_fs, nullptr,
                         JSFunction::ExtendedFinalizeKind);
 }
 
@@ -530,13 +547,8 @@ js::SetFunctionNativeReserved(JSObject *fun, size_t which, const Value &val)
 JS_FRIEND_API(bool)
 js::GetObjectProto(JSContext *cx, JS::Handle<JSObject*> obj, JS::MutableHandle<JSObject*> proto)
 {
-    const js::Class *clasp = GetObjectClass(obj);
-    if (clasp == js::ObjectProxyClassPtr ||
-        clasp == js::OuterWindowProxyClassPtr ||
-        clasp == js::FunctionProxyClassPtr)
-    {
+    if (IsProxy(obj))
         return JS_GetPrototype(cx, obj, proto);
-    }
 
     proto.set(reinterpret_cast<const shadow::Object*>(obj.get())->type->proto);
     return true;
@@ -646,7 +658,7 @@ js::GetWeakmapKeyDelegate(JSObject *key)
 {
     if (JSWeakmapKeyDelegateOp op = key->getClass()->ext.weakmapKeyDelegateOp)
         return op(key);
-    return NULL;
+    return nullptr;
 }
 
 JS_FRIEND_API(void)
@@ -1018,12 +1030,12 @@ JS::ObjectPtr::trace(JSTracer *trc, const char *name)
 JS_FRIEND_API(JSObject *)
 js::GetTestingFunctions(JSContext *cx)
 {
-    RootedObject obj(cx, JS_NewObject(cx, NULL, NULL, NULL));
+    RootedObject obj(cx, JS_NewObject(cx, nullptr, nullptr, nullptr));
     if (!obj)
-        return NULL;
+        return nullptr;
 
-    if (!DefineTestingFunctions(cx, obj))
-        return NULL;
+    if (!DefineTestingFunctions(cx, obj, false))
+        return nullptr;
 
     return obj;
 }
@@ -1048,7 +1060,7 @@ js::GetDOMCallbacks(JSRuntime *rt)
     return rt->DOMcallbacks;
 }
 
-static const void *gDOMProxyHandlerFamily = NULL;
+static const void *gDOMProxyHandlerFamily = nullptr;
 static uint32_t gDOMProxyExpandoSlot = 0;
 static DOMProxyShadowsCheck gDOMProxyShadowsCheck;
 
@@ -1082,7 +1094,7 @@ js::GetDOMProxyShadowsCheck()
 bool
 js::detail::IdMatchesAtom(jsid id, JSAtom *atom)
 {
-    return id == INTERNED_STRING_TO_JSID(NULL, atom);
+    return id == INTERNED_STRING_TO_JSID(nullptr, atom);
 }
 
 JS_FRIEND_API(JSContext *)
@@ -1124,11 +1136,7 @@ js::AutoCTypesActivityCallback::AutoCTypesActivityCallback(JSContext *cx,
 JS_FRIEND_API(void)
 js::SetObjectMetadataCallback(JSContext *cx, ObjectMetadataCallback callback)
 {
-    // Clear any jitcode in the runtime, which behaves differently depending on
-    // whether there is a creation callback.
-    ReleaseAllJITCode(cx->runtime()->defaultFreeOp());
-
-    cx->compartment()->objectMetadataCallback = callback;
+    cx->compartment()->setObjectMetadataCallback(callback);
 }
 
 JS_FRIEND_API(bool)

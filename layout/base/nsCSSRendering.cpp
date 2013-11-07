@@ -48,6 +48,7 @@
 #include "ImageContainer.h"
 #include "mozilla/Telemetry.h"
 #include "gfxUtils.h"
+#include "gfxColor.h"
 #include <algorithm>
 
 using namespace mozilla;
@@ -2496,7 +2497,6 @@ nsCSSRendering::PaintGradient(nsPresContext* aPresContext,
       // tile with the overall area we're supposed to be filling
       gfxRect fillRect =
         forceRepeatToCoverTiles ? areaToFill : tileRect.Intersect(areaToFill);
-      ctx->NewPath();
       // Try snapping the fill rect. Snap its top-left and bottom-right
       // independently to preserve the orientation.
       gfxPoint snappedFillRectTopLeft = fillRect.TopLeft();
@@ -2522,6 +2522,7 @@ nsCSSRendering::PaintGradient(nsPresContext* aPresContext,
             snappedFillRectBottomRight);
         ctx->SetMatrix(transform);
       }
+      ctx->NewPath();
       ctx->Rectangle(fillRect);
       ctx->Translate(tileRect.TopLeft());
       ctx->SetPattern(gradientPattern);
@@ -4922,12 +4923,12 @@ nsContextBoxBlur::Init(const nsRect& aRect, nscoord aSpreadRadius,
                          blurRadius, &dirtyRect, &skipRect);
   } else {
     mContext = blur.Init(rect, spreadRadius,
-                         blurRadius, &dirtyRect, NULL);
+                         blurRadius, &dirtyRect, nullptr);
   }
 
   if (mContext) {
     // we don't need to blur if skipRect is equal to rect
-    // and mContext will be NULL
+    // and mContext will be nullptr
     mContext->SetMatrix(transform);
   }
   return mContext;

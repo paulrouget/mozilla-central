@@ -20,6 +20,7 @@ import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.text.InputType;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.DisplayMetrics;
 import android.view.inputmethod.InputMethodManager;
@@ -51,6 +52,7 @@ abstract class BaseTest extends ActivityInstrumentationTestCase2<Activity> {
     private static final int MAX_WAIT_ENABLED_TEXT_MS = 10000;
     private static final int MAX_WAIT_HOME_PAGER_HIDDEN_MS = 15000;
     public static final int MAX_WAIT_MS = 4500;
+    public static final int LONG_PRESS_TIME = 6000;
 
     // IDs for UI views
     private static final String BROWSER_TOOLBAR_ID = "browser_toolbar";
@@ -205,13 +207,16 @@ abstract class BaseTest extends ActivityInstrumentationTestCase2<Activity> {
     }
 
     protected final void enterUrl(String url) {
+        final EditText urlEditView = (EditText) mSolo.getView(URL_EDIT_TEXT_ID);
+
         focusUrlBar();
 
         // Send the keys for the URL we want to enter
-        mActions.sendKeys(url);
+        mSolo.clearEditText(urlEditView);
+        mSolo.enterText(urlEditView, url);
 
         // Get the URL text from the URL bar EditText view
-        String urlBarText = ((EditText) mSolo.getView(URL_EDIT_TEXT_ID)).getText().toString();
+        final String urlBarText = urlEditView.getText().toString();
         mAsserter.is(url, urlBarText, "URL typed properly");
     }
 

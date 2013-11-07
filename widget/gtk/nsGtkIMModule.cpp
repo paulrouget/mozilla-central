@@ -65,6 +65,7 @@ nsGtkIMModule* nsGtkIMModule::sLastFocusedModule = nullptr;
 nsGtkIMModule::nsGtkIMModule(nsWindow* aOwnerWindow) :
     mOwnerWindow(aOwnerWindow), mLastFocusedWindow(nullptr),
     mContext(nullptr),
+    mSimpleContext(nullptr),
     mDummyContext(nullptr),
     mCompositionStart(UINT32_MAX), mProcessingKeyEvent(nullptr),
     mCompositionState(eCompositionState_NotComposing),
@@ -111,6 +112,28 @@ nsGtkIMModule::Init()
                      G_CALLBACK(nsGtkIMModule::OnStartCompositionCallback),
                      this);
     g_signal_connect(mContext, "preedit_end",
+                     G_CALLBACK(nsGtkIMModule::OnEndCompositionCallback),
+                     this);
+
+    // Simple context
+    mSimpleContext = gtk_im_context_simple_new();
+    gtk_im_context_set_client_window(mSimpleContext, gdkWindow);
+    g_signal_connect(mSimpleContext, "preedit_changed",
+                     G_CALLBACK(&nsGtkIMModule::OnChangeCompositionCallback),
+                     this);
+    g_signal_connect(mSimpleContext, "retrieve_surrounding",
+                     G_CALLBACK(&nsGtkIMModule::OnRetrieveSurroundingCallback),
+                     this);
+    g_signal_connect(mSimpleContext, "delete_surrounding",
+                     G_CALLBACK(&nsGtkIMModule::OnDeleteSurroundingCallback),
+                     this);
+    g_signal_connect(mSimpleContext, "commit",
+                     G_CALLBACK(&nsGtkIMModule::OnCommitCompositionCallback),
+                     this);
+    g_signal_connect(mSimpleContext, "preedit_start",
+                     G_CALLBACK(nsGtkIMModule::OnStartCompositionCallback),
+                     this);
+    g_signal_connect(mSimpleContext, "preedit_end",
                      G_CALLBACK(nsGtkIMModule::OnEndCompositionCallback),
                      this);
 
@@ -168,6 +191,12 @@ nsGtkIMModule::OnDestroyWindow(nsWindow* aWindow)
         mContext = nullptr;
     }
 
+    if (mSimpleContext) {
+        gtk_im_context_set_client_window(mSimpleContext, nullptr);
+        g_object_unref(mSimpleContext);
+        mSimpleContext = nullptr;
+    }
+
     if (mDummyContext) {
         // mContext and mDummyContext have the same slaveType and signal_data
         // so no need for another workaround_gtk_im_display_closed.
@@ -212,7 +241,7 @@ nsGtkIMModule::PrepareToDestroyContext(GtkIMContext *aContext)
 #if (MOZ_WIDGET_GTK == 2)
     GtkIMContext *slave = multicontext->slave;
 #else
-    GtkIMContext *slave = NULL; //TODO GTK3
+    GtkIMContext *slave = nullptr; //TODO GTK3
 #endif
     if (!slave) {
         return;
@@ -221,7 +250,7 @@ nsGtkIMModule::PrepareToDestroyContext(GtkIMContext *aContext)
     GType slaveType = G_TYPE_FROM_INSTANCE(slave);
     const gchar *im_type_name = g_type_name(slaveType);
     if (strcmp(im_type_name, "GtkIMContextXIM") == 0) {
-        if (gtk_check_version(2, 12, 1) == NULL) {
+        if (gtk_check_version(2, 12, 1) == nullptr) {
             return; // gtk bug has been fixed
         }
 
@@ -240,7 +269,7 @@ nsGtkIMModule::PrepareToDestroyContext(GtkIMContext *aContext)
 
         g_signal_handlers_disconnect_matched(
             gtk_widget_get_display(GTK_WIDGET(container)),
-            G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, signal_data);
+            G_SIGNAL_MATCH_DATA, 0, 0, nullptr, nullptr, signal_data);
 
         // Add a reference to prevent the XIM module from being unloaded
         // and reloaded: each time the module is loaded and used, it
@@ -548,7 +577,9 @@ nsGtkIMModule::GetContext()
     if (IsEnabled()) {
         return mContext;
     }
-
+    if (mInputContext.mIMEState.mEnabled == IMEState::PASSWORD) {
+        return mSimpleContext;
+    }
     return mDummyContext;
 }
 
@@ -556,7 +587,6 @@ bool
 nsGtkIMModule::IsEnabled()
 {
     return mInputContext.mIMEState.mEnabled == IMEState::ENABLED ||
-           mInputContext.mIMEState.mEnabled == IMEState::PASSWORD ||
            mInputContext.mIMEState.mEnabled == IMEState::PLUGIN;
 }
 
@@ -1201,7 +1231,7 @@ nsGtkIMModule::SetTextRangeList(nsTArray<TextRange> &aTextRangeList)
         } else {
             glong uniStrLen;
             uniStr = g_utf8_to_utf16(preedit_string, start,
-                                     NULL, &uniStrLen, NULL);
+                                     nullptr, &uniStrLen, nullptr);
             if (uniStr) {
                 range.mStartOffset = uniStrLen;
                 g_free(uniStr);
@@ -1211,7 +1241,7 @@ nsGtkIMModule::SetTextRangeList(nsTArray<TextRange> &aTextRangeList)
 
         glong uniStrLen;
         uniStr = g_utf8_to_utf16(preedit_string + start, end - start,
-                                 NULL, &uniStrLen, NULL);
+                                 nullptr, &uniStrLen, nullptr);
         if (!uniStr) {
             range.mEndOffset = range.mStartOffset;
         } else {

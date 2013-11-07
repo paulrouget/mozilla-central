@@ -21,6 +21,7 @@
 #include "nsSize.h"                     // for nsIntSize
 #include "gfxReusableSharedImageSurfaceWrapper.h"
 #include "nsMathUtils.h"               // for NS_roundf
+#include "gfx2DGlue.h"
 
 #ifdef GFX_TILEDLAYER_DEBUG_OVERLAY
 #include "cairo.h"
@@ -273,7 +274,7 @@ BasicTiledLayerBuffer::PaintThebes(const nsIntRegion& aNewValidRegion,
 #endif
     PROFILER_LABEL("BasicTiledLayerBuffer", "PaintThebesSingleBufferDraw");
 
-    mCallback(mThebesLayer, ctxt, aPaintRegion, nsIntRegion(), mCallbackData);
+    mCallback(mThebesLayer, ctxt, aPaintRegion, CLIP_NONE, nsIntRegion(), mCallbackData);
   }
 
 #ifdef GFX_TILEDLAYER_PREF_WARNINGS
@@ -382,6 +383,7 @@ BasicTiledLayerBuffer::ValidateTileInternal(BasicTiledLayerTile aTile,
     mCallback(mThebesLayer, ctxt,
               nsIntRegion(nsIntRect(a, nsIntSize(GetScaledTileLength(),
                                                  GetScaledTileLength()))),
+              CLIP_NONE,
               nsIntRegion(), mCallbackData);
   }
 

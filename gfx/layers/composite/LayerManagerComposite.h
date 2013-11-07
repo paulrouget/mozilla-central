@@ -158,20 +158,6 @@ public:
   void* GetThebesLayerCallbackData() const
   { return mThebesLayerCallbackData; }
 
-  /*
-   * Helper functions for our layers
-   */
-  void CallThebesLayerDrawCallback(ThebesLayer* aLayer,
-                                   gfxContext* aContext,
-                                   const nsIntRegion& aRegionToDraw)
-  {
-    NS_ASSERTION(mThebesLayerCallback,
-                 "CallThebesLayerDrawCallback without callback!");
-    mThebesLayerCallback(aLayer, aContext,
-                         aRegionToDraw, nsIntRegion(),
-                         mThebesLayerCallbackData);
-  }
-
 #ifdef MOZ_LAYERS_HAVE_LOG
   virtual const char* Name() const MOZ_OVERRIDE { return ""; }
 #endif // MOZ_LAYERS_HAVE_LOG
@@ -381,12 +367,18 @@ public:
     mShadowTransformSetByAnimation = aSetByAnimation;
   }
 
+  void SetLayerComposited(bool value)
+  {
+    mLayerComposited = value;
+  }
+
   // These getters can be used anytime.
   float GetShadowOpacity() { return mShadowOpacity; }
   const nsIntRect* GetShadowClipRect() { return mUseShadowClipRect ? &mShadowClipRect : nullptr; }
   const nsIntRegion& GetShadowVisibleRegion() { return mShadowVisibleRegion; }
   const gfx3DMatrix& GetShadowTransform() { return mShadowTransform; }
   bool GetShadowTransformSetByAnimation() { return mShadowTransformSetByAnimation; }
+  bool HasLayerBeenComposited() { return mLayerComposited; }
 
 protected:
   gfx3DMatrix mShadowTransform;
@@ -398,6 +390,7 @@ protected:
   bool mUseShadowClipRect;
   bool mShadowTransformSetByAnimation;
   bool mDestroyed;
+  bool mLayerComposited;
 };
 
 

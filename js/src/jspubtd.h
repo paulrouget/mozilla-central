@@ -11,6 +11,8 @@
  * JS public API typedefs.
  */
 
+#include "mozilla/LinkedList.h"
+#include "mozilla/NullPtr.h"
 #include "mozilla/PodOperations.h"
 
 #include "jsprototypes.h"
@@ -172,9 +174,12 @@ typedef bool                    (*JSInitCallback)(void);
 typedef void
 (* JSTraceDataOp)(JSTracer *trc, void *data);
 
+void js_FinishGC(JSRuntime *rt);
+
 namespace js {
 namespace gc {
 class StoreBuffer;
+void MarkPersistentRootedChains(JSTracer *);
 }
 }
 
@@ -223,7 +228,48 @@ struct Runtime
     static JS::shadow::Runtime *asShadowRuntime(JSRuntime *rt) {
         return reinterpret_cast<JS::shadow::Runtime*>(rt);
     }
+
+    /* Allow inlining of PersistentRooted constructors and destructors. */
+  private:
+    template <typename Referent> friend class JS::PersistentRooted;
+    friend void js::gc::MarkPersistentRootedChains(JSTracer *);
+    friend void ::js_FinishGC(JSRuntime *rt);
+
+    mozilla::LinkedList<PersistentRootedFunction> functionPersistentRooteds;
+    mozilla::LinkedList<PersistentRootedId>       idPersistentRooteds;
+    mozilla::LinkedList<PersistentRootedObject>   objectPersistentRooteds;
+    mozilla::LinkedList<PersistentRootedScript>   scriptPersistentRooteds;
+    mozilla::LinkedList<PersistentRootedString>   stringPersistentRooteds;
+    mozilla::LinkedList<PersistentRootedValue>    valuePersistentRooteds;
+
+    /* Specializations of this return references to the appropriate list. */
+    template<typename Referent>
+    inline mozilla::LinkedList<PersistentRooted<Referent> > &getPersistentRootedList();
 };
+
+template<>
+inline mozilla::LinkedList<PersistentRootedFunction>
+&Runtime::getPersistentRootedList<JSFunction *>() { return functionPersistentRooteds; }
+
+template<>
+inline mozilla::LinkedList<PersistentRootedId>
+&Runtime::getPersistentRootedList<jsid>() { return idPersistentRooteds; }
+
+template<>
+inline mozilla::LinkedList<PersistentRootedObject>
+&Runtime::getPersistentRootedList<JSObject *>() { return objectPersistentRooteds; }
+
+template<>
+inline mozilla::LinkedList<PersistentRootedScript>
+&Runtime::getPersistentRootedList<JSScript *>() { return scriptPersistentRooteds; }
+
+template<>
+inline mozilla::LinkedList<PersistentRootedString>
+&Runtime::getPersistentRootedList<JSString *>() { return stringPersistentRooteds; }
+
+template<>
+inline mozilla::LinkedList<PersistentRootedValue>
+&Runtime::getPersistentRootedList<Value>() { return valuePersistentRooteds; }
 
 } /* namespace shadow */
 } /* namespace JS */
@@ -312,13 +358,13 @@ struct ContextFriendFields
 
   public:
     explicit ContextFriendFields(JSRuntime *rt)
-      : runtime_(rt), compartment_(NULL), zone_(NULL), autoGCRooters(NULL)
+      : runtime_(rt), compartment_(nullptr), zone_(nullptr), autoGCRooters(nullptr)
     {
 #ifdef JSGC_TRACK_EXACT_ROOTS
         mozilla::PodArrayZero(thingGCRooters);
 #endif
 #if defined(DEBUG) && defined(JS_GC_ZEAL) && defined(JSGC_ROOT_ANALYSIS) && !defined(JS_THREADSAFE)
-        skipGCRooters = NULL;
+        skipGCRooters = nullptr;
 #endif
     }
 
@@ -357,6 +403,34 @@ struct ContextFriendFields
     friend JSCompartment *GetContextCompartment(const JSContext *cx);
     friend JS::Zone *GetContextZone(const JSContext *cx);
 };
+
+/*
+ * Inlinable accessors for JSContext.
+ *
+ * - These must not be available on the more restricted superclasses of
+ *   JSContext, so we can't simply define them on ContextFriendFields.
+ *
+ * - They're perfectly ordinary JSContext functionality, so ought to be
+ *   usable without resorting to jsfriendapi.h, and when JSContext is an
+ *   incomplete type.
+ */
+inline JSRuntime *
+GetRuntime(const JSContext *cx)
+{
+    return ContextFriendFields::get(cx)->runtime_;
+}
+
+inline JSCompartment *
+GetContextCompartment(const JSContext *cx)
+{
+    return ContextFriendFields::get(cx)->compartment_;
+}
+
+inline JS::Zone *
+GetContextZone(const JSContext *cx)
+{
+    return ContextFriendFields::get(cx)->zone_;
+}
 
 class PerThreadData;
 

@@ -58,7 +58,7 @@ MetroAppShell::Init()
   LogFunction();
 
   WNDCLASSW wc;
-  HINSTANCE module = GetModuleHandle(NULL);
+  HINSTANCE module = GetModuleHandle(nullptr);
 
   const PRUnichar *const kWindowClass = L"nsAppShell:EventWindowClass";
   if (!GetClassInfoW(module, kWindowClass, &wc)) {
@@ -67,16 +67,16 @@ MetroAppShell::Init()
     wc.cbClsExtra    = 0;
     wc.cbWndExtra    = 0;
     wc.hInstance     = module;
-    wc.hIcon         = NULL;
-    wc.hCursor       = NULL;
-    wc.hbrBackground = (HBRUSH) NULL;
-    wc.lpszMenuName  = (LPCWSTR) NULL;
+    wc.hIcon         = nullptr;
+    wc.hCursor       = nullptr;
+    wc.hbrBackground = (HBRUSH) nullptr;
+    wc.lpszMenuName  = (LPCWSTR) nullptr;
     wc.lpszClassName = kWindowClass;
     RegisterClassW(&wc);
   }
 
   mEventWnd = CreateWindowW(kWindowClass, L"nsAppShell:EventWindow",
-                           0, 0, 0, 10, 10, NULL, NULL, module, NULL);
+                           0, 0, 0, 10, 10, nullptr, nullptr, module, nullptr);
   NS_ENSURE_STATE(mEventWnd);
 
   nsresult rv;
@@ -121,7 +121,7 @@ WinLaunchDeferredMetroFirefox()
 
   nsRefPtr<IExecuteCommand> executeCommand;
   HRESULT hr = CoCreateInstance(CLSID_FirefoxMetroDEH,
-                                NULL,
+                                nullptr,
                                 CLSCTX_LOCAL_SERVER,
                                 IID_IExecuteCommand,
                                 getter_AddRefs(executeCommand));
@@ -140,7 +140,8 @@ WinLaunchDeferredMetroFirefox()
 
   // Create an IShellItem for the current browser path
   nsRefPtr<IShellItem> shellItem;
-  hr = WinUtils::SHCreateItemFromParsingName(exePath, NULL, IID_IShellItem, getter_AddRefs(shellItem));
+  hr = WinUtils::SHCreateItemFromParsingName(exePath, nullptr, IID_IShellItem,
+                                             getter_AddRefs(shellItem));
   if (FAILED(hr))
     return FALSE;
 
@@ -221,7 +222,6 @@ MetroAppShell::Run(void)
 void // static
 MetroAppShell::MarkEventQueueForPurge()
 {
-  LogFunction();
   sWillEmptyThreadQueue = true;
 
   // If we're dispatching native events, wait until the dispatcher is
@@ -242,7 +242,6 @@ MetroAppShell::DispatchAllGeckoEvents()
     return;
   }
 
-  LogFunction();
   NS_ASSERTION(NS_IsMainThread(), "DispatchAllXPCOMEvents should be called on the main thread");
 
   sWillEmptyThreadQueue = false;
@@ -280,7 +279,7 @@ MetroAppShell::ProcessOneNativeEventIfPresent()
     // Calling into ProcessNativeEvents is harmless, but won't actually process any
     // native events. So we log here so we can spot this and get a handle on the
     // corner cases where this can happen.
-    Log("WARNING: Reentrant call into process events detected, returning early.");
+    WinUtils::Log("WARNING: Reentrant call into process events detected, returning early.");
     return false;
   }
 
@@ -310,7 +309,8 @@ MetroAppShell::ProcessNextNativeEvent(bool mayWait)
     return true;
   }
   if (mayWait) {
-    DWORD result = ::MsgWaitForMultipleObjectsEx(0, NULL, MSG_WAIT_TIMEOUT, MOZ_QS_ALLEVENT,
+    DWORD result = ::MsgWaitForMultipleObjectsEx(0, nullptr, MSG_WAIT_TIMEOUT,
+                                                 MOZ_QS_ALLEVENT,
                                                  MWMO_INPUTAVAILABLE|MWMO_ALERTABLE);
     NS_WARN_IF_FALSE(result != WAIT_FAILED, "Wait failed");
   }
@@ -393,7 +393,7 @@ MetroAppShell::Observe(nsISupports *subject, const char *topic,
     NS_ENSURE_ARG_POINTER(topic);
     if (!strcmp(topic, "dl-start")) {
       if (mPowerRequestCount++ == 0) {
-        Log("Download started - Disallowing suspend");
+        WinUtils::Log("Download started - Disallowing suspend");
         REASON_CONTEXT context;
         context.Version = POWER_REQUEST_CONTEXT_VERSION;
         context.Flags = POWER_REQUEST_CONTEXT_SIMPLE_STRING;
@@ -406,7 +406,7 @@ MetroAppShell::Observe(nsISupports *subject, const char *topic,
                !strcmp(topic, "dl-cancel") ||
                !strcmp(topic, "dl-failed")) {
       if (--mPowerRequestCount == 0 && mPowerRequest) {
-        Log("All downloads ended - Allowing suspend");
+        WinUtils::Log("All downloads ended - Allowing suspend");
         PowerClearRequestDyn(mPowerRequest, PowerRequestExecutionRequired); 
         mPowerRequest.reset();
       }

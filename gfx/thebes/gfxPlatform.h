@@ -9,18 +9,14 @@
 #include "prlog.h"
 #include "nsTArray.h"
 #include "nsString.h"
-#include "nsIObserver.h"
 #include "nsCOMPtr.h"
 #include "nsAutoPtr.h"
 
 #include "gfxTypes.h"
-#include "gfxColor.h"
 #include "nsRect.h"
 
 #include "qcms.h"
 
-#include "mozilla/gfx/2D.h"
-#include "gfx2DGlue.h"
 #include "mozilla/RefPtr.h"
 #include "GfxInfoCollector.h"
 
@@ -42,10 +38,18 @@ class gfxPlatformFontList;
 class gfxTextRun;
 class nsIURI;
 class nsIAtom;
+class nsIObserver;
+struct gfxRGBA;
 
 namespace mozilla {
 namespace gl {
 class GLContext;
+}
+namespace gfx {
+class DrawTarget;
+class SourceSurface;
+class ScaledFont;
+class DrawEventRecorder;
 }
 }
 
@@ -274,6 +278,8 @@ public:
 
     virtual bool UseAcceleratedSkiaCanvas();
 
+    virtual void InitializeSkiaCaches();
+
     void GetAzureBackendInfo(mozilla::widget::InfoObject &aObj) {
       aObj.DefineProperty("AzureCanvasBackend", GetBackendName(mPreferredCanvasBackend));
       aObj.DefineProperty("AzureSkiaAccelerated", UseAcceleratedSkiaCanvas());
@@ -483,10 +489,6 @@ public:
     // Retrieve the resolution that a low precision buffer should render at.
     static float GetLowPrecisionResolution();
 
-    // Retain some invalid tiles when the valid region of a layer changes and
-    // excludes previously valid tiles.
-    static bool UseReusableTileStore();
-
     static bool OffMainThreadCompositingEnabled();
 
     /** Use gfxPlatform::GetPref* methods instead of direct calls to Preferences
@@ -572,6 +574,7 @@ public:
      * for measuring text etc as if they will be rendered to the screen
      */
     gfxASurface* ScreenReferenceSurface() { return mScreenReferenceSurface; }
+    mozilla::gfx::DrawTarget* ScreenReferenceDrawTarget() { return mScreenReferenceDrawTarget; }
 
     virtual mozilla::gfx::SurfaceFormat Optimal2DFormatForContent(gfxContentType aContent);
 
@@ -636,7 +639,8 @@ protected:
      * The backend used is determined by aBackendBitmask and the order specified
      * by the gfx.canvas.azure.backends pref.
      */
-    void InitBackendPrefs(uint32_t aCanvasBitmask, uint32_t aContentBitmask);
+    void InitBackendPrefs(uint32_t aCanvasBitmask, mozilla::gfx::BackendType aCanvasDefault,
+                          uint32_t aContentBitmask, mozilla::gfx::BackendType aContentDefault);
 
     /**
      * returns the first backend named in the pref gfx.canvas.azure.backends
@@ -651,15 +655,12 @@ protected:
     static mozilla::gfx::BackendType GetContentBackendPref(uint32_t &aBackendBitmask);
 
     /**
-     * If aEnabledPrefName is non-null, checks the aEnabledPrefName pref and
-     * returns BACKEND_NONE if the pref is not enabled.
-     * Otherwise it will return the first backend named in aBackendPrefName
+     * Will return the first backend named in aBackendPrefName
      * allowed by aBackendBitmask, a bitmask of backend types.
      * It also modifies aBackendBitmask to only include backends that are
      * allowed given the prefs.
      */
-    static mozilla::gfx::BackendType GetBackendPref(const char* aEnabledPrefName,
-                                                    const char* aBackendPrefName,
+    static mozilla::gfx::BackendType GetBackendPref(const char* aBackendPrefName,
                                                     uint32_t &aBackendBitmask);
     /**
      * Decode the backend enumberation from a string.
@@ -704,10 +705,12 @@ private:
     virtual bool SupportsOffMainThreadCompositing() { return true; }
 
     nsRefPtr<gfxASurface> mScreenReferenceSurface;
+    mozilla::RefPtr<mozilla::gfx::DrawTarget> mScreenReferenceDrawTarget;
     nsTArray<uint32_t> mCJKPrefLangs;
     nsCOMPtr<nsIObserver> mSRGBOverrideObserver;
     nsCOMPtr<nsIObserver> mFontPrefsObserver;
     nsCOMPtr<nsIObserver> mOrientationSyncPrefsObserver;
+    nsCOMPtr<nsIObserver> mMemoryPressureObserver;
 
     // The preferred draw target backend to use for canvas
     mozilla::gfx::BackendType mPreferredCanvasBackend;

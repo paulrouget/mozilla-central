@@ -12,6 +12,7 @@
  */
 
 #include "jsbytecode.h"
+#include "jstypes.h"
 #include "NamespaceImports.h"
 
 #include "frontend/SourceNotes.h"
@@ -256,7 +257,6 @@ BytecodeFallsThrough(JSOp op)
       case JSOP_GOTO:
       case JSOP_DEFAULT:
       case JSOP_RETURN:
-      case JSOP_STOP:
       case JSOP_RETRVAL:
       case JSOP_THROW:
       case JSOP_TABLESWITCH:
@@ -453,7 +453,7 @@ class Sprinter
     char &operator[](size_t off);
 
     /*
-     * Attempt to reserve len + 1 space (for a trailing NULL byte). If the
+     * Attempt to reserve len + 1 space (for a trailing nullptr byte). If the
      * attempt succeeds, return a pointer to the start of that space and adjust the
      * internal content. The caller *must* completely fill this space on success.
      */
@@ -556,7 +556,7 @@ inline bool
 FlowsIntoNext(JSOp op)
 {
     /* JSOP_YIELD is considered to flow into the next instruction, like JSOP_CALL. */
-    return op != JSOP_STOP && op != JSOP_RETURN && op != JSOP_RETRVAL && op != JSOP_THROW &&
+    return op != JSOP_RETRVAL && op != JSOP_RETURN && op != JSOP_THROW &&
            op != JSOP_GOTO && op != JSOP_RETSUB;
 }
 
