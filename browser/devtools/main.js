@@ -17,6 +17,8 @@ Object.defineProperty(exports, "TargetFactory", {
   get: () => require("devtools/framework/target").TargetFactory
 });
 
+require("devtools/animation-clock/main");
+
 loader.lazyGetter(this, "osString", () => Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS);
 
 let events = require("sdk/system/events");

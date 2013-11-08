@@ -110,6 +110,51 @@
   -moz-image-region: rect(0px, 48px, 16px, 32px);
 }
 
+#toolbox-button-animclock {
+  list-style-image: url("chrome://browser/skin/devtools/animation-clock-icon.png");
+  -moz-image-region: rect(0px, 16px, 16px, 0px);
+}
+#toolbox-button-animclock:hover {
+  -moz-image-region: rect(0px, 32px, 16px, 16px);
+}
+
+#toolbox-button-animclock:hover:active {
+  -moz-image-region: rect(0px, 48px, 16px, 32px);
+}
+
+#toolbox-button-animclock[checked=true] {
+  -moz-image-region: rect(0px, 64px, 16px, 48px);
+}
+
+#toolbox-button-animclock[checked=true][motion=pause] {
+  -moz-image-region: rect(0px, 80px, 16px, 64px);
+}
+
+#toolbox-button-animclock[checked=true][motion=forward] {
+  -moz-image-region: rect(0px, 96px, 16px, 80px);
+}
+
+#toolbox-button-animclock[checked=true][motion=backward] {
+  -moz-image-region: rect(0px, 112px, 16px, 96px);
+}
+
+#toolbox-button-animclock[checked=true][motion=forward-slow] {
+  -moz-image-region: rect(0px, 128px, 16px, 112px);
+}
+
+#toolbox-button-animclock[checked=true][motion=backward-slow] {
+  -moz-image-region: rect(0px, 144px, 16px, 128px);
+}
+
+#toolbox-button-animclock[checked=true][motion=forward-fast] {
+  -moz-image-region: rect(0px, 160px, 16px, 144px);
+}
+
+#toolbox-button-animclock[checked=true][motion=backward-fast] {
+  -moz-image-region: rect(0px, 176px, 16px, 160px);
+}
+
+
 /* Tabs */
 
 .devtools-tabbar {

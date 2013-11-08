@@ -6,6 +6,7 @@
 
 DIRS += [
     'app-manager',
+    'animation-clock',
     'commandline',
     'debugger',
     'fontinspector',
@@ -23,7 +24,7 @@ DIRS += [
     'styleeditor',
     'styleinspector',
     'tilt',
-    'webconsole',
+    'webconsole'
 ]
 
 EXTRA_COMPONENTS += [

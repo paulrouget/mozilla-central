@@ -122,6 +122,23 @@
   -moz-image-region: rect(0px, 48px, 16px, 32px);
 }
 
+#toolbox-button-animclock {
+  list-style-image: url("chrome://browser/skin/devtools/animation-clock-icon.png");
+  -moz-image-region: rect(0px, 16px, 16px, 0px);
+}
+#toolbox-button-animclock:hover {
+  -moz-image-region: rect(0px, 32px, 16px, 16px);
+}
+
+#toolbox-button-animclock:hover:active {
+  -moz-image-region: rect(0px, 48px, 16px, 32px);
+}
+
+#toolbox-button-animclock[checked=true] {
+  -moz-image-region: rect(0px, 64px, 16px, 48px);
+}
+
+
 /* Tabs */
 
 .devtools-tabbar {
