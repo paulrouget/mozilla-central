@@ -1,0 +1,2 @@
+component {57bf62a0-3f92-49ff-9e89-4769e347c446} view-source-protocol-handler.js
+contract @mozilla.org/network/protocol;1?name=view-source {57bf62a0-3f92-49ff-9e89-4769e347c446}

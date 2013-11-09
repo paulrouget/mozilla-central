@@ -23,6 +23,7 @@ DIRS += [
     'styleeditor',
     'styleinspector',
     'tilt',
+    'viewsource',
     'webconsole',
 ]
 

@@ -2020,9 +2020,6 @@ function BrowserViewSourceOfDocument(aDocument)
   var pageCookie;
   var webNav;
 
-  // Get the document charset
-  var docCharset = "charset=" + aDocument.characterSet;
-
   // Get the nsIWebNavigation associated with the document
   try {
       var win;
@@ -2057,7 +2054,8 @@ function BrowserViewSourceOfDocument(aDocument)
     // If no page descriptor is available, just use the view-source URL...
   }
 
-  top.gViewSourceUtils.viewSource(webNav.currentURI.spec, pageCookie, aDocument);
+  //top.gViewSourceUtils.viewSource(webNav.currentURI.spec, pageCookie, aDocument);
+  top.gBrowser.selectedTab = top.gBrowser.addTab("view-source:" + webNav.currentURI.spec);
 }
 
 // doc - document to use for source, or null for this window's document
