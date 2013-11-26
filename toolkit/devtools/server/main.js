@@ -368,6 +368,7 @@ var DebuggerServer = {
     this.registerModule("devtools/server/actors/webgl");
     this.registerModule("devtools/server/actors/tracer");
     this.registerModule("devtools/server/actors/device");
+    this.registerModule("devtools/server/actors/pageinfo");
   },
 
   /**
@@ -385,6 +386,7 @@ var DebuggerServer = {
       this.addActors("resource://gre/modules/devtools/server/actors/styleeditor.js");
       this.registerModule("devtools/server/actors/inspector");
       this.registerModule("devtools/server/actors/webgl");
+      this.registerModule("devtools/server/actors/pageinfo");
     }
     if (!("ContentAppActor" in DebuggerServer)) {
       this.addActors("resource://gre/modules/devtools/server/actors/childtab.js");

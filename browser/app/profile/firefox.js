@@ -1239,6 +1239,9 @@ pref("devtools.editor.expandtab", true);
 // Enable the Font Inspector
 pref("devtools.fontinspector.enabled", true);
 
+// Enable the PageInfo panel
+pref("devtools.pageinfo.enabled", true);
+
 // Pref to store the browser version at the time of a telemetry ping for an
 // opened developer tool. This allows us to ping telemetry just once per browser
 // version for each user.

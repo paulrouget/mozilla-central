@@ -31,6 +31,7 @@ loader.lazyGetter(this, "ShaderEditorPanel", () => require("devtools/shaderedito
 loader.lazyGetter(this, "ProfilerPanel", () => require("devtools/profiler/panel"));
 loader.lazyGetter(this, "NetMonitorPanel", () => require("devtools/netmonitor/netmonitor-panel").NetMonitorPanel);
 loader.lazyGetter(this, "ScratchpadPanel", () => require("devtools/scratchpad/scratchpad-panel").ScratchpadPanel);
+loader.lazyGetter(this, "PageInfoPanel", () => require("devtools/pageinfo/panel").PageInfoPanel);
 
 // Strings
 const toolboxProps = "chrome://browser/locale/devtools/toolbox.properties";
@@ -254,8 +255,29 @@ Tools.scratchpad = {
   }
 };
 
+Tools.pageinfo = {
+  id: "pageinfo",
+  ordinal: 1,
+  visibilityswitch: "devtools.pageinfo.enabled",
+  icon: "chrome://browser/skin/devtools/tool-profiler.png",
+  url: "chrome://browser/content/devtools/pageinfo/pageinfo.xhtml",
+  label: "pageinfo",
+  tooltip: "pageinfo tooltip",
+  inMenu: true,
+
+  isTargetSupported: function (target) {
+    return true;
+  },
+
+  build: function (frame, target) {
+    let panel = new PageInfoPanel(frame, target);
+    return panel.open();
+  }
+};
+
 let defaultTools = [
   Tools.options,
+  Tools.pageinfo,
   Tools.webConsole,
   Tools.inspector,
   Tools.jsdebugger,
