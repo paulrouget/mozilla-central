@@ -21,7 +21,25 @@ const Editor = require("devtools/sourceeditor/editor");
 let gToolbox, gTarget, gFront;
 
 function start() {
-  gFront.getInfo("1.0").then(i => {
-    document.querySelector("pre").textContent = JSON.stringify(i, null, 2);
-  })
+  gFront.getInfo().then(info => {
+    document.querySelector("#preInfo").textContent = "info: " + JSON.stringify(info, null, 2);
+  });
+
+  gFront.getColorProfile().then(colors => {
+    document.querySelector("#preColors").textContent = "colors: " + JSON.stringify(colors, null, 2);
+    colors = colors.map(c => {
+      let r = c.color >> 16;
+      let g = c.color >> 8 & 0xff;
+      let b = c.color & 0xff;
+      c.color = {r: r, g: g, b: b};
+      return c;
+    });
+    for (let c of colors) {
+      let {r, g, b} = c.color;
+      let colorSpan = document.createElement("span");
+      document.querySelector("#colors").appendChild(colorSpan)
+      colorSpan.className = "color";
+      colorSpan.style.backgroundColor = "rgb(" + [r,g,b].join(",") + ")";
+    }
+  });
 }
