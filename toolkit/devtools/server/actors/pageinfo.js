@@ -180,12 +180,148 @@ let PageInfo = protocol.ActorClass({
 
     // Cached console messages
     (function getCachedConsoleMessages() {
+
+      const CATEGORY_NETWORK = 0;
+      const CATEGORY_CSS = 1;
+      const CATEGORY_JS = 2;
+      const CATEGORY_WEBDEV = 3;
+      const CATEGORY_INPUT = 4;
+      const CATEGORY_OUTPUT = 5;
+      const CATEGORY_SECURITY = 6;
+
+      const SEVERITY_ERROR = 0;
+      const SEVERITY_WARNING = 1;
+      const SEVERITY_INFO = 2;
+      const SEVERITY_LOG = 3;
+
+      function categoryToString(category) {
+        if (category == CATEGORY_NETWORK) return "network";
+        if (category == CATEGORY_CSS) return "css";
+        if (category == CATEGORY_JS) return "js";
+        if (category == CATEGORY_WEBDEV) return "webdev";
+        if (category == CATEGORY_INPUT) return "input";
+        if (category == CATEGORY_OUTPUT) return "output";
+        if (category == CATEGORY_SECURITY) return "security";
+      }
+
+      function severityToString(severity) {
+        if (severity == SEVERITY_ERROR) return "error";
+        if (severity == SEVERITY_WARNING) return "warning";
+        if (severity == SEVERITY_INFO) return "info";
+        if (severity == SEVERITY_LOG) return "log";
+      }
+
+      function categoryForScriptError(aScriptError) {
+        switch (aScriptError.category) {
+          case "CSS Parser":
+          case "CSS Loader":
+            return CATEGORY_CSS;
+
+          case "Mixed Content Blocker":
+          case "Mixed Content Message":
+          case "CSP":
+          case "Invalid HSTS Headers":
+          case "Insecure Password Field":
+          case "SSL":
+            return CATEGORY_SECURITY;
+
+          default:
+            return CATEGORY_JS;
+        }
+      }
+
+      let WebConsoleUtils = require("devtools/toolkit/webconsole/utils").Utils;
       let {ConsoleServiceListener, ConsoleAPIListener} = require("devtools/toolkit/webconsole/utils");
 
-      let consoleServiceListener = new ConsoleServiceListener(window);
-      let consoleAPIListener = new ConsoleAPIListener(window);
 
-      // FIXME: what do with this?
+      let messages = [];
+
+
+      let consoleAPIListener = new ConsoleAPIListener(window);
+      let cacheConsoleAPI = consoleAPIListener.getCachedMessages(true);
+      cacheConsoleAPI.forEach((aMessage) => {
+        let message = WebConsoleUtils.cloneObject(aMessage);
+        message._type = "ConsoleAPI";
+        delete message.wrappedJSObject;
+        delete message.ID;
+        delete message.innerID;
+        message.message = Array.prototype.join.call(aMessage.arguments, ",");
+        messages.push(message);
+      });
+
+      let consoleServiceListener = new ConsoleServiceListener(window);
+      let cacheConsoleService = consoleServiceListener.getCachedMessages(true);
+      cacheConsoleService.forEach((aMessage) => {
+        let message = null;
+        if (aMessage instanceof Ci.nsIScriptError) {
+          message = {
+            errorMessage: aMessage.errorMessage,
+            sourceName: aMessage.sourceName,
+            lineNumber: aMessage.lineNumber,
+            category: aMessage.category,
+            warning: !!(aMessage.flags & aMessage.warningFlag),
+            error: !!(aMessage.flags & aMessage.errorFlag),
+            exception: !!(aMessage.flags & aMessage.exceptionFlag),
+            strict: !!(aMessage.flags & aMessage.strictFlag),
+          };
+
+          message._type = "PageError";
+        } else {
+          message = {
+            _type: "LogMessage",
+            message: aMessage.message,
+            timeStamp: aMessage.timeStamp,
+          };
+        }
+        messages.push(message);
+      });
+
+      messages = messages.filter((aMessage) => {
+        return !(aMessage._type == "ConsoleAPI" &&
+                 aMessage.level != "warn" &&
+                 aMessage.level != "error");
+      });
+
+      messages = messages.map((aMessage) => {
+        switch (aMessage._type) {
+          case "PageError":
+            let category = categoryForScriptError(aMessage);
+            let severity = SEVERITY_ERROR;
+            if (aMessage.warning || aMessage.strict) {
+              severity = SEVERITY_WARNING;
+            }
+            return {
+              category: categoryToString(category),
+              severity: severityToString(severity),
+              message: aMessage.errorMessage,
+              sourceName: aMessage.sourceName,
+              lineNumber: aMessage.lineNumber
+            }
+          case "LogMessage": // FIXME: skip?
+            let msg = aPacket.message;
+            return {
+              category: categoryToString(CATEGORY_JS),
+              severity: severityToString(SEVERITY_LOG),
+              message: aPacket.message
+            }
+          case "ConsoleAPI":
+            let level = aMessage.level;
+            if (level == "warn")
+              level = SEVERITY_WARNING;
+            else
+              level = SEVERITY_ERROR;
+            return {
+              category: categoryToString(CATEGORY_WEBDEV),
+              severity: severityToString(level),
+              message: aMessage.message,
+              sourceName: aMessage.filename,
+              lineNumber: aMessage.lineNumber
+            }
+        }
+      });
+
+      json.messages = messages;
+
     })()
 
     // Fonts
