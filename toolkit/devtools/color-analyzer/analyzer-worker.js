@@ -34,7 +34,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-importScripts('rgb.js', 'clusterfck.js');
+importScripts("resource://gre/modules/devtools/color-analyzer/rgb.js", "resource://gre/modules/devtools/color-analyzer/clusterfck.js");
 
 onmessage = function(event) {
   var pixels = event.data.pixels;

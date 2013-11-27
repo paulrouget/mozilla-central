@@ -49,6 +49,8 @@ exports.PageInfoFront = protocol.FrontClass(PageInfo, {
 
 
 Cu.import("resource://gre/modules/jsdebugger.jsm");
+Cu.import('resource://gre/modules/devtools/dbg-server.jsm');
+
 addDebuggerToGlobal(this);
 
 const Implementations = {
@@ -65,7 +67,7 @@ const Implementations = {
     Cu.import("resource://gre/modules/PlacesUtils.jsm");
     Cu.import("resource://gre/modules/Services.jsm");
     let dbg = new Debugger(gWindow);
-    // "Debugger: argument must be an object from a different compartment
+    let chromeWindow = Services.wm.getMostRecentWindow(DebuggerServer.chromeWindowType);
 
     // Basic
     json.title = gWindow.document.title;
@@ -205,30 +207,33 @@ const Implementations = {
       let consoleServiceListener = new ConsoleServiceListener(gWindow);
       let consoleAPIListener = new ConsoleAPIListener(gWindow);
 
-      console.log(consoleServiceListener.getCachedMessages(true));
-      console.log(consoleAPIListener.getCachedMessages(true));
+      // FIXME: what do with this?
     })()
 
     // Colors
-    let chromeEventHandler = docShell.chromeEventHandler;
-    let canvas = chromeEventHandler.document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas');
+
+    // FIXME: chromeWindow not always available
+
+    let canvas = chromeWindow.document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas');
+    let contentWidth = json.size.width;
+    let contentHeight = json.size.height;
     canvas.width = contentWidth;
     canvas.height = contentHeight;
     let context = canvas.getContext("2d"); 
-    let contentWidth = json.size.width;
-    let contentHeight = json.size.height;
     context.drawWindow(gWindow, gWindow.scrollX, gWindow.scrollY, contentWidth, contentHeight, "white");
     let pixels = context.getImageData(0, 0, contentWidth, contentHeight).data;
 
     let colorPromise = promise.defer();
-    let worker = new Worker("chrome://browser/content/devtools/pageingo/color-worker.js");
+    let worker = new chromeWindow.Worker("resource://gre/modules/devtools/color-analyzer/analyzer-worker.js");
     worker.onmessage = function(event) {
+      dump("message");
       let colors = event.data.colors;
       json.colors = colors;
-      colorPromise.resolve();
+      colorPromise.resolve(json);
     };
     worker.onerror = function(event) {
-      colorPromise.reject();
+      dump("error");
+      colorPromise.reject("worker error");
     };
     worker.postMessage({pixels: pixels, width: contentWidth, height: contentHeight});
 
@@ -245,7 +250,7 @@ const Implementations = {
     });
 
 
-    return promise.all([colorPromise, faviconPromise]).then(() => json);
+    return colorPromise.promise;
   }
 };
 

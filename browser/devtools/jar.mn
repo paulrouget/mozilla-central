@@ -80,7 +80,6 @@ browser.jar:
     content/browser/devtools/inspector/inspector.css                   (inspector/inspector.css)
     content/browser/devtools/pageinfo/pageinfo.xhtml                   (pageinfo/pageinfo.xhtml)
     content/browser/devtools/pageinfo/pageinfo.js                      (pageinfo/pageinfo.js)
-    content/browser/devtools/pageinfo/color-worker.js                  (pageinfo/color-worker.js)
     content/browser/devtools/connect.xhtml                             (framework/connect/connect.xhtml)
     content/browser/devtools/connect.css                               (framework/connect/connect.css)
     content/browser/devtools/connect.js                                (framework/connect/connect.js)

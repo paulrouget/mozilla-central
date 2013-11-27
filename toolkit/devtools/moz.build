@@ -15,5 +15,6 @@ PARALLEL_DIRS += [
     'apps',
     'styleinspector',
     'acorn',
-    'pretty-fast'
+    'pretty-fast',
+    'color-analyzer'
 ]
