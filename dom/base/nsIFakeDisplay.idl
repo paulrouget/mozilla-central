@@ -1,0 +1,56 @@
+/* -*- Mode: IDL; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+#include "nsISupports.idl"
+
+interface nsIFakeDisplayObserver;
+
+[scriptable, uuid(524eaac3-3a21-4038-83a3-248cc5843003)]
+interface nsIFakeDisplay: nsISupports
+{
+  readonly attribute long top;
+  readonly attribute long left;
+  readonly attribute long width;
+  readonly attribute long height;
+
+  readonly attribute long rotationAlpha;
+  readonly attribute long rotationBeta;
+  readonly attribute long rotationGamma;
+
+  const long ORIENTATION_LANDSCAPE_PRIMARY = 0;
+  const long ORIENTATION_PORTRAIT_PRIMARY = 1;
+  const long ORIENTATION_LANDSCAPE_SECONDARY = 2;
+  const long ORIENTATION_PORTRAIT_SECONDARY = 3;
+  const long ORIENTATION_NONE = 4;
+  const long ORIENTATION_DEFAULT = 5;
+
+  readonly attribute long orientation;
+
+  boolean lockOrientation(in long aOrientation);
+  boolean unlockOrientation();
+
+  void registerFakeDisplayObserver(in nsIFakeDisplayObserver aObserver);
+  void unregisterFakeDisplayObserver(in nsIFakeDisplayObserver aObserver);
+};
+
+[scriptable, uuid(8481aa3b-dec1-4da3-a560-686d3841da4b)]
+interface nsIFakeDisplayController: nsIFakeDisplay
+{
+  attribute long top;
+  attribute long left;
+  attribute long width;
+  attribute long height;
+
+  attribute long rotationAlpha;
+  attribute long rotationBeta;
+  attribute long rotationGamma;
+};
+
+[scriptable, builtinclass, uuid(4ed7868c-34f5-4dc1-b6c1-f50af2926302)]
+interface nsIFakeDisplayObserver: nsISupports
+{
+  void onFakeDisplayChanged(in nsIFakeDisplay aFakeDisplay);
+};

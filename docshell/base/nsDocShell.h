@@ -43,6 +43,7 @@
 #include "nsIWebShellServices.h"
 #include "nsILinkHandler.h"
 #include "nsIClipboardCommands.h"
+#include "nsIFakeDisplay.h"
 #include "nsCRT.h"
 #include "prtime.h"
 #include "nsRect.h"
@@ -740,6 +741,9 @@ protected:
     // Checked in nsMixedContentBlocker, to see if the channels match.
     nsCOMPtr<nsIChannel>       mMixedContentChannel;
 
+    // Fake display
+    nsCOMPtr<nsIFakeDisplay>   mFakeDisplay;
+
     // WEAK REFERENCES BELOW HERE.
     // Note these are intentionally not addrefd.  Doing so will create a cycle.
     // For that reasons don't use nsCOMPtr.
@@ -813,7 +817,6 @@ protected:
     bool                       mIsAppTab;
     bool                       mUseGlobalHistory;
     bool                       mInPrivateBrowsing;
-    bool                       mDeviceSizeIsPageSize;
 
     // Because scriptability depends on the mAllowJavascript values of our
     // ancestors, we cache the effective scriptability and recompute it when

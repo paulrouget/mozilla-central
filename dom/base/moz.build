@@ -10,6 +10,7 @@ XPIDL_SOURCES += [
     'nsIDOMDOMCursor.idl',
     'nsIDOMDOMRequest.idl',
     'nsIEntropyCollector.idl',
+    'nsIFakeDisplay.idl',
     'nsIScriptChannel.idl',
     'nsISiteSpecificUserAgent.idl',
 ]

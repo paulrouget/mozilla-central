@@ -12,6 +12,7 @@
 #include "nsIDOMScreen.h"
 #include "nsCOMPtr.h"
 #include "nsDOMEventTargetHelper.h"
+#include "nsIFakeDisplay.h"
 #include "nsRect.h"
 
 class nsDeviceContext;
@@ -19,6 +20,7 @@ class nsDeviceContext;
 // Script "screen" object
 class nsScreen : public nsDOMEventTargetHelper
                , public nsIDOMScreen
+               , public nsIFakeDisplayObserver
                , public mozilla::hal::ScreenConfigurationObserver
 {
   typedef mozilla::ErrorResult ErrorResult;
@@ -27,6 +29,7 @@ public:
 
   NS_DECL_ISUPPORTS_INHERITED
   NS_DECL_NSIDOMSCREEN
+  NS_DECL_NSIFAKEDISPLAYOBSERVER
   NS_REALLY_FORWARD_NSIDOMEVENTTARGET(nsDOMEventTargetHelper)
 
   nsPIDOMWindow* GetParentObject() const
@@ -51,15 +54,6 @@ public:
   int32_t GetWidth(ErrorResult& aRv)
   {
     nsRect rect;
-    if (IsDeviceSizePageSize()) {
-      nsCOMPtr<nsPIDOMWindow> owner = GetOwner();
-      if (owner) {
-        int32_t innerWidth = 0;
-        aRv = owner->GetInnerWidth(&innerWidth);
-        return innerWidth;
-      }
-    }
-
     aRv = GetRect(rect);
     return rect.width;
   }
@@ -67,15 +61,6 @@ public:
   int32_t GetHeight(ErrorResult& aRv)
   {
     nsRect rect;
-    if (IsDeviceSizePageSize()) {
-      nsCOMPtr<nsPIDOMWindow> owner = GetOwner();
-      if (owner) {
-        int32_t innerHeight = 0;
-        aRv = owner->GetInnerHeight(&innerHeight);
-        return innerHeight;
-      }
-    }
-
     aRv = GetRect(rect);
     return rect.height;
   }
@@ -153,9 +138,12 @@ private:
     LOCK_ALLOWED
   };
 
-  LockPermission GetLockOrientationPermission() const;
+  nsIFakeDisplay* GetFakeDisplay();
 
-  bool IsDeviceSizePageSize();
+  static mozilla::dom::ScreenOrientation fakeDisplayOrientationToHalOrientation(int32_t);
+  static int32_t halOrientationToFakeDisplayOrientation(mozilla::dom::ScreenOrientation);
+
+  LockPermission GetLockOrientationPermission() const;
 
   nsRefPtr<FullScreenEventListener> mEventListener;
 };

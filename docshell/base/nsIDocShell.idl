@@ -41,10 +41,11 @@ interface nsIWebBrowserPrint;
 interface nsIVariant;
 interface nsIPrivacyTransitionObserver;
 interface nsIReflowObserver;
+interface nsIFakeDisplay;
 
 typedef unsigned long nsLoadFlags;
 
-[scriptable, builtinclass, uuid(55ca6545-7ce4-49ad-8117-8286ca9c61bb)]
+[scriptable, builtinclass, uuid(169FB3DD-9374-42E8-8012-F10D1A34A607)]
 interface nsIDocShell : nsIDocShellTreeItem
 {
   /**
@@ -914,15 +915,7 @@ interface nsIDocShell : nsIDocShellTreeItem
 */
   [noscript,notxpcom,nostdcall] nsIScriptGlobalObject GetScriptGlobalObject();
 
-  /**
-   * If deviceSizeIsPageSize is set to true, device-width/height media queries
-   * will be calculated from the page size, not the device size.
-   *
-   * Used by the Responsive Design View and B2G Simulator.
-   *
-   * Default is False.
-   * Default value can be overriden with
-   * docshell.device_size_is_page_size pref.
-   */
-  [infallible] attribute boolean deviceSizeIsPageSize;
+  attribute nsIFakeDisplay fakeDisplay;
+
+  void invalidateScreenMediaQueries();
 };

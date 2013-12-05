@@ -114,9 +114,12 @@ GetDeviceSize(nsPresContext* aPresContext)
 {
     nsSize size;
 
+    /* FIXME
     if (aPresContext->IsDeviceSizePageSize()) {
         size = GetSize(aPresContext);
-    } else if (aPresContext->IsRootPaginatedDocument()) {
+    } else
+    */
+    if (aPresContext->IsRootPaginatedDocument()) {
         // We want the page size, including unprintable areas and margins.
         // XXX The spec actually says we want the "page sheet size", but
         // how is that different?

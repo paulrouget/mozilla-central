@@ -52,10 +52,18 @@ nsScreen::Create(nsPIDOMWindow* aWindow)
   nsRefPtr<nsScreen> screen = new nsScreen();
   screen->BindToOwner(aWindow);
 
-  hal::RegisterScreenConfigurationObserver(screen);
-  hal::ScreenConfiguration config;
-  hal::GetCurrentScreenConfiguration(&config);
-  screen->mOrientation = config.orientation();
+  nsIFakeDisplay* fakeDisplay = screen->GetFakeDisplay();
+  if (fakeDisplay) {
+    int32_t fakeOrientation;
+    fakeDisplay->GetOrientation(&fakeOrientation);
+    screen->mOrientation = fakeDisplayOrientationToHalOrientation(fakeOrientation);
+    fakeDisplay->RegisterFakeDisplayObserver(screen);
+  } else {
+    hal::RegisterScreenConfigurationObserver(screen);
+    hal::ScreenConfiguration config;
+    hal::GetCurrentScreenConfiguration(&config);
+    screen->mOrientation = config.orientation();
+  }
 
   return screen.forget();
 }
@@ -69,13 +77,19 @@ nsScreen::nsScreen()
 nsScreen::~nsScreen()
 {
   MOZ_ASSERT(!mEventListener);
-  hal::UnregisterScreenConfigurationObserver(this);
+  nsIFakeDisplay* fakeDisplay = GetFakeDisplay();
+  if (fakeDisplay) {
+    fakeDisplay->UnregisterFakeDisplayObserver(this);
+  } else {
+    hal::UnregisterScreenConfigurationObserver(this);
+  }
 }
 
 
 // QueryInterface implementation for nsScreen
 NS_INTERFACE_MAP_BEGIN(nsScreen)
   NS_INTERFACE_MAP_ENTRY(nsIDOMScreen)
+  NS_INTERFACE_MAP_ENTRY(nsIFakeDisplayObserver)
 NS_INTERFACE_MAP_END_INHERITING(nsDOMEventTargetHelper)
 
 NS_IMPL_ADDREF_INHERITED(nsScreen, nsDOMEventTargetHelper)
@@ -127,18 +141,30 @@ nsScreen::GetDeviceContext()
 nsresult
 nsScreen::GetRect(nsRect& aRect)
 {
-  nsDeviceContext *context = GetDeviceContext();
+  nsIFakeDisplay* fakeDisplay = GetFakeDisplay();
 
-  if (!context) {
-    return NS_ERROR_FAILURE;
+  if (fakeDisplay) {
+
+    fakeDisplay->GetLeft(&aRect.x);
+    fakeDisplay->GetTop(&aRect.y);
+    fakeDisplay->GetWidth(&aRect.width);
+    fakeDisplay->GetHeight(&aRect.height);
+
+  } else {
+
+    nsDeviceContext *context = GetDeviceContext();
+
+    if (!context) {
+      return NS_ERROR_FAILURE;
+    }
+
+    context->GetRect(aRect);
+    aRect.x = nsPresContext::AppUnitsToIntCSSPixels(aRect.x);
+    aRect.y = nsPresContext::AppUnitsToIntCSSPixels(aRect.y);
+    aRect.height = nsPresContext::AppUnitsToIntCSSPixels(aRect.height);
+    aRect.width = nsPresContext::AppUnitsToIntCSSPixels(aRect.width);
+
   }
-
-  context->GetRect(aRect);
-
-  aRect.x = nsPresContext::AppUnitsToIntCSSPixels(aRect.x);
-  aRect.y = nsPresContext::AppUnitsToIntCSSPixels(aRect.y);
-  aRect.height = nsPresContext::AppUnitsToIntCSSPixels(aRect.height);
-  aRect.width = nsPresContext::AppUnitsToIntCSSPixels(aRect.width);
 
   return NS_OK;
 }
@@ -146,18 +172,23 @@ nsScreen::GetRect(nsRect& aRect)
 nsresult
 nsScreen::GetAvailRect(nsRect& aRect)
 {
-  nsDeviceContext *context = GetDeviceContext();
+  nsIFakeDisplay* fakeDisplay = GetFakeDisplay();
+  if (fakeDisplay) {
+    return this->GetRect(aRect);
+  } else {
+    nsDeviceContext *context = GetDeviceContext();
 
-  if (!context) {
-    return NS_ERROR_FAILURE;
+    if (!context) {
+      return NS_ERROR_FAILURE;
+    }
+
+    context->GetClientRect(aRect);
+
+    aRect.x = nsPresContext::AppUnitsToIntCSSPixels(aRect.x);
+    aRect.y = nsPresContext::AppUnitsToIntCSSPixels(aRect.y);
+    aRect.height = nsPresContext::AppUnitsToIntCSSPixels(aRect.height);
+    aRect.width = nsPresContext::AppUnitsToIntCSSPixels(aRect.width);
   }
-
-  context->GetClientRect(aRect);
-
-  aRect.x = nsPresContext::AppUnitsToIntCSSPixels(aRect.x);
-  aRect.y = nsPresContext::AppUnitsToIntCSSPixels(aRect.y);
-  aRect.height = nsPresContext::AppUnitsToIntCSSPixels(aRect.height);
-  aRect.width = nsPresContext::AppUnitsToIntCSSPixels(aRect.width);
 
   return NS_OK;
 }
@@ -177,6 +208,19 @@ nsScreen::Notify(const hal::ScreenConfiguration& aConfiguration)
   if (mOrientation != previousOrientation) {
     DispatchTrustedEvent(NS_LITERAL_STRING("mozorientationchange"));
   }
+}
+
+NS_IMETHODIMP                                                                 \
+nsScreen::OnFakeDisplayChanged(nsIFakeDisplay* aFakeDisplay)
+{
+  int32_t orientation;
+  ScreenOrientation previousOrientation = mOrientation;
+  aFakeDisplay->GetOrientation(&orientation);
+  mOrientation = fakeDisplayOrientationToHalOrientation(orientation);
+  if (mOrientation != previousOrientation) {
+    DispatchTrustedEvent(NS_LITERAL_STRING("mozorientationchange"));
+  }
+  return NS_OK;
 }
 
 void
@@ -316,6 +360,8 @@ nsScreen::MozLockOrientation(const Sequence<nsString>& aOrientations,
 {
   ScreenOrientation orientation = eScreenOrientation_None;
 
+  nsIFakeDisplay* fakeDisplay = GetFakeDisplay();
+
   for (uint32_t i = 0; i < aOrientations.Length(); ++i) {
     const nsString& item = aOrientations[i];
 
@@ -346,7 +392,14 @@ nsScreen::MozLockOrientation(const Sequence<nsString>& aOrientations,
     case LOCK_DENIED:
       return false;
     case LOCK_ALLOWED:
-      return hal::LockScreenOrientation(orientation);
+      if (fakeDisplay) {
+        int32_t fakeOrientation = nsScreen::halOrientationToFakeDisplayOrientation(orientation);
+        bool success;
+        fakeDisplay->LockOrientation(fakeOrientation, &success);
+        return success;
+      } else {
+        return hal::LockScreenOrientation(orientation);
+      }
     case FULLSCREEN_LOCK_ALLOWED: {
       // We need to register a listener so we learn when we leave full-screen
       // and when we will have to unlock the screen.
@@ -357,9 +410,20 @@ nsScreen::MozLockOrientation(const Sequence<nsString>& aOrientations,
         return false;
       }
 
-      if (!hal::LockScreenOrientation(orientation)) {
-        return false;
+
+      if (fakeDisplay) {
+        int32_t fakeOrientation = nsScreen::halOrientationToFakeDisplayOrientation(orientation);
+        bool success;
+        fakeDisplay->LockOrientation(fakeOrientation, &success);
+        if (!success) {
+          return false;
+        }
+      } else {
+        if (!hal::LockScreenOrientation(orientation)) {
+          return false;
+        }
       }
+
 
       // We are fullscreen and lock has been accepted.
       if (!mEventListener) {
@@ -377,10 +441,17 @@ nsScreen::MozLockOrientation(const Sequence<nsString>& aOrientations,
   MOZ_CRASH("unexpected lock orientation permission value");
 }
 
+
 void
 nsScreen::MozUnlockOrientation()
 {
-  hal::UnlockScreenOrientation();
+  nsIFakeDisplay* fakeDisplay = GetFakeDisplay();
+  if (fakeDisplay) {
+    bool success;
+    fakeDisplay->UnlockOrientation(&success);
+  } else {
+    hal::UnlockScreenOrientation();
+  }
 }
 
 NS_IMETHODIMP
@@ -390,18 +461,13 @@ nsScreen::SlowMozUnlockOrientation()
   return NS_OK;
 }
 
-bool
-nsScreen::IsDeviceSizePageSize()
+nsIFakeDisplay* nsScreen::GetFakeDisplay()
 {
-  nsPIDOMWindow* owner = GetOwner();
-  if (owner) {
-    nsIDocShell* docShell = owner->GetDocShell();
-    if (docShell) {
-      return docShell->GetDeviceSizeIsPageSize();
-    }
-  }
-  return false;
+  nsIFakeDisplay* fakeDisplay;
+  GetOwner()->GetDocShell()->GetFakeDisplay(&fakeDisplay);
+  return fakeDisplay;
 }
+
 
 /* virtual */
 JSObject*
@@ -438,7 +504,53 @@ nsScreen::FullScreenEventListener::HandleEvent(nsIDOMEvent* aEvent)
   target->RemoveSystemEventListener(NS_LITERAL_STRING("mozfullscreenchange"),
                                     this, true);
 
-  hal::UnlockScreenOrientation();
+  nsIFakeDisplay* fakeDisplay;
+  doc->GetDocShell()->GetFakeDisplay(&fakeDisplay);
+
+  if (fakeDisplay) {
+    bool success;
+    fakeDisplay->UnlockOrientation(&success);
+  } else {
+    hal::UnlockScreenOrientation();
+  }
 
   return NS_OK;
+}
+
+ScreenOrientation nsScreen::fakeDisplayOrientationToHalOrientation(int32_t aFakeDisplayOrientation) {
+  switch (aFakeDisplayOrientation) {
+    case nsIFakeDisplay::ORIENTATION_LANDSCAPE_PRIMARY:
+      return eScreenOrientation_LandscapePrimary;
+    case nsIFakeDisplay::ORIENTATION_LANDSCAPE_SECONDARY:
+      return eScreenOrientation_LandscapeSecondary;
+    case nsIFakeDisplay::ORIENTATION_PORTRAIT_PRIMARY:
+      return eScreenOrientation_PortraitPrimary;
+    case nsIFakeDisplay::ORIENTATION_PORTRAIT_SECONDARY:
+      return eScreenOrientation_PortraitSecondary;
+    case nsIFakeDisplay::ORIENTATION_NONE:
+      return eScreenOrientation_None;
+    case nsIFakeDisplay::ORIENTATION_DEFAULT:
+      return eScreenOrientation_Default;
+    default:
+      MOZ_CRASH("Unacceptable aFakeDisplayOrientation value");
+  }
+}
+
+int32_t nsScreen::halOrientationToFakeDisplayOrientation(ScreenOrientation aHalOrientation) {
+  switch (aHalOrientation) {
+    case eScreenOrientation_LandscapePrimary:
+      return nsIFakeDisplay::ORIENTATION_LANDSCAPE_PRIMARY;
+    case eScreenOrientation_LandscapeSecondary:
+      return nsIFakeDisplay::ORIENTATION_LANDSCAPE_SECONDARY;
+    case eScreenOrientation_PortraitPrimary:
+      return nsIFakeDisplay::ORIENTATION_PORTRAIT_PRIMARY;
+    case eScreenOrientation_PortraitSecondary:
+      return nsIFakeDisplay::ORIENTATION_PORTRAIT_SECONDARY;
+    case eScreenOrientation_None:
+      return nsIFakeDisplay::ORIENTATION_NONE;
+    case eScreenOrientation_Default:
+      return nsIFakeDisplay::ORIENTATION_DEFAULT;
+    default:
+      MOZ_CRASH("Unacceptable aHalOrientation value");
+  }
 }

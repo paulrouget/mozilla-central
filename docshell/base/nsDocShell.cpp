@@ -730,6 +730,7 @@ static uint64_t gDocshellIDCounter = 0;
 nsDocShell::nsDocShell():
     nsDocLoader(),
     mDefaultScrollbarPref(Scrollbar_Auto, Scrollbar_Auto),
+    mFakeDisplay(nullptr),
     mTreeOwner(nullptr),
     mChromeEventHandler(nullptr),
     mCharsetReloadState(eCharsetReloadInit),
@@ -764,7 +765,6 @@ nsDocShell::nsDocShell():
     mIsAppTab(false),
     mUseGlobalHistory(false),
     mInPrivateBrowsing(false),
-    mDeviceSizeIsPageSize(false),
     mCanExecuteScripts(false),
     mFiredUnloadEvent(false),
     mEODForCurrentDocument(false),
@@ -4018,23 +4018,31 @@ nsDocShell::GetScriptGlobalObject()
 }
 
 NS_IMETHODIMP
-nsDocShell::SetDeviceSizeIsPageSize(bool aValue)
+nsDocShell::InvalidateScreenMediaQueries()
 {
-    if (mDeviceSizeIsPageSize != aValue) {
-      mDeviceSizeIsPageSize = aValue;
-      nsRefPtr<nsPresContext> presContext;
-      GetPresContext(getter_AddRefs(presContext));
-      if (presContext) {
-          presContext->MediaFeatureValuesChanged(presContext->eAlwaysRebuildStyle);
-      }
+    nsRefPtr<nsPresContext> presContext;
+    GetPresContext(getter_AddRefs(presContext));
+    if (presContext) {
+        presContext->MediaFeatureValuesChanged(presContext->eAlwaysRebuildStyle);
     }
     return NS_OK;
 }
 
 NS_IMETHODIMP
-nsDocShell::GetDeviceSizeIsPageSize(bool* aValue)
+nsDocShell::GetFakeDisplay(nsIFakeDisplay** aResult)
 {
-    *aValue = mDeviceSizeIsPageSize;
+    NS_ENSURE_ARG_POINTER(aResult);
+
+    *aResult = mFakeDisplay;
+    NS_IF_ADDREF(*aResult);
+
+    return NS_OK;
+}
+
+NS_IMETHODIMP
+nsDocShell::SetFakeDisplay(nsIFakeDisplay* aFakeDisplay)
+{
+    mFakeDisplay = aFakeDisplay;
     return NS_OK;
 }
 
@@ -5056,10 +5064,6 @@ nsDocShell::Create()
                                      mUseErrorPages);
         gAddedPreferencesVarCache = true;
     }
-
-    mDeviceSizeIsPageSize =
-        Preferences::GetBool("docshell.device_size_is_page_size",
-                             mDeviceSizeIsPageSize);
 
     nsCOMPtr<nsIObserverService> serv = services::GetObserverService();
     if (serv) {
